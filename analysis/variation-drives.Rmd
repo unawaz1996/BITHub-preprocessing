@@ -1,0 +1,22 @@
+---
+title: "Determining drivers of variation across datasets"
+author: "unawaz1996"
+date: "2023-09-19"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{r}
+
+```
+
+
+- Variance explained per factor per dataset 
+
+- PCA of all data 
+
+- PCA per bulk gene expression dataset 
+

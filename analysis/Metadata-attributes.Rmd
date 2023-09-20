@@ -1,0 +1,42 @@
+---
+title: "Metadata-attributes"
+author: "unawaz1996"
+date: "2023-09-19"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Set-up 
+```{r}
+
+```
+
+# Metadata attributes across datasets 
+
+- Attributes by category per dataset
+
+```{r}
+
+```
+
+## Filtering of redudant metadata labels 
+
+- BrainSeq 
+- GTEx
+- FANTOM5
+- HCA
+- Velmeshev 
+- Aldringer
+
+# Final metadata descriptions on BITHub 
+
+
+## Heatmap showing metadata variables in at least 2 datasets 
+
+```{r}
+
+```
+
+## Shared sequencing metrics 
+
