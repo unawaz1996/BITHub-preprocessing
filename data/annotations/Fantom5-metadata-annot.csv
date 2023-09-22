@@ -1,101 +1,101 @@
-OriginalName,BITHubName,,Type
-SampleID,SampleID,,
-zenbu:proxy_id,ZenbuID,,
-eedb:display_name,DisplayName,,
-DOID:desc,Diseases,,
-FF:id,FF::id,,
-FF_ont:desc,FF:ID Description,,
-FF_ont:id,FF_ont_ID,,
-description,Description,,
-norm_rle,Norm RLE,,
-osc:LSA_sample_name,SampleName,,
-osc:LSArchive_application_experiment_description,Experiment description,,
-osc:LSArchive_application_investigation_title,Investigation title,,
-osc:LSArchive_application_project_no,LSA_project_no,,
-osc:LSArchive_sample_organism,Organism,,
-oscfile_colnum,Column num,,
-rle_norm_factor,Norm factor,,
-rna_concentration,RNA_Concentration,,
-rna_sample_type,SampleType,,
-rna_weight_ug,RNA_weight,,
-sample_cell_type,CellType,,
-sample_collaboration,Collaboration,,
-sample_dev_stage,Stage,,
-sample_experimental_condition,Experimental_condition,,
-sample_sex,Sex,,
-sample_species,Species,,
-sample_strain,Sample_Strain,,
-sample_tissue,Tissue,,
-tagcount_total,Tag count total,,
-tpm_total,tpm total,,
-DOID:id,DOID:id,,
-assembly_name,Assembly name,,
-eedb:expression_datatype,Datatype,,
-eedb:platform,Platform,,
-expname,Experiment name,,
-genas:heliscope_channel,Channel,,
-genas:heliscope_flow_cell,FlowCell,,
-genas:heliscope_machine,Heliscope machine,,
-genome_assembly,GenomeAssembly,,
-osc:LSA_library_id,LibraryID,,
-osc:LSA_sample_barcode,LSA_barcode,,
-osc:LSA_sample_id,LSA_SampleID,,
-osc:LSArchive_application_public_application_id,LSA_PublicID,,
-osc:LSArchive_library_library_type_name,LSA_LibraryType,,
-osc:LSArchive_library_osc_lib_id,LSA_SampleID,,
-osc:LSArchive_library_sequencer_type_name,LSA Library Sequencer,,
-osc:LSArchive_sample_cell_line,LSA_CellLine,,
-osc:LSArchive_sample_cell_type,SampleCellType,,
-osc:LSArchive_sample_collaboration,Collaboration,,
-osc:LSArchive_sample_developmental_stage,Developmental stage,,
-osc:LSArchive_sample_experiment_condition,Experimental_condition,,
-osc:LSArchive_sample_osc_sample_id,SampleID,,
-osc:LSArchive_sample_sex,Sex,,
-osc:LSArchive_sample_strain,SampleStrain,,
-osc:LSArchive_sample_tissue_type,LSA_tissue_type,,
-phase_freeze,Phase Freeze,,
-rna_box,RNA box,,
-rna_position,RNA position,,
-rna_tube_id,RNA tube ID,,
-sample_cell_line,CellLine,,
-sample_id,SampleID,,
-eedb:dbid,eedb:dbid,,
-CL:desc,CellLine_description,,
-UBERON:desc,CellLine_ID,,
-CL:id,UBERON_ID,,
-UBERON:id,,,
-EFO:desc,,,
-rna_catalog_number,Catalogoue ID,,
-rna_extraction_protocol,RNA extraction protocol,,
-rna_od260/230,260/230 Ratio,,
-rna_od260/280,260/280 ration,,
-sample_cell_catalog,Cell Catalogue,,
-EFO:id,,,
-datafreeze_phase,Freeze phase,,
-osc:LSA_application_id,LSA_application_id,,
-sample_age,Age,,
-sample_cell_lot,Cell Lot,,
-sample_company,Provider,,
-sample_ethnicity,Ethnicity,,
-eedb:owner_email,Owner_email,,
-rna_lot_number,RNA lot number,,
-sample_note,SampleNote,,
-rna_rin,RIN,,
-comment,Comment,,
-sample_description,Sample_description,,
-sample_donor(cell_lot),DonorID,,
-id,ID,,
-CL,CellLine,,
-EFO,EFO,,
-FF,Fantom5,,
-UBERON,Uberon,,
-namespace,NameSpave,,
-sample_disease,Diagnosis,,
-def,Def,,
-creation_date,Creation date,,
-created_by,Created by,,
-DOID,DOID,,
-PATO:desc,PATO:Desc,,
-PATO:id,PATO:ID,,
-PR:desc,PR:Desc,,
-PR:id,PR:ID,,
+OriginalName,BITColumnName,Include (Yes/No) - Interest,Type
+SampleID,SampleID,Yes,Sample charactertics
+zenbu:proxy_id,ZenbuID,Yes,Sample charactertics
+eedb:display_name,DisplayName,Yes,Sample charactertics
+DOID:desc,Disease,Yes,Phenotype
+FF:id,FF::id,No,Sample charactertics
+FF_ont:desc,FF:ID Description,No,Sample charactertics
+FF_ont:id,FF_ont_ID,No,Sample charactertics
+description,Description,Yes,Sample charactertics
+norm_rle,Norm RLE,Yes,Sequencing metrics
+osc:LSA_sample_name,SampleName,Yes,Sample charactertics
+osc:LSArchive_application_experiment_description,Experiment description,No,Sequencing metrics
+osc:LSArchive_application_investigation_title,Investigation title,No,Sequencing metrics
+osc:LSArchive_application_project_no,LSA_project_no,No,Sample charactertics
+osc:LSArchive_sample_organism,Organism,No,Phenotype
+oscfile_colnum,Column num,No,Sample charactertics
+rle_norm_factor,Norm factor,Yes,Sequencing metrics
+rna_concentration,RNA_Concentration,Yes,Sequencing metrics
+rna_sample_type,SampleType,Yes,Sample
+rna_weight_ug,RNA_weight,Yes,Sequencing metrics
+sample_cell_type,CellType,Yes,Cell-Type
+sample_collaboration,Collaboration,No,Sample charactertics
+sample_dev_stage,Stage,Yes,Phenotype
+sample_experimental_condition,Experimental_condition,Yes,Sequencing metrics
+sample_sex,Sex,Yes,Phenotype
+sample_species,Species,No,Phenotype
+sample_strain,Sample_Strain,Yes,Phenotype
+sample_tissue,Tissue,Yes,Sample charactertics
+tagcount_total,Tag count total,Yes,Sequencing metrics
+tpm_total,TPM Total,Yes,Sequencing metrics
+DOID:id,DOID:id,No,Sequencing metrics
+assembly_name,Assembly name,No,Sequencing metrics
+eedb:expression_datatype,Datatype,No,Sequencing metrics
+eedb:platform,Platform,Yes,Sequencing metrics
+expname,Experiment name,No,Sequencing metrics
+genas:heliscope_channel,Channel,Yes,Sequencing metrics
+genas:heliscope_flow_cell,FlowCell,Yes,Sequencing metrics
+genas:heliscope_machine,Heliscope machine,Yes,Sequencing metrics
+genome_assembly,GenomeAssembly,No,Sequencing metrics
+osc:LSA_library_id,LSA_LibraryID,No,Sequencing metrics
+osc:LSA_sample_barcode,LSA_barcode,No,Sequencing metrics
+osc:LSA_sample_id,LSA_SampleID,No,Sequencing metrics
+osc:LSArchive_application_public_application_id,LSA_PublicID,No,Sequencing metrics
+osc:LSArchive_library_library_type_name,LSA_LibraryType,No,Sequencing metrics
+osc:LSArchive_library_osc_lib_id,LSA_Sample_LIB_ID,No,Sequencing metrics
+osc:LSArchive_library_sequencer_type_name,LSA Library Sequencer,No,Sequencing metrics
+osc:LSArchive_sample_cell_line,LSA_CellLine,No,Cell-Type
+osc:LSArchive_sample_cell_type,LSA_SampleCellType,No,Cell-Type
+osc:LSArchive_sample_collaboration,LSA_Collaboration,No,Sample charactertics
+osc:LSArchive_sample_developmental_stage,LSA_DevelopmentalStage,No,Phenotype
+osc:LSArchive_sample_experiment_condition,LSA_Experimental_condition,No,Phenotype
+osc:LSArchive_sample_osc_sample_id,LSA_SampleID_OSC,No,Sample charactertics
+osc:LSArchive_sample_sex,LSA_Sex,No,Phenotype
+osc:LSArchive_sample_strain,LSA_SampleStrain,No,Phenotype
+osc:LSArchive_sample_tissue_type,LSA_tissue_type,No,Phenotype
+phase_freeze,Phase Freeze,Yes,Sequencing metrics
+rna_box,RNA box,Yes,Sequencing metrics
+rna_position,RNA position,Tes,Sequencing metrics
+rna_tube_id,RNA tube ID,Yes,Sequencing metrics
+sample_cell_line,CellLine,Yes,Cell-Type
+sample_id,SampleID,No,Sample charactertics
+eedb:dbid,eedb:dbid,No,Sample charactertics
+CL:desc,CellLine_description,No,Cell-Type
+UBERON:desc,CellLine_ID,No,Cell-Type
+CL:id,UBERON_ID,No,Sample charactertics
+UBERON:id,UBERON:id,No,Sample charactertics
+EFO:desc,EFO:desc,No,Sequencing metrics
+rna_catalog_number,Catalogoue ID,No,Sequencing metrics
+rna_extraction_protocol,RNA extraction protocol,Yes,Sequencing metrics
+rna_od260/230,260/230 Ratio,No,Sequencing metrics
+rna_od260/280,260/280 Ratio,Yes,Sequencing metrics
+sample_cell_catalog,Cell Catalogue,Yes,Cell-Type
+EFO:id,EFO:id,No,Sequencing metrics
+datafreeze_phase,Freeze phase,No,Sequencing metrics
+osc:LSA_application_id,LSA_application_id,No,Sample charactertics
+sample_age,Age,Yes,Phenotype
+sample_cell_lot,Cell Lot,Yes,Sequencing metrics
+sample_company,Provider,No,Sample charactertics
+sample_ethnicity,Ethnicity,Yes,Phenotype
+eedb:owner_email,Owner_email,No,Sample charactertics
+rna_lot_number,RNA lot number,Yes,Sequencing metrics
+sample_note,SampleNote,No,Sample charactertics
+rna_rin,RIN,Yes,Sequencing metrics
+comment,Comment,No,Sequencing metrics
+sample_description,Sample_description,No,Sample charactertics
+sample_donor(cell_lot),DonorID,Yes,Phenotype
+id,ID,No,Sample charactertics
+CL,CellLine,No,Sample charactertics
+EFO,EFO,No,Sample charactertics
+FF,Fantom5,No,Sequencing metrics
+UBERON,Uberon,No,Sample charactertics
+namespace,NameSpace,No,Sample charactertics
+sample_disease,Diagnosis,Yes,Phenotype
+def,Def,No,Sequencing metrics
+creation_date,Creation date,No,Sequencing metrics
+created_by,Created by,No,Sequencing metrics
+DOID,DOID,No,Sequencing metrics
+PATO:desc,PATO:Desc,No,Sequencing metrics
+PATO:id,PATO:ID,No,Sequencing metrics
+PR:desc,PR:Desc,No,Sequencing metrics
+PR:id,PR:ID,Yes,Sequencing metrics

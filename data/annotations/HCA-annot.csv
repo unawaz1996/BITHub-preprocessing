@@ -1,50 +1,50 @@
-OriginalMetadata,BITHubColumnName,Include(Yes/No),Type
-sample_name,CellID,Yes,Cell-
-exp_component_name,exp_component_name,No,Cell
-specimen_type,specimen_type,No,Cell
-cluster_color,cluster_color,No,Cell
-cluster_order,cluster_order,No,Cell
-cluster_label,CellType,Yes,Cell
-class_color,class_color,No,Cell
-class_order,class_order,No,Cell
-class_label,class_label,No,Cell
-subclass_color,subclass_color,No,Cell
-subclass_order,subclass_order,No,Cell
-subclass_label,Subclass,Yes,Cell
+OriginalMetadata,BITColumnName,Include (Yes/No) - Interest,Type
+sample_name,CellID,Yes,Cell-Type
+exp_component_name,exp_component_name,No,Cell-Type
+specimen_type,specimen_type,No,Cell-Type
+cluster_color,cluster_color,No,Cell-Type
+cluster_order,cluster_order,No,Cell-Type
+cluster_label,CellType,Yes,Cell-Type
+class_color,class_color,No,Cell-Type
+class_order,class_order,No,Cell-Type
+class_label,class_label,No,Cell-Type
+subclass_color,subclass_color,No,Cell-Type
+subclass_order,subclass_order,No,Cell-Type
+subclass_label,Subclass,Yes,Cell-Type
 full_genotype_color,full_genotype_color,No,Phenotype
 full_genotype_order,full_genotype_order,No,Phenotype
 full_genotype_label,full_genotype_label,No,Phenotype
 donor_sex_color,donor_sex_color,No,Phenotype
 donor_sex_order,donor_sex_order,No,Phenotype
 donor_sex_label,Sex,Yes,Phenotype
-region_color,region_color,No,Sample
-region_order,region_order,No,Sample
-region_label,StructureAcronym,Yes,Sample
-cortical_layer_color,cortical_layer_color,No,Sample
-cortical_layer_order,cortical_layer_order,No,Sample
-cortical_layer_label,CorticalLayer,Yes,Sample
-cell_type_accession_color,cell_type_accession_color,No,Cell
-cell_type_accession_order,cell_type_accession_order,No,Cell
-cell_type_accession_label,cell_type_accession_label,No,Cell
-cell_type_alias_color,cell_type_alias_color,No,Cell
-cell_type_order,cell_type_order,No,Cell
-cell_type_alias_label,CellTypeAlias,Yes,Cell
-cell_type_alt_alias_color,cell_type_alt_alias_color,No,Cell
-cell_type_alt_alias_order,cell_type_alt_alias_order,No,Cell
-cell_type_alt_alias_label,cell_type_alt_alias_label,No,Cell
-cell_type_designation_color,cell_type_designation_color,No,Cell
-cell_type_designation_order,cell_type_designation_order,No,Cell
-cell_type_designation_label,CellTypeDesignation,No,Cell
-external_donor_name_color,external_donor_name_color,No,Cell
-external_donor_name_order,external_donor_name_order,No,Cell
+region_color,region_color,No,Sample charactertics
+region_order,region_order,No,Sample charactertics
+region_label,StructureAcronym,Yes,Sample charactertics
+cortical_layer_color,cortical_layer_color,No,Sample charactertics
+cortical_layer_order,cortical_layer_order,No,Sample charactertics
+cortical_layer_label,CorticalLayer,Yes,Sample charactertics
+cell_type_accession_color,cell_type_accession_color,No,Cell-Type
+cell_type_accession_order,cell_type_accession_order,No,Cell-Type
+cell_type_accession_label,cell_type_accession_label,No,Cell-Type
+cell_type_alias_color,cell_type_alias_color,No,Cell-Type
+cell_type_order,cell_type_order,No,Cell-Type
+cell_type_alias_label,CellTypeAlias,Yes,Cell-Type
+cell_type_alt_alias_color,cell_type_alt_alias_color,No,Cell-Type
+cell_type_alt_alias_order,cell_type_alt_alias_order,No,Cell-Type
+cell_type_alt_alias_label,cell_type_alt_alias_label,No,Cell-Type
+cell_type_designation_color,cell_type_designation_color,No,Cell-Type
+cell_type_designation_order,cell_type_designation_order,No,Cell-Type
+cell_type_designation_label,CellTypeDesignation,No,Cell-Type
+external_donor_name_color,external_donor_name_color,No,Cell-Type
+external_donor_name_order,external_donor_name_order,No,Cell-Type
 external_donor_name_label,DonorID,Yes,Phenotype
-outlier_call,outlier_call,No,Cell
-outlier_type,outlier_type,No,Cell
-MajorCelltype,MajorCellType,Yes,Cell
+outlier_call,outlier_call,No,Cell-Type
+outlier_type,outlier_type,No,Cell-Type
+MajorCelltype,MajorCellType,Yes,Cell-Type
 donor_age_days,Age,Yes,Phenotype
 NA,AgeNumeric,Yes,Phenotype
 NA,AgeInterval,Yes,Phenotype
-NA,Regions,Yes,Sample
-,mito_ratio,Yes,Sequencing
-,nCount,Yes,Sequencing
-,nFeature,Yes,Sequencing
+NA,Regions,Yes,Sample charactertics
+NA,mito_ratio,Yes,Sequencing metrics
+NA,nCount,Yes,Sequencing metrics
+NA,nFeature,Yes,Sequencing metrics

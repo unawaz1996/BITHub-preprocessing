@@ -8,7 +8,36 @@ editor_options:
 ---
 
 # Set-up 
-```{r}
+```{r libraries}
+library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(AnnotationHub)
+library(stargazer)
+library(ggfortify)
+library(glue)
+library(cowplot)
+library(broom)
+library(glmpca)
+library(DT)
+library(naniar)
+source("code/preprocess/functions.R")
+source("code/preprocess/def_stages.R")
+library(UpSetR)
+library(patchwork)
+library(pheatmap)
+library(ggpubr)
 
 ```
 
@@ -16,18 +45,176 @@ editor_options:
 
 - Attributes by category per dataset
 
-```{r}
+```{r md-annot}
+annot = list()
 
+annot$BrainSpan = read.csv(here::here("data/annotations/BrainSpan-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("BrainSpan"))
+annot$BrainSeq = read.csv(here::here("data/annotations/BrainSeq-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("BrainSeq"))
+
+annot$GTEx = read.csv(here::here("data/annotations/GTEx-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("GTEx"))
+
+annot$PsychEncode =  read.csv(here::here("data/annotations/PsychEncode-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("PsychEncode"))
+
+annot$FANTOM5 = read.csv(here::here("data/annotations/Fantom5-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("FANTOM5"))
+
+annot$HDBR = read.csv(here::here("data/annotations/HDBR-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("HDBR"))
+
+annot$Velmeshev = read.csv(here::here("data/annotations/Velmeshev-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("Velmeshev"))
+
+annot$Aldringer = read.csv(here::here("data/annotations/Aldringer-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("Aldringer"))
+
+annot$HCA =  read.csv(here::here("data/annotations/HCA-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("HCA"))
+
+annot$Cameron =  read.csv(here::here("data/annotations/Cameron-metadata-annot.csv"), header=TRUE) %>%
+  mutate(Dataset = c("Cameron"))
+```
+
+
+```{r}
+dir = file.path("/home/neuro/Documents/BrainData/Bulk")
+sn_dir = file.path("/home/neuro/Documents/BrainData/single-cell")
+md = list()
+
+md$BrainSeq = read.csv(file.path(dir,"Brainseq/Formatted/BrainSeq-metadata.csv"), header=TRUE, check.names = FALSE)
+md$BrainSpan = read.csv(file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE)
+md$GTEx =  read.csv(file.path(dir,"GTEx/Formatted/GTEx-metadata.csv"), header=TRUE, check.names = FALSE)
+md$HDBR = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
+md$FANTOM5 = read.csv(file.path(dir, "Fantom5/Formatted/FANTOM5-metadata.csv"), header=TRUE, check.names = FALSE)
+#md$Velmeshev = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
+md$Aldringer = read.csv(file.path(sn_dir, "aldinger/Aldringer-metadata.csv"), header=TRUE, check.names = FALSE)
 ```
 
 ## Filtering of redudant metadata labels 
 
+To allow comparison of gene expression with a metadata variable of interest, BITHub contains comprehensive metadata annotations of the curated datasets. The three main categories of annotation are present in BITHub: 
+
+* Phenotype annotations: 
+Relating to the phenotype and origin of sample, including sex, donorIDs, age of donor, diagnosis and ethnicity
+
+* Sequencing metrics 
+These annotations relate to the quality of the RNA-seq samples and how they were experimentally prepared (if available).
+
+* Sample characteristics 
+These include the characteristics of the samples. 
+
+In order to ensure the metadata information is displayed in a user-friendly manner, highly correlated metadata annotations will be removed and a subset will be used for the site.
+
+
 - BrainSeq 
-- GTEx
+
+```{r}
+annot_seq = annot$BrainSeq %>%
+  dplyr::filter(Type == "Sequencing metrics")
+md.clean = md$BrainSeq %>% 
+  dplyr::select(contains(annot_seq$BITColumnName))
+md.clean = md.clean %>% select_if(~ !any(is.na(.)))
+md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(1L))]
+```
+
+- Correlation of metadata variables 
+
+```{r}
+M = cor(data.matrix(md.clean), use = "complete.obs")
+corrplot(M, order='hclust',
+         method = "circle", 
+         number.cex = .50, 
+         tl.cex=0.75, type="upper")
+```
+
+- GTEx 
+
+```{r}
+annot_seq = annot$GTEx %>%
+  dplyr::filter(Type == "Sequencing metrics")
+md.clean = md$GTEx %>% 
+  dplyr::select(contains(annot_seq$BITColumnName))
+md.clean = md.clean %>% select_if(~ !any(is.na(.)))
+md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(1L))]
+```
+
+
+```{r}
+M = cor(data.matrix(md.clean), use = "complete.obs")
+corrplot(M, order='hclust',
+         method = "circle", 
+         number.cex = .50, 
+         tl.cex=0.75, type="upper")
+```
+
 - FANTOM5
-- HCA
-- Velmeshev 
-- Aldringer
+
+```{r f5-cor}
+annot_seq = annot$FANTOM5 %>%
+  dplyr::filter(Type == "Sequencing")
+md.clean = md$FANTOM5 %>% 
+  dplyr::select(contains(annot_seq$BITHubName))
+md.clean = md.clean %>% select_if(~ !any(is.na(.)))
+md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(1L))]
+```
+
+
+```{r}
+M = cor(data.matrix(md.clean), use = "complete.obs")
+corrplot(M, order='hclust',
+         method = "circle", 
+         number.cex = .50, 
+         tl.cex=0.75, type="upper")
+```
+
+
+- HDBR 
+
+```{r}
+hdbr_annot_seq = annot$HDBR %>% 
+  dplyr::filter(Type == "Sequencing metrics")
+
+md.seq = md$HDBR %>%
+  dplyr::select(contains(hdbr_annot_seq$BITColumnName))
+
+md.seq.clean = md.seq  %>% select_if(~ !any(is.na(.)))
+md.seq.clean = md.seq.clean[vapply(md.seq.clean, function(x) length(unique(x)) > 1, logical(1L))]
+```
+
+```{r fig.height=30, fig.width=30}
+M = cor(data.matrix(md.seq.clean), use = "complete.obs")
+pdf("../../Results/Thesis_plots/HDBR-corplot.pdf", height = 30, width=30)
+corrplot(M, order='hclust',
+         method = "circle", 
+         number.cex = .50, type="upper", 
+         cl.cex = 3,
+         tl.cex=1.2)
+dev.off()
+```
+
+
+- Aldringer 
+
+```{r}
+aldringer_annot_seq = annot$Aldringer %>%
+  dplyr::filter(Type == "Sequencing") 
+  
+md.seq = md$Aldringer %>%
+  dplyr::select(contains(aldringer_annot_seq$BITHubColumnName))
+
+md.seq.clean = md.seq  %>% select_if(~ !any(is.na(.)))
+md.seq.clean = md.seq.clean[vapply(md.seq.clean, function(x) length(unique(x)) > 1, logical(1L))]
+
+M = cor(data.matrix(md.seq.clean ), use = "complete.obs")
+corrplot(M, order='hclust',
+         method = "circle", 
+         number.cex = .50, 
+         tl.cex=0.75, type="upper")
+```
+
 
 # Final metadata descriptions on BITHub 
 
@@ -35,8 +222,106 @@ editor_options:
 ## Heatmap showing metadata variables in at least 2 datasets 
 
 ```{r}
+metadata_summary = lapply(annot, function(x) { x %>% 
+    dplyr::filter(`Include..Yes.No....Interest` == "Yes") %>% 
+    dplyr::select("BITColumnName",`Include..Yes.No....Interest`, "Dataset")})
 
+
+
+metadata_heatmap = metadata_summary  %>% do.call(rbind,.) %>%
+  pivot_wider(id_cols = "Dataset", names_from = "BITColumnName", values_from = "Include..Yes.No....Interest") %>% 
+  as.data.frame()
+ 
+metadata_heatmap$SampleID[6] <- "Yes"
+metadata_heatmap[metadata_heatmap == "Yes"] <- 1
+metadata_heatmap[is.na(metadata_heatmap)] <- 0
+  #mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>% 
+  #xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.)
+
+metadata_heatmap <- apply(metadata_heatmap,2,as.character)
+#write.csv(metadata_heatmap,here::here("output/metadata_heatmap.csv"))
+```
+
+```{r}
+
+heatmap_file = read.csv("output/metadata_heatmap.csv", header=TRUE)
+md.summary = heatmap_file %>% 
+  column_to_rownames("Dataset") %>%
+  pheatmap(cellheight = 15, 
+             cellwidth = 15, 
+             cluster_rows = FALSE, 
+             cluster_cols = FALSE, 
+             border_color = "#FFF8F9", 
+             color = c("#FFF8F9", "black"))
+
+ggsave(file = here::here("output/Thesis_plots/Metadata/summary-heatmap.svg"),  md.summary, 
+       height = 15, width = 19.9329, units = "cm")
 ```
 
 ## Shared sequencing metrics 
 
+```{r}
+bseq.tech = annot$BrainSeq %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+bspan.tech = annot$BrainSpan %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+gtex.tech = annot$GTEx %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+hdbr.tech = annot$HDBR %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+pe.tech = annot$PsychEncode %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+f5.tech = annot$FANTOM5 %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+vel.tech = annot$Velmeshev %>%
+  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+
+hca.tech = annot$HCA %>%
+  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
+
+cam.tech = annot$Cameron %>%
+  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
+
+adl.tech = annot$Aldringer %>%
+  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
+```
+
+```{r}
+
+x= list( "BrainSeq" = bseq.tech$BITColumnName, 
+          "BrainSpan" = bspan.tech$BITColumnName, 
+          "GTEx" = gtex.tech$BITColumnName, 
+          "HDBR" = hdbr.tech$BITColumnName, 
+          "PsychEncode" = pe.tech$BITColumnName,
+          "FANTOM5" =f5.tech$BITHubName
+       #  "HCA" = hca.tech$BITHubColumnName,
+        # "Cameron et al" = cam.tech$BITHubColumnName, 
+         #"Velmeshev et al" = vel.tech$BITColumnName, 
+         #"Aldringer et al" = adl.tech$BITHubColumnName
+         #, 
+        #  "Ramaker" = ram.tech$BITColumnName
+         )
+
+
+UpSetR::upset(fromList(x), sets.bar.color = c ("#75C7A0","#E11F28","#7DA1D4","#F1605F", "#46CEB3"))
+```
+
+```{r}
+
+x= list("HCA" = hca.tech$BITHubColumnName,
+         "Cameron et al" = cam.tech$BITHubColumnName, 
+         "Velmeshev et al" = vel.tech$BITColumnName, 
+         "Aldringer et al" = adl.tech$BITHubColumnName
+         #, 
+        #  "Ramaker" = ram.tech$BITColumnName
+         )
+
+
+UpSetR::upset(fromList(x), sets.bar.color = c ("#E85571","#838DE0","#FFD256","#75C7A0"))
+```

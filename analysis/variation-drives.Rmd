@@ -7,13 +7,802 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Introduction
+# Introduction
+
+# Set-up
 
 ```{r}
+source("code/preprocess/functions.R")
+library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(ggplot2)
+library(UpSetR)
+library(patchwork)
+library(pheatmap)
+library(ggpubr)
+```
+
+
+```{r load-data}
+brain.dir =file.path("/home/neuro/Documents/BrainData/Bulk")
+e <- list()
+  
+e$Raw$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-exp.csv"), 
+                       check.names = FALSE, row.names = 1)
+e$Raw$PE <- read.csv(file.path(brain.dir, "/PsychEncode/Formatted/PsychEncode-exp.csv"), 
+                     row.names =1, check.names = FALSE)
+e$Raw$BSpan <- read.csv(file.path(brain.dir, "/BrainSpan/Formatted/BrainSpan-exp.csv"),
+                        check.names = FALSE, row.names = 1)
+e$Raw$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-exp.csv"), 
+                       check.names = FALSE, row.names = 1)
+
+e$Raw$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-exp.csv"), 
+                       check.names = FALSE, row.names = 1)  %>% 
+  column_to_rownames("EnsemblID")
+
+#e$Raw$Ram <- read.csv(file.path(brain.dir, "/Ramakar/Formatted/Ramaker-exp.csv"), 
+ #                      check.names = FALSE, row.names = 1)
+
+
+#e$Raw <- lapply(e$Raw, function(x) {
+ #   rownames(x) <- x[,1]
+  #  x <- x[,-1]
+   # return(x)
+#  })
+```
+
+```{r metadata-load}
+md = list()
+md$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-metadata.csv"), 
+                       check.names = FALSE, row.names = 1)
+md$PE <- read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-metadata.csv"),
+                  check.names = FALSE)
+md$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-metadata.csv"), 
+                       check.names = FALSE)
+md$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-metadata.csv"), 
+                       check.names = FALSE, row.names = 1) 
+#md$Ram <- read.csv(file.path(brain.dir, "/Ramakar/Formatted/Ramaker-metadata.csv"),
+ #                      check.names = FALSE, row.names = 1)
+
+md$BSpan <- read.csv(file.path(brain.dir,
+                               "/BrainSpan/Formatted/BrainSpan-metadata.csv"),
+                     check.names = FALSE)
+  
+
 
 ```
 
 
+# Expression-thresholding
+
+```{r}
+e$Scale <- lapply(e$Raw, scale) # basic z-score columnwise transformation
+e$Log <- lapply(e$Raw, function(x) { log2(x+0.5) }) # log2
+e$Log_Scale <- lapply(e$Log, scale) # log2 followed by scale
+```
+
+```{r}
+e$Thresh <- lapply(e$Raw, apply.threshold) # this is > 1 unit (TPM in GTEx, RPKM in others) in > 10% of samples
+e$Thresh_Scale <- lapply(e$Thresh, scale)
+e$Thresh_Log <- lapply(e$Thresh, function(x) { log2(x+0.5) })
+e$Thresh_Log_Scale <- lapply(e$Log, scale)
+```
+
+```{r}
+## Histogram of median expression
+  # collect median expression values across samples for every dataset
+#p <- lapply(e, function(x) {
+#    # lapply(x, rowMeans)
+ #   lapply(x, function(y) {
+ #     apply(y, 1, median)
+#    })
+#  })
+
+p <- lapply(e, function(x) {
+    # lapply(x, rowMeans)
+    lapply(x, function(y) {
+      apply(y, 1, mean)
+    })
+  })
+  
+p <- melt(p)
+colnames(p) <- c("MeanExp", "Dataset", "Transform")
+p$Dataset <- factor(p$Dataset)
+```
+
+```{r}
+# move thresholding category to a separate column
+p$Thresh <- FALSE;
+p$Thresh[grep("Thresh", p$Transform)] <- TRUE
+p$Transform <- gsub("Thresh_", "", p$Transform)
+p$Transform[which(p$Transform == "Thresh")] <- "Raw"
+p$Transform <- factor(p$Transform, levels = c("Raw", "Log", "Scale", "Log_Scale"))
+  
+  # ...and to separate dataframes
+t <- p[which(p$Thresh),]
+x <- table(t$Dataset) / 4 # this gets the number of genes in each dataset (divisor is 4 as each gene is represented by 4 transformations)
+levels(t$Dataset) <- paste0(names(x), " (n=", x, ")")
+  
+p2 <- p[-which(p$Thresh),]
+x <- table(p$Dataset) / 4 # this gets the number of genes in each dataset (divisor is 4 as each gene is represented by 4 transformations)
+levels(p$Dataset) <- paste0(names(x), " (n=", x, ")")
+```
+
+```{r}
+no_filt= p %>% 
+  dplyr::filter(Transform == "Log" | Transform == 
+                  "Log_Scale") %>%
+  ggplot(aes(x = MeanExp, colour = Dataset)) +
+   scale_color_manual(values = c("#F75E5E", 
+                                 "#49165E",
+                                "#78A2EB", 
+                               "#E11F28", 
+                                 "#F9AD79")) +
+    geom_density() +
+    # geom_histogram() +
+    facet_wrap(~Transform, scales = "free") +
+    theme_bw() +
+    labs(y = "Density", x = "Mean Expression Across Samples", title = "No Expression Filter") +
+  theme(legend.position = "top", 
+        axis.text = element_text(size =10))
+
+
+no_filt
+```
+
+<!-- # ```{r} -->
+<!-- # filt =ggplot(t, aes(x = MeanExp, colour = Dataset)) + -->
+<!-- #   scale_color_manual(values = c("#F75E5E",  -->
+<!-- #                                  "#49165E", -->
+<!-- #                                 "#78A2EB",  -->
+<!-- #                                "#E11F28",  -->
+<!-- #                                  "#F9AD79",  -->
+<!-- #                                  "#74C69D")) + -->
+<!-- #     geom_density() + -->
+<!-- #     # geom_histogram() + -->
+<!-- #     facet_wrap(~Transform, scales = "free") + -->
+<!-- #     theme_bw() + -->
+<!-- #     labs(y = "Density", x = "Median Expression Across Samples", title = ">1 RPKM in 10% of Samples") -->
+<!-- #  -->
+<!-- # filt -->
+<!-- # ``` -->
+
+```{r}
+## Correspondence
+  p <- lapply(e[c(1,4,5,8)], function(x) {
+    lapply(x, function(y) {
+      apply(y, 1, median)
+    })
+  })
+  
+q <- list()
+q$Thresh <- q$Raw <- list()
+for (j in names(e$Raw)) {
+    q$Raw[[j]] <- cbind(p$Raw[[j]], p$Log_Scale[[j]])
+    q$Thresh[[j]] <- cbind(p$Thresh[[j]], p$Thresh_Log_Scale[[j]])
+  }
+  
+scatterplot <- function(x, y, lim = 100) { # x is Raw/Thresh, y is dataset
+    z <- q[[x]][[y]]
+    
+    # filter to set limit
+    rem <- (which(z[,1] > lim))
+    z <- z[-rem,]
+    
+    # calculate correspondences
+    at1 <- round(z[which.min(abs(z[,1] - 1)), 2],2)
+    at10 <- round(z[which.min(abs(z[,1] - 10)), 2],2)
+    at25 <- round(z[which.min(abs(z[,1] - 25)), 2],2)
+    at100 <- round(z[which.min(abs(z[,1] - 100)), 2],2)
+    at <- paste(at1, at10, at25, at100, sep = "/")
+    
+    qplot(z[,1], z[,2]) +
+      theme_bw() +
+      scale_x_continuous(limits = c(NA, lim)) +
+      # theme(axis.title.x = element_blank(), axis.ti)
+      labs(x = paste0("Untransformed RPKM/TPM", "\nx=1/10/25/100 | y=", at), 
+           y = "Scaled log2+0.5", 
+           title = paste(x, y, "(n=", nrow(z), ",", length(rem), "not shown)")) 
+  }
+  
+p <- list()
+
+```
+
+
+````{r}
+p <- list()
+p$AR <- scatterplot("Raw", "PE")
+p$AT <- scatterplot("Thresh", "PE")
+p$BR <- scatterplot("Raw", "BSpan")
+p$BT <- scatterplot("Thresh", "BSpan")
+p$CR <- scatterplot("Raw", "BSeq")
+p$CT <- scatterplot("Thresh", "BSeq")
+p$DR <- scatterplot("Raw", "GTEx")
+p$DT <- scatterplot("Thresh", "GTEx")
+#p$ER <- scatter_plot("Raw", "Ram")
+#p$EL <- scatter_plot("Thresh", "Ram")
+#p$FR <- scatter_plot("Raw", "HDBR")
+#p$FL <- scatter_plot("Thresh", "HDBR")
+```
+
+# PCA 
+
+
+
+```{r}
+thresh <- function(x) {
+      y <- x > 1
+      keep <- rowSums(y) > (ncol(y) / 10)
+      return(x[keep,])
+    }
+```
+
+```{r}
+gtex <- thresh(e$Raw$GTEx)
+span <- thresh(e$Raw$BSpan)
+seq <- thresh(e$Raw$BSeq)
+pe <- thresh(e$Raw$PE)
+hdbr <- thresh(e$Raw$HDBR)
+#ram <- thresh(e$Raw$Ram)
+```
+
+```{r}
+common <- intersect(rownames(gtex), rownames(span))
+common <- intersect(common, rownames(seq))
+common <- intersect(common, rownames(pe))
+common <- intersect(common, rownames(hdbr))
+#common <- intersect(common, rownames(ram))
+
+
+merge <- cbind(gtex[common,], 
+               span[common,], 
+               seq[common,], 
+               pe[common,],
+               hdbr[common,])
+```
+
+```{r}
+library(preprocessCore)
+q.merge <- normalize.quantiles(as.matrix(merge), copy = FALSE)
+  
+  # log transform
+q.merge <- log2(q.merge + 0.5)
+```
+
+```{r}
+pca <- princomp(q.merge, cor = TRUE) # ~10 minutse
+```
+
+
+```{r}
+m.merge = list()
+m.merge$BSeq= md$BSeq %>% 
+  dplyr::select("SampleID", "AgeInterval", "Sex", "Period",
+                "Regions", "StructureAcronym", "DonorID")  %>% 
+  mutate(Dataset = c("Brainseq"))
+m.merge$BSpan = md$BSpan %>% 
+  dplyr::select("SampleID", "AgeInterval", "Sex", "Period",
+                "Regions", "StructureAcronym", "DonorID")  %>% 
+  mutate(Dataset = c("BrainSpan"))
+
+m.merge$GTEx = md$GTEx %>% 
+  dplyr::select("SampleID", "AgeInterval", "Sex", "Period",
+                "Regions", "StructureAcronym", "DonorID") %>% 
+  mutate(Dataset = c("GTEx"))
+m.merge$PE = md$PE %>% 
+  dplyr::select("SampleID", "AgeInterval", 
+                "Sex", "Period", "Regions", "StructureAcronym", "DonorID")  %>% 
+  mutate(Dataset = c("PsychEncode"))
+
+m.merge$HDBR = md$HDBR %>% 
+  dplyr::select("SampleID", "AgeInterval", "Sex", 
+                "Regions", "StructureAcronym", "DonorID") %>% 
+  mutate(Period = c("Prenatal"), 
+         Dataset = c("HBDR"))
+
+
+
+m.merge = do.call(rbind, m.merge)
+```
+
+```{r}
+plot.data <- as.data.frame(pca$loadings[,1:3])
+colnames(plot.data) <- c("PC1", "PC2", "PC3")
+plot.data = plot.data[rownames(plot.data) %in% m.merge$SampleID,]
+```
+
+```{r}
+plot.data %>% 
+  rownames_to_column("SampleID") %>%
+  left_join(m.merge, by = "SampleID") %>%
+ # dplyr::filter(Dataset != "Ramaker") %>%
+  ggplot(aes(x = PC1, y = PC2, color = Dataset, shape = Period, alpha = Dataset)) +
+    geom_point(size =5) + 
+  scale_color_manual(values =c("Brainseq" ="#F1605F",
+                               "BrainSpan" = "#49215F", 
+                               "GTEx" = "#7DA1D4", 
+                               "HBDR" = "#E11F28", 
+                               "PsychEncode" = "#FAAD79")) +
+  theme_bw() + 
+   labs(
+    x = glue("PC1 ({percent(pca$sdev[[1]]^2 / sum(pca$sdev^2), 0.1)})"),
+    y = glue("PC2 ({percent(pca$sdev[[2]]^2 / sum(pca$sdev^2), 0.1)})"),
+    colour = "Dataset",
+    shape = "Period"
+  ) + scale_alpha_manual(values = c("Brainseq" = 0.45, 
+                                    "BrainSpan" = 0.65, 
+                                    "GTEx" = 0.65,
+                                    "HBDR" = 1, 
+                                    "PsychEncode" = 0.65)) +
+  theme(axis.text = element_text(size=12)) + scale_shape_manual(values = c("Postnatal" =0, 
+                                                                           "Prenatal" = 19))
+```
+
+```{r}
+plot.data  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(m.merge) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        Period, 
+        Regions, 
+        Dataset, 
+        Sex
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)), 
+          Dataset = as.numeric(as.factor(Dataset)), 
+          Sex = as.numeric(as.factor(Sex))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1)
+```
+
+## Within each individual datatset 
+
+- BrainSeq 
+
+```{r}
+pc = log(seq + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+
+pca_bseq =pc$x %>% 
+  as.data.frame() %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+   rownames_to_column("SampleID") %>% 
+  left_join(md$BSeq, by = "SampleID") %>%
+ # pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
+  ggplot(aes(PC1, PC2)
+    
+  ) +
+  geom_point(aes(colour = mito_ratio, shape = Period),size=5) + 
+  theme_bw()+ theme(legend.position = "top") + 
+  scale_color_gradient2(low = "#ffaf7b", 
+                       mid = "#d76d77", 
+                       high = "#3a1c71")  +
+   labs(
+    x = glue("PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})"),
+    y = glue("PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})"),
+    colour = "Mitochondrial rate",
+    shape = "Period"
+  ) 
+
+pca_bseq
+
+ggsave(pca_bseq,
+       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSeq/BrainSeq-PCA-mitoR.svg"), 
+        height = 6, 
+       width = 8, 
+       units = "in")
+```
+
+```{r}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSeq) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        mito_ratio, 
+        Period, 
+        Regions,
+        rRNA_ratio, 
+        AgeNumeric,
+        RIN, 
+        TotalNReads, 
+        MappingRate, 
+        Diagnosis,
+        Sex, 
+        DonorID
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+
+```
+
+- BrainSpan 
+
+```{r}
+pc = log(span + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+
+pca_bspan  = pc$x %>% 
+  as.data.frame() %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+   rownames_to_column("SampleID") %>% 
+  left_join(md$BSpan, by = "SampleID") %>%
+ # pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
+  ggplot(aes(PC1, PC2)
+    
+  ) +
+  geom_point(aes(colour = Regions, shape = Period),size=5) + 
+  theme_bw()+ theme(legend.position = "top") + 
+  scale_color_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571")) +
+   labs(
+    x = glue("PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})"),
+    y = glue("PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})"),
+    colour = "Regions",
+    shape = "Period"
+  ) 
+
+pca_bspan
+
+ggsave(pca_bspan,
+       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSpan/BrainSpan-PCA.svg"), 
+        height = 6, 
+       width = 8, 
+       units = "in")
+```
+
+```{r  fig.cap="Correlation"}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSpan) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        Period, 
+        AgeNumeric,
+        AgeInterval,
+        DonorID,
+        Regions, 
+       
+        Sex 
+       
+     #   RIN, 
+      #  PMI, 
+      #  pH, 
+    
+      #Dissectionscore
+    ) %>% 
+  #drop_na(RIN, pH) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+
+```
+
+
+```{r  fig.cap="Correlation after removing missing values"}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSpan) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        Period, 
+        PMI, 
+        RIN,
+        AgeNumeric,
+        DonorID,
+        AgeInterval,
+        pH, 
+        Dissectionscore,
+        Sex,
+        Regions) %>% 
+  drop_na(RIN, pH) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+
+```
+
+- GTEx
+
+
+```{r}
+pc = log(gtex + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+
+pca_gtex = pc$x %>% 
+  as.data.frame() %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+   rownames_to_column("SampleID") %>% 
+  left_join(md$GTEx, by = "SampleID") %>%
+ # pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
+  ggplot(aes(PC1, PC2)
+    
+  ) +
+  geom_point(aes(colour = as.numeric(rRNA_ratio), shape = Regions, alpha = Regions),size=5) + 
+  theme_bw()+ theme(legend.position = "top") + 
+  scale_color_gradient(low = "#EECDA3", 
+
+                         
+                       high = "#ef629f")  +
+  scale_shape_manual(values = c("Cerebellum" =15, 
+                                "Spinal Cord" = 0, 
+                                "Cortex" = 17,
+                                "Subcortex" = 19)) +
+  scale_alpha_manual(values = c("Cerebellum" =1, 
+                                "Spinal Cord" = 1, 
+                                "Cortex" = 0.5,
+                                "Subcortex" = 0.5)) +
+   labs(
+    x = glue("PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})"),
+    y = glue("PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})"),
+    color = "rRNA rate", 
+    shape = "Regions"
+  )
+
+pca_gtex 
+
+ggsave(pca_gtex ,
+       filename = here::here("output/Thesis_plots/Variance/PCA/GTEx/GTEx-PCA-rRNA.svg"), 
+        height = 6, 
+       width = 8, 
+       units = "in")
+```
+
+
+```{r}
+pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$GTEx) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        rRNA_ratio,
+        ExonicRate, 
+        IntronicRate,
+        Regions, 
+        RIN, 
+        TotalNReads, 
+        AgeInterval,
+        MappingRate, 
+        Sex, 
+        DonorID,
+        SequencingBatch,
+        PMI, 
+        HardyScale
+       
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(RIN = as.numeric(as.factor(RIN)), 
+          TotalNReads = as.numeric(as.factor(TotalNReads)), 
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          rRNA_ratio = as.numeric(as.factor(rRNA_ratio)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
+
+- PyschEncode
+
+```{r}
+pc = log(pe + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+
+
+pc$x %>% 
+  as.data.frame() %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+   rownames_to_column("SampleID") %>% 
+  left_join(md$PE, by = "SampleID") %>%
+ # pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
+  ggplot(aes(PC1, PC2)
+    
+  ) +
+  geom_point(aes(colour = ContributingStudy, shape = Period),size=5) + 
+  theme_bw()+ theme(legend.position = "top")
+
+pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$PE) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        individualIDSource,
+        Sex, 
+        ContributingStudy, 
+        Period, 
+        #brainWeight, 
+        AgeNumeric,
+        Diagnosis,
+        causeDeath,
+        AgeInterval
+    ) %>% 
+  #drop_na(brainWeight) %>%
+   mutate(#RIN = as.numeric(as.factor(RIN)), 
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          individualIDSource = as.numeric(as.factor(individualIDSource)), 
+          ContributingStudy = as.numeric(as.factor(ContributingStudy)), 
+          Period = as.numeric(as.factor(Period)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis)), 
+          causeDeath = as.numeric(as.factor(causeDeath))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
+- HDBR
+
+
+
+```{r}
+pc = log(hdbr + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+
+pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$HDBR) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        IntronicRate, 
+        MappingRate,
+        AgeInterval,
+        Sex, 
+        ExonicRate,
+        DonorID,
+        TotalNReads,
+        Regions,
+        Hemisphere, 
+     #   PMI, 
+        SequencingBatch) %>% 
+  #drop_na(PMI, Regions) %>%
+   mutate(#RIN = as.numeric(as.factor(RIN)), 
+          TotalNReads = as.numeric(as.factor(TotalNReads)), 
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
+
+```{r}
+pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$HDBR) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        IntronicRate, 
+        MappingRate,
+        AgeInterval,
+        Sex, 
+        ExonicRate,
+        DonorID,
+        TotalNReads,
+        Regions,
+        Hemisphere, 
+        PMI, 
+        SequencingBatch) %>% 
+  drop_na(PMI, Regions) %>%
+   mutate(#RIN = as.numeric(as.factor(RIN)), 
+          TotalNReads = as.numeric(as.factor(TotalNReads)), 
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+
+```
+
+```{r}
+library(vegan)
+doubs.spe <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsSpe.csv', row.names = 1)
+doubs.env <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsEnv.csv', row.names = 1)
+doubs.spa <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsSpa.csv', row.names = 1)
+
+head(doubs.spe)
+head(doubs.env)
+
+
+env.z <- decostand(doubs.env, method = "standardize")
+
+spe.hel <- decostand(doubs.spe, method = "hellinger")
+```
+
+
+```{r}
+spe.rda <- rda(spe.hel ~ ., data = env.z)
+fwd.sel <- ordiR2step(rda(spe.hel ~ 1, data = env.z), # lower model limit (simple!)
+               scope = formula(spe.rda), # upper model limit (the "full" model)
+               direction = "forward",
+               R2scope = TRUE, # can't surpass the "full" model's R2
+               pstep = 1000,
+               trace = FALSE) # change to TRUE to see the selection process!
+```
 - Variance explained per factor per dataset 
 
 - PCA of all data 

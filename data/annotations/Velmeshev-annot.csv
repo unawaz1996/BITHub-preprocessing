@@ -1,19 +1,19 @@
 OriginalMetadataColumnName,BITColumnName,Include (Yes/No) - Interest,Type
-cell,CellID,Yes,Cell
-cluster,CellType,Yes,Cell
+cell,CellID,Yes,Cell-Type
+cluster,CellType,Yes,Cell-Type
 individual,DonorID,Yes,Phenotype
-region,StructureAcronym,Yes,Sample
+region,StructureAcronym,Yes,Sample charactertics
 age,AgeNumeric,Yes,Phenotype
 sex,Sex,Yes,Phenotype
 diagnosis,Diagnosis,Yes,Phenotype
-Capbatch,CaptureBatch,Yes,Sample
-Seqbatch,SequencingBatch,Yes,Sequencing
-post.mortem.interval..hours.,PMI,Yes,Sample
-RNA.Integrity.Number,RIN,Yes,Sample
-genes,TotalGenesDetected,Yes,Sequencing
-UMIs,TotalUMIs,Yes,Cell
-RNA.mitochondr..percent,mito_Ratio,Yes,Sequencing
-RNA.ribosomal.percent,rRNA_Rate,Yes,Sequencing
-MajorCelltype,MajorCellType,Yes,Cell
+Capbatch,CaptureBatch,Yes,Sample charactertics
+Seqbatch,SequencingBatch,Yes,Sequencing metrics
+post.mortem.interval..hours.,PMI,Yes,Sample charactertics
+RNA.Integrity.Number,RIN,Yes,Sample charactertics
+genes,TotalGenesDetected,Yes,Sequencing metrics
+UMIs,TotalUMIs,Yes,Cell-Type
+RNA.mitochondr..percent,mito_Ratio,Yes,Sequencing metrics
+RNA.ribosomal.percent,rRNA_Rate,Yes,Sequencing metrics
+MajorCelltype,MajorCellType,Yes,Cell-Type
 NA,AgeInterval,Yes,Phenotype
-NA,Regions,Yes,Sample
+NA,Regions,Yes,Sample charactertics
