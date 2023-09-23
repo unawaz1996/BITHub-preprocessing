@@ -1,0 +1,11 @@
+Dataset,SampleID,DonorID,Sex,StructureAcronym,Period,AgeNumeric,AgeInterval,Diagnosis,Regions,Hemisphere,RIN,PMI,Ethnicity,TotalNReads,MappingRate,mito_ratio,totalAssignedGene,rRNA_ratio,SequencingBatch,ChimericPairs,ExonicRate,GenesDetected,ReadsMapped,MappedPairs,IntronicRate,MappingRate_unique,CellType,CellID,MajorCellType
+BrainSpan,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+BrainSeq,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0
+GTEx,1,1,1,1,1,0,1,1,1,0,1,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0
+PsychEncode,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+FANTOM5,1,1,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+HDBR,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,0,1,1,1,1,0,0,0
+Velmeshev,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1
+Aldringer,0,1,1,1,1,1,1,0,1,0,0,1,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,1,1
+HCA,0,1,1,1,1,1,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1
+Cameron,0,1,0,1,1,1,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1
