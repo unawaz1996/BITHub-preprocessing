@@ -32,6 +32,7 @@ library(UpSetR)
 library(patchwork)
 library(pheatmap)
 library(ggpubr)
+library(variancePartition)
 ```
 
 
@@ -448,6 +449,33 @@ ggsave(pca_bseq,
 
 ```
 
+
+```{r}
+form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) 
+C.bseq = canCorPairs(form.bseq, md$BSeq)
+plotCorrMatrix( C.bseq )
+```
+
+
+The correlation plot reveals that many of the selected covariates do not correlate highly within their respective category, and therefore we will feed these into the mixed linear model. 
+
+
+```{r}
+varPar.bseq <- fitExtractVarPartModel(seq, form.bseq, md$BSeq)
+varPar.bseq = sortCols(varPar.bseq)
+plot_varPart = plotVarPart(varPar.bseq) 
+
+ggsave(plot_varPart, 
+       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSeq/BrainSeq_varPart_full.svg"),
+       height = 6, 
+       width = 8, 
+       units = "in")
+
+
+write.csv(varPar.bseq, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart.csv")
+```
+
+
 - BrainSpan 
 
 ```{r}
@@ -554,6 +582,30 @@ ggsave(pca_bspan,
 
 ```
 
+Variance partition 
+
+```{r}
+form.bspan <- ~ AgeNumeric + (1|StructureAcronym) + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore + (1| AgeInterval)
+C.bspan = canCorPairs(form.bspan, md$BSpan)
+plotCorrMatrix( C.bspan )
+
+
+form.bspan <- ~ AgeNumeric  + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore 
+varPar.bspan <- fitExtractVarPartModel(span,form.bspan ,md$BSpan)
+varPar.bspan = sortCols(varPar.bspan)
+plot_varPart = plotVarPart(varPar.bspan) 
+
+ggsave(plot_varPart, 
+       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSpan/BrainSpan_varPart_full.svg"),
+       height = 6, 
+       width = 8, 
+       units = "in")
+
+
+write.csv(varPar.bspan, file="/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-varPart.csv")
+
+```
+
 - GTEx
 
 
@@ -621,7 +673,8 @@ pc$x  %>%
         DonorID,
         SequencingBatch,
         PMI, 
-        HardyScale
+        HardyScale, 
+        BSS_Collection_side_code
        
     ) %>% 
   drop_na(Regions) %>%
@@ -633,7 +686,8 @@ pc$x  %>%
           Sex = as.numeric(as.factor(Sex)), 
           DonorID = as.numeric(as.factor(DonorID)), 
           rRNA_ratio = as.numeric(as.factor(rRNA_ratio)),
-          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
+          SequencingBatch = as.numeric(as.factor(SequencingBatch)),
+          BSS_Collection_side_code =  as.numeric(as.factor(SequencingBatch))) %>%
     cor() %>% 
     corrplot(
         type = "lower", 
@@ -642,6 +696,28 @@ pc$x  %>%
         number.cex = 0.75)
 ```
 
+```{r}
+gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch) + (1|DateofBatch) + (1|BSS_Collection_side_code) + (1|AgeInterval) + (1|Sex) + (1|Regions) + IntergenicRate + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate
+C.gtex = canCorPairs(gtex.form, md$GTEx)
+plotCorrMatrix(C.gtex)
+```
+
+```{r}
+gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate 
+
+varPar.gtex <- fitExtractVarPartModel(gtex,gtex.form ,md$GTEx)
+varPar.gtex = sortCols(varPar.gtex)
+plot_varPart = plotVarPart(varPar.gtex) 
+plot_varPart 
+
+ggsave(plot_varPart, 
+       filename = here::here("output/Thesis_plots/Variance/PCA/GTEx/GTEx_varPart_full.svg"),
+       height = 6, 
+       width = 8, 
+       units = "in")
+
+write.csv(varPar.gtex,"/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-varPart.csv")
+```
 
 - PyschEncode
 
@@ -696,6 +772,22 @@ pc$x  %>%
         number.cex = 0.75)
 ```
 
+```{r fig.height =5, fig.width=5, fig.cap="*Assessing correlation between covariates of interest from the PsychEncode data*"}
+pe.form <- ~ (1|Sex) + (1|Diagnosis) + AgeNumeric + (1|Ethnicity) + 
+  (1|Period) + (1|DonorID) + (1|individualIDSource) + (1|Death)
+
+C.pe = canCorPairs(pe.form, md$PE)
+plotCorrMatrix(C.pe)
+```
+
+```{r}
+md$PE %>% 
+  distinct("SampleID", .keep_all = TRUE)
+varPar.pe <- fitExtractVarPartModel(pe, pe.form, md$PE)
+
+```
+
+
 - HDBR
 
 
@@ -705,6 +797,43 @@ pc = log(hdbr + 0.05) %>%
   t() %>% 
    prcomp(scale = TRUE)
 
+pca_hdbr = pc$x %>% 
+  as.data.frame() %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+   rownames_to_column("SampleID") %>% 
+  left_join(md$HDBR, by = "SampleID") %>%
+ # pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
+  ggplot(aes(PC1, PC2)) +
+  geom_point(aes(colour = IntronicRate, shape = Regions),size=5, alpha = 0.85) +
+  #geom_point(aes(colour = ContributingStudy, shape = Period),size=5) + 
+  theme_bw()+ theme(legend.position = "top")  + 
+  scale_color_gradient2(low = "#ffaf7b", 
+                       mid = "#d76d77", 
+                       high = "#3a1c71") +
+  scale_shape_manual(values = c("Brain" = 16, 
+                                "Forebrain" = 17, 
+                                "Forebrain and midbrain" = 2, 
+                                "Hindbrain" = 15, 
+                                "Midbrain" = 0, 
+                                "Spinal Cord" = 6)) +
+   labs(
+    x = glue("PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})"),
+    y = glue("PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})"),
+    color = "Intronic Rate", 
+    shape = "Regions"
+  )
+
+
+ggsave(pca_hdbr,
+       filename = here::here("output/Thesis_plots/Variance/PCA/HDBR/HDBR-PCA-intronicRate.svg"), 
+        height = 6, 
+       width = 8, 
+       units = "in")
+
+```
+
+
+```{r}
 pc$x  %>%
     as.data.frame() %>%
   rownames_to_column("SampleID") %>%
@@ -777,6 +906,43 @@ pc$x  %>%
         number.cex = 0.75)
 
 ```
+
+```{r}
+form.hdbr <- ~ (1|Age) + (1|StructureAcronym) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval)
+C.hdbr = canCorPairs(form.hdbr, md$HDBR)
+plotCorrMatrix(C.hdbr)
+```
+
+```{r}
+form.hdbr <- ~ (1|AgeInterval) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + IntronicRate 
+varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR)
+varPar.hdbr = sortCols(varPar.hdbr)
+plot_varPart = plotVarPart(varPar.hdbr) 
+
+ggsave(plot_varPart, 
+       filename = here::here("output/Thesis_plots/Variance/PCA/HDBR/HDBR_varPart_full.svg"),
+       height = 6, 
+       width = 8, 
+       units = "in")
+```
+
+<!-- # ```{r} -->
+<!-- # form.hdbr <- ~ (1|AgeInterval) + (1|Sex) + (1|Hemisphere) + (Regions+0|SequencingBatch) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + IntronicRate  -->
+<!-- # varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR) -->
+<!-- # varPar.hdbr = sortCols(varPar.hdbr) -->
+<!-- # plot_varPart = plotVarPart(varPar.hdbr)  -->
+<!-- #  -->
+<!-- # ggsave(plot_varPart,  -->
+<!-- #        filename = here::here("output/Thesis_plots/Variance/PCA/HDBR/HDBR_varPart_full.svg"), -->
+<!-- #        height = 6,  -->
+<!-- #        width = 8,  -->
+<!-- #        units = "in") -->
+<!-- # ``` -->
+
+
+
+
+
 
 ```{r}
 library(vegan)

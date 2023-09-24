@@ -5,7 +5,7 @@ libs = c("dplyr", "ggplot2", "reshape2", "tools", "magrittr", "tibble", "readxl"
 libsLoaded = lapply(libs,function(l){suppressWarnings(suppressMessages(library(l, character.only = TRUE)))})
 
 
-source("code/preprocess/def_stages.R")
+source("/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/code/preprocess/def_stages.R")
 
 ## Function to add a feature
 add_feature = function(feature_column, features){
