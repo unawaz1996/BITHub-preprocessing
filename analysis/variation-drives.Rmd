@@ -35,6 +35,12 @@ library(ggpubr)
 library(variancePartition)
 ```
 
+```{r}
+gene2symbol = genes(EnsDb.Hsapiens.v86, return.type="DataFrame") %>%
+    as.data.frame()
+gene2symbol %<>% 
+    dplyr::select("EnsemblID" = "gene_id", gene_name)
+```
 
 ```{r load-data}
 brain.dir =file.path("/home/neuro/Documents/BrainData/Bulk")
@@ -460,22 +466,6 @@ plotCorrMatrix( C.bseq )
 The correlation plot reveals that many of the selected covariates do not correlate highly within their respective category, and therefore we will feed these into the mixed linear model. 
 
 
-```{r}
-varPar.bseq <- fitExtractVarPartModel(seq, form.bseq, md$BSeq)
-varPar.bseq = sortCols(varPar.bseq)
-plot_varPart = plotVarPart(varPar.bseq) 
-
-ggsave(plot_varPart, 
-       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSeq/BrainSeq_varPart_full.svg"),
-       height = 6, 
-       width = 8, 
-       units = "in")
-
-
-write.csv(varPar.bseq, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart.csv")
-```
-
-
 - BrainSpan 
 
 ```{r}
@@ -588,22 +578,6 @@ Variance partition
 form.bspan <- ~ AgeNumeric + (1|StructureAcronym) + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore + (1| AgeInterval)
 C.bspan = canCorPairs(form.bspan, md$BSpan)
 plotCorrMatrix( C.bspan )
-
-
-form.bspan <- ~ AgeNumeric  + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore 
-varPar.bspan <- fitExtractVarPartModel(span,form.bspan ,md$BSpan)
-varPar.bspan = sortCols(varPar.bspan)
-plot_varPart = plotVarPart(varPar.bspan) 
-
-ggsave(plot_varPart, 
-       filename = here::here("output/Thesis_plots/Variance/PCA/BrainSpan/BrainSpan_varPart_full.svg"),
-       height = 6, 
-       width = 8, 
-       units = "in")
-
-
-write.csv(varPar.bspan, file="/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-varPart.csv")
-
 ```
 
 - GTEx
@@ -702,25 +676,7 @@ C.gtex = canCorPairs(gtex.form, md$GTEx)
 plotCorrMatrix(C.gtex)
 ```
 
-```{r}
-gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate 
 
-varPar.gtex <- fitExtractVarPartModel(gtex,gtex.form ,md$GTEx)
-varPar.gtex = sortCols(varPar.gtex)
-# varPar.gtex = read.csv("/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-varPart.csv",
-#                        header=TRUE, 
-#                        row.names = 1)
-plot_varPart = plotVarPart(varPar.gtex) 
-plot_varPart 
-
-ggsave(plot_varPart, 
-       filename = here::here("output/Thesis_plots/Variance/PCA/GTEx/GTEx_varPart_full.svg"),
-       height = 6, 
-       width = 8, 
-       units = "in")
-
-write.csv(varPar.gtex,"/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-varPart.csv")
-```
 
 - PyschEncode
 
@@ -783,22 +739,6 @@ C.pe = canCorPairs(pe.form, md$PE)
 plotCorrMatrix(C.pe)
 ```
 
-```{r}
-md$PE= md$PE[!duplicated(md$PE[,c('SampleID')]),]
-varPar.pe <- fitExtractVarPartModel(pe, pe.form, md$PE)
-
-varPar.pe = sortCols(varPar.pe)
-plot_varPart = plotVarPart(varPar.pe) 
-plot_varPart 
-
-ggsave(plot_varPart, 
-       filename = here::here("output/Thesis_plots/Variance/PCA/PsychEncode/PE_varPart_full.svg"),
-       height = 6, 
-       width = 8, 
-       units = "in")
-
-write.csv(varPar.pe,"/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-varPart.csv")
-```
 
 
 - HDBR
@@ -926,68 +866,819 @@ C.hdbr = canCorPairs(form.hdbr, md$HDBR)
 plotCorrMatrix(C.hdbr)
 ```
 
+
+## Determining the utlity of factors of unwanted variation 
+
 ```{r}
-form.hdbr <- ~ (1|AgeInterval) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + IntronicRate 
-varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR)
-varPar.hdbr = sortCols(varPar.hdbr)
+var_part = list()
 
-plot_varPart = plotVarPart(varPar.hdbr) 
+var_part$BSpan = read.csv(file.path(brain.dir,"/BrainSpan/Formatted/BrainSpan-varPart.csv"), header=TRUE, 
+                                    row.names =1)  %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID")
+var_part$BSeq = read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-varPart.csv"), 
+                                   header=TRUE, row.names=1) %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID")
+var_part$GTEx = read.csv(file.path(brain.dir,"/GTEx/Formatted/GTEx-varPart.csv"), header=TRUE, 
+                                   row.names=1) %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID")
+var_part$HDBR = read.csv(file.path(brain.dir,"/HDBR/Formatted/HDBR-varPart.csv"), header=TRUE, 
+                                   row.names=1) %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID")
+var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-varPart.csv"), header=TRUE, 
+                                   row.names=1) %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID")
+```
 
-ggsave(plot_varPart, 
-       filename = here::here("output/Thesis_plots/Variance/PCA/HDBR/HDBR_varPart_full.svg"),
-       height = 6, 
-       width = 8, 
+We want to investigate the impact of genes having previously been altered with respect to PMI levels. 
+Other than BrainSeq and PsychEncode, all other datasets contain PMI values. 
+For ease, made the scale of each PMI consistent into minutes and have it as continuous and categorical values. 
+Categorical values have the PMI binned into intervals of based on the GTEx Biospecimen Methodological Study (BMS). 
+
+- Study by Fereria aet al showed that gene changes with PMI are tissue related
+* Genes to test are RNASE2, CXCL2, EGR3 and HBA1 had no significant associated in their brain datasets tested 
+
+
+-  RNASE2
+
+```{r}
+md$GTEx %<>% 
+  mutate(PMI.hours = PMI/60) %>% 
+  mutate(PMI.intervals = case_when(
+    PMI.hours >= 1 & PMI.hours< 4 ~ "> 1 & < 4", 
+    PMI.hours >= 4 & PMI.hours < 8 ~ "> 4 & < 8", 
+    PMI.hours >= 8 & PMI.hours < 12 ~ "> 8 & < 12", 
+    PMI.hours >= 12 & PMI.hours < 16 ~ "> 12 & < 16", 
+    PMI.hours >= 16 & PMI.hours < 20 ~ "> 16 & < 20", 
+    PMI.hours >= 20 ~ "> 20", 
+  ))
+
+
+gtex_fig  = e$Raw$GTEx %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "RNASE2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$GTEx, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + 
+  scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+  xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+
+gtex_fig
+
+ggsave(gtex_fig, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-region-RNASE2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+  
+```
+
+
+```{r}
+md$BSpan %<>%
+    mutate(PMI.intervals = case_when(
+    PMI >= 1 & PMI< 4 ~ "> 1 & < 4", 
+    PMI >= 4 & PMI < 8 ~ "> 4 & < 8", 
+    PMI >= 8 & PMI < 12 ~ "> 8 & < 12", 
+    PMI >= 12 & PMI < 16 ~ "> 12 & < 16", 
+    PMI >= 16 & PMI < 20 ~ "> 16 & < 20", 
+    PMI >= 20 ~ "> 20", 
+  ))
+
+
+bspan_fig = e$Raw$BSpan %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "RNASE2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$BSpan, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+    xlab ("PMI Intervals") + ylab("RPKM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+
+
+bspan_fig
+ggsave(bspan_fig, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-region-RNASE2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+  
+```
+
+```{r}
+md$HDBR %<>% 
+  mutate(PMI.hours = PMI/60) %>% 
+  mutate(PMI.intervals = case_when(
+    PMI.hours >= 1 & PMI.hours< 4 ~ "> 1 & < 4", 
+    PMI.hours >= 4 & PMI.hours < 8 ~ "> 4 & < 8", 
+    PMI.hours >= 8 & PMI.hours < 12 ~ "> 8 & < 12", 
+    PMI.hours >= 12 & PMI.hours < 16 ~ "> 12 & < 16", 
+    PMI.hours >= 16 & PMI.hours < 20 ~ "> 16 & < 20", 
+    PMI.hours >= 20 ~ "> 20", 
+  ))
+
+e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "RNASE2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp)) + geom_boxplot() +
+  theme_bw() 
+
+
+HDBR_plot = e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "RNASE2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+    xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ))
+
+HDBR_plot 
+ggsave(HDBR_plot, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-region-RNASE2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+gtex_var =var_part$GTEx %>% 
+  dplyr::filter(gene_name %in% "RNASE2") %>% 
+  melt() %>%
+  arrange(value) %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+gtex_var
+
+ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-RNASE2.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+- CXCL2
+
+```{r}
+gtex_plot =e$Raw$GTEx %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "CXCL2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$GTEx, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+    xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+gtex_plot
+ggsave(gtex_plot, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-region-CXCL2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+  
+  
+```
+
+```{r}
+bspan_fig =e$Raw$BSpan %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "CXCL2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$BSpan, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+      xlab ("PMI Intervals") + ylab("RPKM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+bspan_fig  
+
+ggsave(bspan_fig, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-region-CXCL2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+HDBR_plot =e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "CXCL2") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+      xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+HDBR_plot
+ggsave(HDBR_plot, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-region-CXCL2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+gtex_var = var_part$GTEx %>% 
+  dplyr::filter(gene_name %in% "CXCL2") %>% 
+  melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+gtex_var
+
+ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-CXL2.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+
+```{r}
+hdbr_var =var_part$HDBR %>% 
+  dplyr::filter(gene_name %in% "CXCL2") %>% 
+  melt() %>% 
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+hdbr_var
+
+ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-CXL2.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+```{r}
+bspan_var= var_part$BSpan %>% 
+  dplyr::filter(gene_name %in% "CXCL2") %>% 
+  melt() %>%
+    ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+bspan_var
+
+ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-CXL2.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+
+- EGR3
+
+
+```{r}
+gtex_plot = e$Raw$GTEx %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "EGR3") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$GTEx, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+gtex_plot
+  
+ggsave(gtex_plot, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-region-EGR3.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+bspan_plot = e$Raw$BSpan %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "EGR3") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$BSpan, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("RPKM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+bspan_plot 
+ggsave(bspan_plot, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-region-EGR3.svg"), 
+        width = 8, 
+       height =5, 
        units = "in")
 
-write.csv(varPar.hdbr , file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-varPart.csv")
 ```
 
-<!-- # ```{r} -->
-<!-- # form.hdbr <- ~ (1|AgeInterval) + (1|Sex) + (1|Hemisphere) + (Regions+0|SequencingBatch) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + IntronicRate  -->
-<!-- # varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR) -->
-<!-- # varPar.hdbr = sortCols(varPar.hdbr) -->
-<!-- # plot_varPart = plotVarPart(varPar.hdbr)  -->
-<!-- #  -->
-<!-- # ggsave(plot_varPart,  -->
-<!-- #        filename = here::here("output/Thesis_plots/Variance/PCA/HDBR/HDBR_varPart_full.svg"), -->
-<!-- #        height = 6,  -->
-<!-- #        width = 8,  -->
-<!-- #        units = "in") -->
-<!-- # ``` -->
+```{r}
+
+e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "EGR3") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
 
 
+hdbr_plot = e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "EGR3") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+hdbr_plot
+ggsave(hdbr_plot , file=here::here("output/Thesis_plots/Variance/Examples/HDBR-region-EGR3.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
 
+```{r}
+gtex_var =var_part$GTEx %>% 
+  dplyr::filter(gene_name %in% "EGR3") %>% 
+  melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+gtex_var
 
+ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-EGR3.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
 
 
 ```{r}
-library(vegan)
-doubs.spe <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsSpe.csv', row.names = 1)
-doubs.env <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsEnv.csv', row.names = 1)
-doubs.spa <- read.csv ('https://raw.githubusercontent.com/zdealveindy/anadat-r/master/data/DoubsSpa.csv', row.names = 1)
+hdbr_var =var_part$HDBR %>% 
+  dplyr::filter(gene_name %in% "EGR3") %>% 
+   melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+hdbr_var
 
-head(doubs.spe)
-head(doubs.env)
+ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-EGR3.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+```{r}
+bspan_var =var_part$BSpan %>% 
+  dplyr::filter(gene_name %in% "EGR3") %>% 
+  melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+bspan_var
+
+ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-EGR3.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
+ - HBA1
+
+```{r}
+gtex_plot =e$Raw$GTEx %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "HBA1") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$GTEx, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +  xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+gtex_plot
+
+ggsave(gtex_plot , file=here::here("output/Thesis_plots/Variance/Examples/GTEx-region-HBA1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+bspan_plot = e$Raw$BSpan %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "HBA1") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$BSpan, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("RPKM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+
+bspan_plot
+ggsave(bspan_plot , file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-region-HBA1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+
+e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "HBA1") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp)) + geom_boxplot() +
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                ))
 
 
-env.z <- decostand(doubs.env, method = "standardize")
+hdbr_plot =e$Raw$HDBR %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "HBA1") %>% 
+    melt() %>% 
+  dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$HDBR, by= "SampleID") %>% 
+  mutate(PMI.intervals = factor(PMI.intervals, levels = c(
+    "> 1 & < 4", 
+    "> 4 & < 8",
+    "> 8 & < 12",
+    "> 12 & < 16",
+    "> 16 & < 20",
+     "> 20"
+  ))) %>%
+  drop_na(PMI.intervals) %>%
+  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  theme_bw()  + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) +
+      xlab ("PMI Intervals") + ylab("TPM") + 
+  theme(legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ) )
+hdbr_plot
+ggsave(hdbr_plot , file=here::here("output/Thesis_plots/Variance/Examples/HDBR-region-EGR3.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
 
-spe.hel <- decostand(doubs.spe, method = "hellinger")
+```{r}
+gtex_var= var_part$GTEx %>% 
+  dplyr::filter(gene_name %in% "HBA1") %>% 
+  melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+gtex_var
+
+ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-HBA1.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
 ```
 
 
 ```{r}
-spe.rda <- rda(spe.hel ~ ., data = env.z)
-fwd.sel <- ordiR2step(rda(spe.hel ~ 1, data = env.z), # lower model limit (simple!)
-               scope = formula(spe.rda), # upper model limit (the "full" model)
-               direction = "forward",
-               R2scope = TRUE, # can't surpass the "full" model's R2
-               pstep = 1000,
-               trace = FALSE) # change to TRUE to see the selection process!
+hdbr_var = var_part$HDBR %>% 
+  dplyr::filter(gene_name %in% "HBA1") %>% 
+  melt() %>%
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+hdbr_var
+
+ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-HBA1.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
 ```
-- Variance explained per factor per dataset 
 
-- PCA of all data 
+```{r}
+bspan_var=var_part$BSpan %>% 
+  dplyr::filter(gene_name %in% "HBA1") %>% 
+  melt()  %>% 
+  ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+bspan_var
 
-- PCA per bulk gene expression dataset 
+ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-HBA1.svg"), 
+        width = 5, 
+       height =8, 
+       units = "in")
+```
+
 
