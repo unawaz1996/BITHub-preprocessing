@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='142.56pt' height='136.08pt' viewBox='0 0 142.56 136.08'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHwxNDIuNTZ8MC4wMHwxMzYuMDg='>
+    <rect x='0.00' y='0.00' width='142.56' height='136.08' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxNDIuNTZ8MC4wMHwxMzYuMDg=)'>
+<rect x='0.00' y='0.00' width='142.56' height='136.08' style='stroke-width: 1.07; stroke: none;' />
+</g>
+<defs>
+  <clipPath id='cpMjEuMjd8MTM3LjA4fDUuNDh8MTE0Ljgx'>
+    <rect x='21.27' y='5.48' width='115.81' height='109.33' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjEuMjd8MTM3LjA4fDUuNDh8MTE0Ljgx)'>
+<rect x='21.27' y='5.48' width='115.81' height='109.33' style='stroke-width: 1.07; stroke: none;' />
+<polyline points='21.27,84.99 137.08,84.99 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='21.27,35.30 137.08,35.30 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='26.53,114.81 26.53,5.48 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='65.53,114.81 65.53,5.48 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='104.52,114.81 104.52,5.48 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<rect x='26.53' y='22.87' width='25.31' height='24.85' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #E11F28;' />
+<rect x='26.53' y='72.57' width='7.41' height='24.85' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #F3765C;' />
+</g>
+<g clip-path='url(#cpMC4wMHwxNDIuNTZ8MC4wMHwxMzYuMDg=)'>
+<polyline points='18.53,84.99 21.27,84.99 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='18.53,35.30 21.27,35.30 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='26.53,117.55 26.53,114.81 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='65.53,117.55 65.53,114.81 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='104.52,117.55 104.52,114.81 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+</g>
+</svg>
