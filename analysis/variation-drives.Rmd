@@ -263,7 +263,7 @@ span <- thresh(e$Raw$BSpan)
 seq <- thresh(e$Raw$BSeq)
 pe <- thresh(e$Raw$PE)
 hdbr <- thresh(e$Raw$HDBR)
-#ram <- thresh(e$Raw$Ram)
+
 ```
 
 ```{r}
@@ -899,6 +899,11 @@ var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-v
     left_join(gene2symbol, by = "EnsemblID")
 ```
 
+
+```{r}
+median(var_part$BSeq$Sex) * 100
+
+```
 We want to investigate the impact of genes having previously been altered with respect to PMI levels. 
 Other than BrainSeq and PsychEncode, all other datasets contain PMI values. 
 For ease, made the scale of each PMI consistent into minutes and have it as continuous and categorical values. 
@@ -1106,7 +1111,7 @@ gtex_var
 
 ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-RNASE2.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1246,7 +1251,7 @@ gtex_var
 
 ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-CXL2.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1261,7 +1266,7 @@ hdbr_var
 
 ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-CXL2.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1275,7 +1280,7 @@ bspan_var
 
 ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-CXL2.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1451,7 +1456,7 @@ gtex_var
 
 ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-EGR3.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1466,7 +1471,7 @@ hdbr_var
 
 ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-EGR3.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1480,7 +1485,7 @@ bspan_var
 
 ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-EGR3.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1648,7 +1653,7 @@ gtex_var
 
 ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-HBA1.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1663,7 +1668,7 @@ hdbr_var
 
 ggsave(hdbr_var, file=here::here("output/Thesis_plots/Variance/Examples/HDBR-varPart-HBA1.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
@@ -1677,7 +1682,7 @@ bspan_var
 
 ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-HBA1.svg"), 
         width = 5, 
-       height =8, 
+       height =6, 
        units = "in")
 ```
 
