@@ -167,8 +167,8 @@ regions_fetal[["Forebrain"]] = c("FB", "FBF", "DIEN", "PIT-DIEN", "TEL",
 regions_fetal[["Midbrain"]] = c("MB")
 regions_fetal[["Hindbrain"]] = c("HB", "HBF", "HB/C",
                                  "CB", "MEDU", "PONS")
-regions_fetal[["Brain"]] =c("BF", "CP")
-regions_fetal[["Forebrain and midbrain"]] = c("FB-MID", "DIEN-MID")
+regions_fetal[["Brain"]] =c("BF",  "FB-MID", "DIEN-MID")
+regions_fetal[["Chroid plexus"]] = c("CP")
 regions_fetal[["Spinal Cord"]] = c("SCI")
 
 
