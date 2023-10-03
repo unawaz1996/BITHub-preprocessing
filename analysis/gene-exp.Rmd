@@ -1,0 +1,996 @@
+---
+title: "gene-exp"
+author: "urwahnawaz"
+date: "2023-10-03"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{r libraries include=FALSE}
+libs = c("dplyr", "ggplot2", "reshape2", "tools", "magrittr", "tibble", "readxl", 
+         "data.table", "scales", "tidyr", "reshape2", "stringr", "tidyverse", "readxl", "corrplot", "viridis", 
+         "sunburstR", "pheatmap")
+libsLoaded <- lapply(libs,function(l){suppressWarnings(suppressMessages(library(l, character.only = TRUE)))})
+library(EnsDb.Hsapiens.v86)
+```
+
+```{r annotations}
+gene2symbol = genes(EnsDb.Hsapiens.v86, return.type="DataFrame") %>%
+    as.data.frame()
+gene2symbol %<>% 
+    dplyr::select("EnsemblID" = "gene_id", gene_name)
+
+```
+
+```{r load-exp}
+brain.dir =file.path("/home/neuro/Documents/BrainData/Bulk")
+e <- list()
+  
+e$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-exp.csv"), 
+                       check.names = FALSE, row.names = 1) 
+e$PE <- read.csv(file.path(brain.dir, "/PsychEncode/Formatted/PsychEncode-exp.csv"), row.names = 1,
+                 check.names = FALSE) 
+e$BSpan <- read.csv(file.path(brain.dir, "/BrainSpan/Formatted/BrainSpan-exp.csv"),
+                        check.names = FALSE, row.names=1)
+e$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-exp.csv"), 
+                       check.names = FALSE, row.names = 1)
+
+e$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-exp.csv"), 
+                       check.names = FALSE, row.names = 1) %>% 
+  column_to_rownames("EnsemblID")
+
+
+```
+
+```{r load-md}
+md = list()
+md$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-metadata.csv"), 
+                       check.names = FALSE, row.names = 1)
+md$PE <- read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-metadata.csv"),
+                  check.names = FALSE)
+md$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-metadata.csv"), 
+                       check.names = FALSE)
+md$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-metadata.csv"), 
+                       check.names = FALSE, row.names = 1) 
+md$Ram <- read.csv(file.path(brain.dir, "/Ramakar/Formatted/Ramaker-metadata.csv"),
+                       check.names = FALSE, row.names = 1)
+
+md$BSpan <- read.csv(file.path(brain.dir,
+                               "/BrainSpan/Formatted/BrainSpan-metadata.csv"),
+                     check.names = FALSE)
+```
+
+
+```{r}
+genes_of_interest = c("FMR1", "ZMYND8", "UPF1", "FOXG1", "ZIC2", "MKI67", "KIF1B")
+exp_data = list()
+datasets = c("BSpan", "GTEx", "BSeq", "PE", "HDBR")
+for (x in datasets) {
+  message(paste("Subsetting samples for", x))
+  dataset = e[[x]]
+  md_sub = md[[x]]
+  name = x
+  sub = dataset %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% genes_of_interest) %>% 
+    melt() %>%
+    dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    mutate(Dataset = x) %>% 
+    left_join(md_sub %>% 
+                dplyr::select(SampleID, Regions,
+                              StructureAcronym, Period, 
+                              AgeInterval), by = "SampleID")
+  exp_data[[paste0(name)]] = sub 
+  
+}
+```
+
+## Plots for ZIC2 
+
+
+- BrainSeq 
+
+```{r}
+bseq = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "ZIC2" & Dataset == "BSeq")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-ZIC2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+- BrainSpan
+```{r}
+bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "ZIC2" & Dataset == "BSpan")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bspan, file=here::here("output/Thesis_plots/Examples/BrainSpan-ZIC2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- GTEx
+
+```{r}
+gtex = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "ZIC2" & Dataset == "GTEx")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-ZIC2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- HDBR 
+
+```{r}
+hdbr  = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "ZIC2" & Dataset == "HDBR")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-ZIC2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- PsychEncode 
+
+```{r}
+pe = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "ZIC2" & Dataset == "PE")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-ZIC2.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+## MKI67
+
+- BrainSeq 
+
+```{r}
+bseq = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "MKI67" & Dataset == "BSeq")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-MKI67.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+- BrainSpan
+```{r}
+bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "MKI67" & Dataset == "BSpan")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bspan, file=here::here("output/Thesis_plots/Examples/BrainSpan-MKI67.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- GTEx
+
+```{r}
+gtex = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "MKI67" & Dataset == "GTEx")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-MKI67.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- HDBR 
+
+```{r}
+hdbr  = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "MKI67" & Dataset == "HDBR")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-MKI67.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- PsychEncode 
+
+```{r}
+pe = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "MKI67" & Dataset == "PE")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-MKI67.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+
+
+
+## FOXG1 
+- BrainSeq 
+
+```{r}
+bseq = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FOXG1" & Dataset == "BSeq")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-FOXG1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+- BrainSpan
+```{r}
+bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FOXG1" & Dataset == "BSpan")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(bspan, file=here::here("output/Thesis_plots/Examples/BrainSpan-FOXG1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- GTEx
+
+```{r}
+gtex = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FOXG1" & Dataset == "GTEx")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-FOXG1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- HDBR 
+
+```{r}
+hdbr  = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FOXG1" & Dataset == "HDBR")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-FOXG1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+- PsychEncode 
+
+```{r}
+pe = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FOXG1" & Dataset == "PE")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  +
+  #facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
+
+
+ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-FOXG1.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+
+```
+
+
+
+```{r}
+sn.dir =file.path("/home/neuro/Documents/BrainData/single-cell")
+
+snRNA = list()
+
+snRNA$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-exp.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+snRNA$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-exp.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+#snRNA$cameron 
+
+sn_md = list()
+
+sn_md$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-metadata.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metadata.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+
+```
+
+
+## MKI67
+
+## FOXG1 
+
+## ZMYND8 gene 
+
+```{r}
+bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSpan" & gene_name == "ZMYND8")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+ggsave(bspan, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSpan-ZMYND8.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+bseq = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSeq" & gene_name == "ZMYND8")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+ggsave(bseq, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSeq-ZMYND8.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+gtex = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "GTEx" & gene_name == "ZMYND8")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+ggsave(gtex, file=here::here("output/Thesis_plots/Examples/NDDs/GTEx-ZMYND8.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+hdbr = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "HDBR" & gene_name == "ZMYND8")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/NDDs/HDBR-ZMYND8.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+pe = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "PE" & gene_name == "ZMYND8")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+ggsave(pe, file=here::here("output/Thesis_plots/Examples/NDDs/PsychEncode-ZMYND8.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+
+
+```{r}
+exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FMR1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.05) + 
+  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
+                                           "Subcortex" = "#838DE0",                 
+                                          "Cortex" = "#E85571", 
+                                           "Spinal Cord" = "#C6D14A", 
+                                           "Forebrain" = "#F6B19D",
+                                           "Midbrain" = "#AC93AD", 
+                                           "Hindbrain" = "#6E8B8E",
+                                          "Brain fragment" = "#FFA6B7", 
+                                          "Forebrain and midbrain")) +
+  facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+```
+
+```{r}
+exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+  theme_bw() +scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) +
+  facet_grid(Dataset~gene_name, scales = "free") + 
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+```
+
+## Some CP genes 

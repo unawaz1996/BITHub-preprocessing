@@ -1,0 +1,13 @@
+OriginalColumnName,BITColumnName,Include (Yes/No) - Interest,Type
+Cells,CellID,Yes,Cell-Type
+CellID,CellType,Yes,Cell-Type
+Samples,DonorID,Yes,Phenotype
+NA,Regions,Yes,Sample charactertics
+NA,StructureAcroynm,Yes,Sample charactertics
+NA,AgeNumeric,Yes,Phenotype
+NA,AgeInterval,Yes,Phenotype
+NA,CellTypeGroup,Yes,Cell-Type
+NA,MajorCellType,Yes,Cell-Type
+NA,mito_ratio,Yes,Sequencing metrics
+NA,nCount_RNA,Yes,Sequencing metrics
+NA,nFeature_RNA,Yes,Sequencing metrics

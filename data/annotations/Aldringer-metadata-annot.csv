@@ -1,0 +1,29 @@
+OriginalMetadata,BITColumnName,Include (Yes/No) - Interest,Type
+cellId,CellID,Yes,Cell-Type
+Cluster-Cell Type Abbreviation,CellType,Yes,Cell-Type
+orig.ident,orig.ident,No,Cell-Type
+nCount_RNA,nCount_RNA,Yes,Sequencing metrics
+nFeature_RNA,nFeature_RNA,No,Sequencing metrics
+Specimen,DonorID,Yes,Phenotype
+percent.mito,mito_ratio,Yes,Sequencing metrics
+S.Score,S.Score,Yes,Sequencing metrics
+G2M.Score,G2M.Score,Yes,Sequencing metrics
+Phase,Phase,No,Sequencing metrics
+CC.Difference,CC.Difference,Yes,Sequencing metrics
+nCount_SCT,nCount_SCT,Yes,Sequencing metrics
+nFeature_SCT,nFeature_SCT,No,Sequencing metrics
+Age (PCW),Age,Yes,Sample charactertics
+figure_clusters,figure_clusters,No,Cell-Type
+Sex,Sex,Yes,Phenotype
+PMI,PMI,Yes,Sequencing metrics
+Experiment,SequencingBatch,Yes,Sequencing metrics
+Type,Type,No,Sequencing metrics
+Replicate,Replicate,No,Sequencing metrics
+nGene,GenesDetected,Yes,Sequencing metrics
+nUMI,TotalUMI,Yes,Sequencing metrics
+Cells/Nuclei,nCells,Yes,Cell-Type
+Cell Type,CellTypeGroup,Yes,Cell-Type
+NA,AgeNumeric,Yes,Phenotype
+NA,AgeInterval,Yes,Phenotype
+NA,MajorCellType,Yes,Cell-Type
+NA,Regions,Yes,Sample charactertics

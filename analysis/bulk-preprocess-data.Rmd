@@ -1,0 +1,599 @@
+---
+title: "bulk-preprocess-data"
+author: "unawaz1996"
+date: "2023-09-20"
+output:
+  html_notebook: default
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    autodep = TRUE,
+    eval = TRUE,
+	echo = TRUE,
+	warning = FALSE,
+	message = FALSE
+)
+```
+# Set-up
+
+```{r libraries}
+library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(AnnotationHub)
+library(stargazer)
+library(ggfortify)
+library(glue)
+library(cowplot)
+library(broom)
+library(glmpca)
+library(DT)
+library(naniar)
+source("code/preprocess/functions.R")
+source("code/preprocess/def_stages.R")
+```
+
+```{r dir}
+
+dir = file.path("/home/neuro/Documents/BrainData/Bulk")
+
+```
+
+
+```{r set-up}
+strc_acr <- map_df(structure_acronym, ~as.data.frame(.x), .id="id") %>% 
+  set_colnames("StructureAcronym")
+colnames(strc_acr)[2] = c("Structure")
+
+rgns = map_df(regions, ~as.data.frame(.x), .id="id") %>% 
+  set_colnames("Regions")
+colnames(rgns)[2] = c("StructureAcronym")
+
+
+rgns_ftl = map_df(regions_fetal, ~as.data.frame(.x), .id="id") %>% 
+  set_colnames("Regions")
+colnames(rgns_ftl)[2] = c("StructureAcronym")
+```
+
+
+# Datasets to preprocess 
+
+
+## BrainSeq 
+
+```{r load-bseq}
+bseq = file.path(dir, "Brainseq")
+bseq.annot = read.csv(here::here("data/annotations/BrainSeq-metadata-annot.csv"), header = TRUE)
+load(file.path(bseq, "rse_gene_unfiltered.Rdata"), envir = .GlobalEnv)
+load(file.path(bseq,"methprop_pd.Rdata"), envir = .GlobalEnv)
+```
+
+```{r preprocess-bseq}
+x = rse_gene@colData 
+x <- as.data.frame(x)
+x <- as.data.frame(t(x))
+replicated <- colnames(x)[grep(",", x["SAMPLE_ID",])]
+y <- as.list(x)
+y[replicated] <- lapply(y[replicated], function(z) {
+  # which variables to merge
+  to.weight <- which(sapply(z, length) > 1 & sapply(z, class) %in% c("numeric", "integer"))
+  # weighting of the merge
+  weighting <- z$numReads # total reads
+  weighting <- weighting / sum(weighting) # rather than a straight average, it's based on the number of reads
+  
+  # apply weighting
+  z[to.weight] <- lapply(z[to.weight], function(zz) {
+    if (length(weighting) == length(zz)) {
+      sum(weighting * zz)
+      } else {
+          NaN
+        }
+        
+      })
+      
+      # quickly fix character variables
+      char <- which(sapply(z, length) > 1 & sapply(z, class) == "character")
+      z[char] <- lapply(z[char], function(zz) {
+        paste(zz, collapse = " & ")
+      })
+      
+      return(z)
+    })
+    
+    w <- lapply(y, as.data.frame)
+    w <- do.call("rbind", w)
+    
+    comp <- as.data.frame(pd)
+    comp <- comp[,57:64]
+    m <- match(rownames(comp), rownames(w)) # they are
+    md<- cbind(w, comp[m,])
+colnames(md) = bseq.annot$BITColumnName[match(colnames(md), bseq.annot$OriginalMetadataColumnName)]
+    
+    
+    # Adding features 
+md %<>% mutate(Period = ifelse(.$AgeNumeric > 0, "Postnatal", "Prenatal"), 
+                   StructureAcronym = gsub("HIPPO", "HIP", .$StructureAcronym),
+                   Diagnosis = gsub("Schizo", "Schizophrenia", .$Diagnosis)) %>%
+      mutate(Regions = add_feature(.$StructureAcronym, regions)) %>% 
+      mutate(Age_rounded = as.character(sapply(na.omit(.$AgeNumeric), num_to_round))) %>% as.data.frame() %>%
+      mutate(AgeInterval = as.character(add_feature(.$Age_rounded, age_intervals))) %>% 
+      dplyr::select(-Age_rounded) %>%
+      dplyr::select("SampleID", everything()) %>%
+      as.data.frame()
+
+```
+
+```{r bseq-md}
+md %>% 
+  DT::datatable(caption = "BrainSeq Metadata after harmonizing column names, ages and structure acronyms")
+```
+
+
+```{r exp-gene}
+exp = rse_gene@assays@.xData$data$rpkm
+rownames(exp) <- sub("\\.[0-9]*$", "", rownames(exp))
+```
+
+### Export 
+
+```{r}
+write.csv(exp, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-exp.csv")
+write.csv(md, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-metadata.csv")
+```
+
+```{r include=FALSE}
+rm(exp)
+rm(md)
+
+```
+
+## BrainSpan 
+
+```{r load-bspan}
+bspan.annot = read.csv(here::here("data/annotations/BrainSpan-metadata-annot.csv"), header = TRUE)
+
+bspan = file.path(dir, "BrainSpan")
+columns.metadata = read.csv(file.path(bspan, "Kang/genes_matrix_csv/columns_metadata.csv"), header = TRUE)
+exp = read.csv(file.path(bspan, "Kang/genes_matrix_csv/expression_matrix.csv"), header= FALSE, row.names= 1)
+rows.metadata = read.csv(file.path(bspan, "Kang/genes_matrix_csv/rows_metadata.csv"))
+```
+
+```{r}
+colnames(columns.metadata) = bspan.annot$BITColumnName[match(colnames(columns.metadata),bspan.annot$OriginalMetadataColumnName)]
+```
+
+```{r md-bspan}
+md = columns.metadata %>% 
+      mutate(Stage = add_feature(.$Age, stages), 
+             AgeInterval = add_feature(.$Age, age_intervals), 
+             Diagnosis = "Control", 
+             Age = gsub(" ","_", .$Age)) %>%  
+      mutate(SampleID = paste(DonorID, Age, StructureAcronym, Stage, sep = "_"), 
+             age_for_mRIN = gsub("_", "", .$Age), 
+             DonorName = gsub("\\.","_", .$DonorName),
+            StructureAcronym = gsub("DFC", "DLPFC", StructureAcronym), 
+            StructureAcronym = gsub("MFC", "ACC", StructureAcronym)) %>% 
+  mutate(Regions = add_feature(.$StructureAcronym, regions)) %>%
+      mutate('sample name' = paste(DonorName, age_for_mRIN,Sex ,StructureAcronym, sep = "//")) %>% 
+      dplyr::select("SampleID", everything())
+
+md$AgeNumeric[grepl("pcw", md$Age, ignore.case = TRUE)]<-
+      md$Age[grepl("pcw", md$Age)] %>%  str_remove("_pcw")%>% 
+      as.numeric() %>% `-` (40) %>% divide_by(52)
+md$AgeNumeric[grepl("mos", md$Age, ignore.case = TRUE)] <- 
+      md$Age[grepl("_mos", md$Age)] %>%  str_remove("_mos") %>% 
+      as.numeric() %>% divide_by(12)
+md$AgeNumeric[grepl("yrs", md$Age, ignore.case = TRUE)] <- 
+      md$Age[grepl("_yrs", md$Age)] %>%  str_remove("_yrs") %>% 
+      as.numeric 
+    
+md %<>% mutate(Period = ifelse(.$AgeNumeric >= 0, "Postnatal", "Prenatal"), 
+                   colname = paste(DonorName, Age, StructureAcronym, sep = "_"))
+
+```
+
+```{r exp-rename}
+colnames(exp) = md$SampleID
+rownames(exp) <- rows.metadata$ensembl_gene_id
+```
+
+
+
+```{r}
+md.excel = read_excel(here::here("data/annotations/BrainSpan-additional.xlsx"),sheet =2, col_names = TRUE, skip =1) %>% 
+      as.data.frame() %>% mutate_at(.vars = "AllenInstituteID", 
+                                    .funs = gsub, pattern = "\\.", replacement = "\\_") %>%
+      mutate_at(.vars = "Age", .funs = gsub, pattern = "PCW", replacement = "_pcw") %>% 
+      mutate_at(.vars = "Age", .funs = gsub, pattern = "M", replacement = "_mos") %>%
+      mutate_at(.vars = "Age", .funs = gsub, pattern = "Y", replacement = "_yrs") %>%
+      mutate_at(.vars = "Region/Area", .funs = gsub, pattern = "\\/", replacement = "-") %>% 
+      mutate(colname = paste(AllenInstituteID, Age, `Region/Area`, sep = "_")) %>% 
+      dplyr::select(-c(Agerange, Age, Description))
+
+md = md %>% 
+      left_join(.,md.excel, by = "colname", keep = TRUE)
+```
+
+```{r}
+md.excel = read_excel(here::here("data/annotations/BrainSpan-additional.xlsx"), sheet = 1, col_names = TRUE) %>% 
+      as.data.frame() %>% 
+      mutate_at(.vars="Internal ID", .funs = gsub, pattern = "\\.", replacement = "\\_") %>% 
+      dplyr::rename("Braincode" = "External ID")
+
+md %<>% 
+  left_join(md.excel, by ="Braincode") %>% 
+      dplyr::select(-c("Age.y", "colname.y", "colname.x", "Gender", AllenInstituteID,
+                     "Region/Area", "age_for_mRIN", "sample name", "Internal ID")) %>% 
+      dplyr::rename("Ethnicity"="Ethn.")  %>% 
+  distinct(SampleID, .keep_all = TRUE)
+
+
+   
+md = md[!duplicated(md[,c('column_num')]),]
+md %>% 
+      dplyr::arrange(column_num)
+```
+
+
+```{r}
+md %>% 
+  DT::datatable(caption = "BrainSpan metadata after metadata harmonization")
+```
+
+
+### Export
+
+```{r}
+write.csv(exp, file = "/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-exp.csv")
+write.csv(md, file = "/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-metadata.csv")
+```
+
+```{r include =FALSE}
+rm(exp)
+rm(md)
+rm(rows.metadata)
+rm(columns.metadata)
+```
+
+
+## GTEx 
+
+```{r}
+gtex = file.path(dir, "GTEx")
+gtex.annot = read.csv(here::here("data/annotations/GTEx-metadata-annot.csv"), header = TRUE)
+```
+
+
+```{r}
+attributes = list.files(gtex, full.names = TRUE, pattern = "\\SampleAttributesDS.txt") # Sample attributes contains sample level information
+phenotype = list.files(gtex, full.names = TRUE, pattern = "\\SubjectPhenotypesDS.txt") # Phenotype level information related to each donor 
+exp = list.files(gtex, full.names = TRUE, pattern = "\\gene_tpm.gct.gz") # File used for expression matrix 
+    
+md.attrbutes = read_tsv(attributes, col_types = c('.default' = 'c')) %>% 
+      dplyr::filter(SMTS == 'Brain') %>% 
+      mutate(SUBJID = sapply(str_split(SAMPID, pattern = "-"), 
+                             function(x) paste(x[1:2], collapse = '-'))) %>%
+  left_join(read_tsv(phenotype, col_types = c('.default' = 'c')))  %>% 
+  as.data.frame()
+colnames(md.attrbutes) = gtex.annot$BITColumnName[match(colnames(md.attrbutes), gtex.annot$OriginalMetadataColumnName)]
+    
+ md.attrbutes %<>% 
+  as.data.frame() %>% 
+  mutate(StructureAcronym = add_feature(.$StructureAcronym, structure_acronym)) %>% 
+      mutate(Regions = add_feature(.$StructureAcronym, regions), 
+             AgeInterval = paste(.$AgeInterval, "yrs", sep = ""), 
+             Diagnosis = "Control", 
+             Sex = ifelse(Sex == 1, "M", "F"), 
+             Period = "Postnatal") %>% as.data.frame()
+    
+exp = read.delim(exp, skip = 2)
+colnames(exp) <- gsub("\\.", "-", colnames(exp)) # Changing expression file names to match metadata SampleIDs
+exp %<>% column_to_rownames("Name")
+    
+exp = exp %>% 
+      dplyr::select(contains(md.attrbutes$SampleID))
+message(paste0("Samples subsetted - Exp matrix contains ", ncol(exp), " samples"))
+rownames(exp) <- sub("\\.[0-9]*$", "", rownames(exp))
+    
+md.attrbutes= md.attrbutes[which(md.attrbutes$SampleID %in% colnames(exp)),] 
+```
+
+```{r}
+md.attrbutes %>% 
+  DT::datatable(caption="GTEx metadata after preprocessing")
+
+```
+
+### Export files
+```{r}
+write.csv(exp, file = file.path(gtex, "Formatted/GTEx-exp.csv"))
+write.csv(md.attrbutes, file = file.path(gtex,"Formatted/GTEx-metadata.csv"))
+```
+
+## Human developmental Biology Resource 
+
+Recount3 contains over 70,000 uniformly processed human RNA-seq samples. Recount provides gene, exon and exon-exon junction count matrices both in text format and as a `RangedSummarizedExperiment`. 
+
+The reads from recount were algined with the splice-aware Rail-RNA aligner. To compute the gene count matrices, the mapped reads were quantified with Gencode v25 with hg38 coordinates. 
+
+Unlike traditional quantification methods, recount3 provides base-pair coverage counts. Essentially, these are created in the following manner: 
+
+- Ar each exonic base-pair, the number of reads overlapping at that given base pair is computed. However, as library size is provided in recount3, the coverage counts can be scaled to read counts for a given library size. 
+
+
+```{r hdbr-setup}
+hdbr = recount3::create_rse_manual(
+  project = "ERP016243",
+  type = "gene"
+)
+
+hdbr_annot = read.csv(here::here("data/annotations/HDBR-metadata-annot.csv"), header=TRUE)
+hdbr_supp = read_excel("/home/neuro/Documents/BrainData/Bulk/HDBR/Amended Supplementary Table 1.xlsx", 
+                       sheet = 1, skip =6) %>% 
+  as.data.frame()
+
+colnames(hdbr_supp) = c("DonorID","Age", "SampleID", "Structure","Hemisphere", "Sex", "PMI")
+hdbr_supp %<>% dplyr::select("DonorID","Structure", "PMI")
+```
+
+```{r}
+hdbr_phenotype = read.csv("/home/neuro/Documents/BrainData/Bulk/HDBR/hdbr-phenotype.csv", 
+                          header=TRUE)
+
+```
+
+
+```{r}
+load(here::here("data/annotations/HDBR.Rda"))
+
+md.hdbr = md.hdbr[,1:15]
+
+colnames(md.hdbr) = hdbr_annot$BITColumnName[match(colnames(md.hdbr), hdbr_annot$OriginalMetadataColumnName)]
+
+md.hdbr %<>% 
+  as.data.frame() %>% 
+  dplyr::select(-c(Block, OntologyIndividual,  KaryotypeOntology, Organism, OrganismOntology, 
+                   StructureOntology, HemisphereOntology, OntologyAge)) %>% 
+  mutate(AgeInterval = add_feature(.$Age, age_intervals))  %>%
+  left_join(strc_acr, by = "Structure") %>% 
+  left_join(rgns_ftl, by = "StructureAcronym") %>% 
+  mutate(Sex = toupper(Sex)) %>% 
+  mutate(Sex = ifelse(str_detect(Sex,"XX"), "F",
+                      ifelse(str_detect(Sex, "XY"), "M", "Unknown" )), 
+         Diagnosis = c("Control"), 
+         Period = c("Prenatal"))
+
+md = colData(hdbr) %>% 
+  as.data.frame() %>% 
+   dplyr::select(-contains("2"))
+colnames(md) = hdbr_annot$BITColumnName[match(colnames(md), hdbr_annot$OriginalMetadataColumnName)]
+
+md.hdbr %<>%
+  mutate(Hemisphere = gsub("right", "R", Hemisphere), 
+         Hemisphere = gsub("left", "L", Hemisphere), 
+         Hemisphere = gsub("frontal", "Frontal", Hemisphere))
+
+hdbr_supp %<>% 
+  distinct(DonorID, .keep_all = TRUE) %>% 
+  mutate(PMI = ifelse(PMI == "UNKNOWN", NA, PMI))
+md.hdbr %<>% 
+  left_join(hdbr_supp, by = c("DonorID"))
+full.md.hdbr =left_join(md.hdbr, md)
+full.md.hdbr %<>%
+  mutate(PMI = as.numeric(PMI))
+
+full.md.hdbr %<>% 
+  dplyr::filter(Structure.x != "stomach")
+```
+
+
+```{r hdbr-tpm}
+assay(hdbr, "counts") = transform_counts(hdbr, round = TRUE)
+
+hdbr.tpm = recount::getTPM(hdbr)
+
+filter <- rowSums(hdbr.tpm, na.rm = TRUE) > 0.05
+hdbr.filter.tpm = hdbr.tpm[filter,]
+hdbr.filter.tpm <- thresh(hdbr.filter.tpm)
+
+```
+
+### Export data 
+
+```{r}
+hdbr.final = hdbr.tpm %>% 
+  as.data.frame() %>% 
+  dplyr::select(contains(full.md.hdbr$SampleID)) %>%
+  rownames_to_column("EnsemblID") %>% 
+  mutate_at(.vars = "EnsemblID", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") 
+
+write.csv(hdbr.final,file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-exp.csv")
+
+write.csv(full.md.hdbr, file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-metadata.csv")
+```
+
+```{r}
+full.md.hdbr %>% 
+  DT::datatable(caption="HDBR metadata after harmonization")
+```
+
+## PsychEncode
+
+```{r pe-data}
+psych = file.path(dir, "PsychEncode")
+pe.annot = read.csv(here::here("data/annotations/PsychEncode-metadata-annot.csv"), header=TRUE)
+
+
+exp = list.files(psych, full.names = TRUE, pattern = "\\Gene_expression_matrix_TPM.txt") %>% 
+      read.table(., header=TRUE, row.names = 1, check.names = FALSE)
+md = list.files(psych, full.names = TRUE, pattern = "Job*") %>% read.csv(., header=TRUE) %>% 
+  dplyr::filter(individualID != "2015-1")
+comp = list.files(psych, full.names = TRUE, pattern = "\\Cell_fractions*") %>% read_excel() %>%
+      as.data.frame() %>% 
+      column_to_rownames("CellType")
+```
+
+
+```{r md-meta}
+colnames(md) = pe.annot$BITColumnName[match(colnames(md), pe.annot$OriginalColumnName)]
+    # Fix existing columns 
+comp = comp[,-1] 
+comp = as.data.frame(t(comp))
+m <- match(md$SampleID, rownames(comp))
+md <- cbind(md, comp[m,])
+
+
+    
+# PCW to age numeric 
+md$AgeNumeric[grepl("PCW", md$AgeNumeric, ignore.case = TRUE)] = md$AgeNumeric[grepl("PCW", md$AgeNumeric)] %>%
+  str_remove("PCW")%>% 
+  as.numeric() %>% `-` (40) %>% divide_by(52)
+    
+md$AgeNumeric = gsub("90+", "91", md$AgeNumeric)
+md$AgeNumeric =gsub("\\+", "", md$AgeNumeric)
+    
+    
+md$AgeNumeric <- as.numeric(as.character(md$AgeNumeric))
+    
+md %<>%
+      dplyr::filter(Diagnosis == "Affective Disorder" |
+               Diagnosis == "Autism Spectrum Disorder" | 
+               Diagnosis == "Bipolar Disorder" |
+               Diagnosis == "Control" |
+               Diagnosis == "Schizophrenia") %>% 
+      mutate(Structure = c("Dorsolateral Prefrontal Cortex"),  ## Adding name of structure
+             StructureAcronym = c("DLPFC")) %>%  
+      mutate(Period = ifelse(.$AgeNumeric >= 0, "Postnatal", "Prenatal"))  %>%
+      mutate(Age_rounded = as.character(sapply(.$AgeNumeric, num_to_round))) %>% as.data.frame() %>%
+      mutate(AgeInterval = as.character(add_feature(.$Age_rounded, age_intervals)),
+             Death = as.character(add_feature(.$causeDeath, death_cause))) %>% 
+      mutate(Regions = c("Cortex")) %>% 
+      mutate(DonorID = as.character(.$SampleID)) %>%
+      dplyr::select(-Age_rounded) %>%
+      as.data.frame()
+
+
+exp = exp %>%
+  dplyr::select(contains(md$SampleID))
+
+md = md %>% 
+  dplyr::filter(SampleID %in% colnames(exp))
+exp = exp[colnames(exp) %in% md$SampleID,] 
+md = md[md$SampleID %in% colnames(exp),] 
+
+```
+
+### Export data
+
+```{r}
+write.csv(exp, file = file.path(psych, "Formatted/PsychEncode-exp.csv"))
+write.csv(md, file = file.path(psych,"Formatted/PsychEncode-metadata.csv"))
+
+```
+
+
+```{r}
+rm(md)
+rm(exp)
+```
+
+## FANTOM5
+
+```{r f5-load}
+f5_annot = read.csv(here::here("data/annotations/Fantom5-metadata-annot.csv"))
+
+f5 = read.delim("/home/neuro/Documents/BrainData/Bulk/Fantom5/fantom5_md.txt", skip=8)
+colnames(f5) = c("metadata")
+
+column_md = str_split_fixed(f5$metadata, "\\[", n = Inf) %>% 
+  as.data.frame() %>% 
+  mutate(V2 = gsub("_ctss]", "",V2)) 
+
+column_md_1 = 
+  str_split_fixed(column_md$V3, "]", n = Inf) %>% 
+  as.data.frame() %>% 
+  mutate(V2 = gsub("=", "", V2))
+
+colnames(column_md) = c("Type", "SampleID", "Metadata_variable")
+colnames(column_md_1) = c("Metadata", "Value")
+
+f5_md=cbind(column_md,column_md_1)%>% 
+  dplyr::select(SampleID, Metadata, Value)
+
+f5_md <- f5_md[-which(f5_md$Metadata == ""), ]
+
+md_f5 = f5_md%>% 
+  pivot_wider(id_cols = "SampleID", names_from = "Metadata", values_from = "Value") %>% 
+  as.data.frame()
+
+md_f5 %>% unnest_wider(`FF_ont:desc`, names_sep = "_")
+colnames(md_f5) = f5_annot$BITColumnName[match(colnames(md_f5), f5_annot$OriginalName)]
+```
+
+
+```{r}
+f5_metadata = read.csv("/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-metadata.csv",
+                       header=TRUE, row.names = 1)
+f5_metadata %>%
+  dplyr::filter(Tissue == "  brain")
+
+
+brain_samples = c("  amygdala", "  brain", "  caudate nucleus",
+                  "  cerebellum", "  cerebral cortex", "  cerebrospinal fluid", 
+                  "  choroid plexus", "  corpus callosum","  frontal lobe", 
+                  "  globus pallidus ", "  hippocampus",
+                  "  locus coeruleus", "  medial frontal gyrus",
+                  "  medial temporal gyrus", "  medulla oblongata",
+                  "  meninges", "  nucleus accumbens", "  occipital cortex", 
+                  "  occipital lobe", "  occipital pole", "  parietal cortex",
+                  "  parietal lobe ", "  pons", 
+                  "  postcentral gyrus", "  putamen", "  spinal cord",
+                  "  temporal lobe", "  thalamus")
+
+f5_metadata %>% 
+  dplyr::filter(Tissue %in% brain_samples)
+```
+
+```{r exp-f5}
+exp = f5_exp %>% 
+  as.data.frame() %>% 
+  dplyr::select(-c("eedb.chrom","eedb.start.0base",
+                   "eedb.end", "eedb.score", "eedb.strand", 
+                   "gff.attributes")) %>%
+  mutate_at(.vars = "eedb.name", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>%
+  column_to_rownames("eedb.name")
+
+colnames(exp) = gsub(pattern = "exp.rle.", replacement = "", x = colnames(exp))
+colnames(exp) = gsub(pattern = "_ctss", replacement = "", x = colnames(exp))
+```
+
+```{r}
+exp = exp %>% 
+  dplyr::select(contains(md_f5$SampleID))
+
+md_f5 = apply(md_f5,2,as.character)
+```
+
+### Export data 
+```{r}
+write.csv(exp, "/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-exp.csv")
+write.csv(md_f5, "/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-metadata.csv")
+```
