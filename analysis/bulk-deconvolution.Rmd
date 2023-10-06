@@ -924,7 +924,7 @@ cibersort_all = rbind(pe.cbs,
                                               "Neurons")),
         Regions = factor(Regions, 
                          levels = c("Brain", "Forebrain","Hindbrain",
-                                    "Midbrain", "Forebrain and midbrain", 
+                                    "Midbrain", "Chroid plexus", 
                                     "Cortex", "Subcortex",
                                     "Cerebellum", "Spinal Cord") )) %>% 
   ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
@@ -957,7 +957,7 @@ cibersort_hdbr = rbind(pe.cbs,
                                               "Neurons")),
         Regions = factor(Regions, 
                          levels = c("Brain", "Forebrain","Hindbrain",
-                                    "Midbrain", "Forebrain and midbrain", 
+                                    "Midbrain", "Chroid plexus", 
                                     "Cortex", "Subcortex",
                                     "Cerebellum", "Spinal Cord") )) %>% 
   ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
@@ -1405,5 +1405,12 @@ bspan.csb %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 ))
+
+```
+
+## Export the datasets 
+
+```{r}
+
 
 ```

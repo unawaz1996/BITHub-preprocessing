@@ -732,26 +732,6 @@ ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-FOXG1.svg")
 
 
 ```{r}
-sn.dir =file.path("/home/neuro/Documents/BrainData/single-cell")
-
-snRNA = list()
-
-snRNA$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-exp.csv"), 
-                     header=TRUE, check.names = FALSE, row.names = 1)
-snRNA$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-exp.csv"), 
-                     header=TRUE, check.names = FALSE, row.names = 1)
-#snRNA$cameron 
-
-sn_md = list()
-
-sn_md$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-metadata.csv"), 
-                     header=TRUE, check.names = FALSE, row.names = 1)
-sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metadata.csv"), 
-                     header=TRUE, check.names = FALSE, row.names = 1)
-
-```
-
-```{r}
 
 sub = snRNA$hca %>% 
     as.data.frame() %>%
@@ -1029,4 +1009,29 @@ exp_data %>%
         axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
 ```
 
-## Some CP genes 
+# Single-nucleus and deconvolution exploration of bulk RNA-seq expression
+
+
+
+```{r}
+sn.dir =file.path("/home/neuro/Documents/BrainData/single-cell")
+
+snRNA = list()
+
+snRNA$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-exp.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+snRNA$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-exp.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+#snRNA$cameron 
+
+sn_md = list()
+
+sn_md$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-metadata.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metadata.csv"), 
+                     header=TRUE, check.names = FALSE, row.names = 1)
+
+```
+
+
+
