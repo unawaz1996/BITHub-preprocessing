@@ -751,6 +751,25 @@ sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metada
 
 ```
 
+```{r}
+
+sub = snRNA$hca %>% 
+    as.data.frame() %>%
+    dplyr::filter(Symbol %in% "MKI67") %>% 
+    melt() %>%
+    dplyr::rename("CellID" = "variable", "Exp" = "value")
+
+#%>% 
+sub %<>% 
+    left_join(sn_md$hca %>%
+                rownames_to_column("CellID"),  by = "CellID")
+
+
+ggplot(sub, aes(x = MajorCelltype, y = log10(Exp), 
+                fill = MajorCelltype))  +geom_boxplot() + theme_bw()
+
+```
+
 
 ## MKI67
 
@@ -782,9 +801,12 @@ bspan = exp_data %>%
                                            "Midbrain" = "#AC93AD", 
                                            "Hindbrain" = "#6E8B8E",
                                           "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  theme(legend.position = "none", 
-        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+                                          "Forebrain and midbrain"))+ theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
 
 ggsave(bspan, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSpan-ZMYND8.svg"), 
         width = 8, 
@@ -816,9 +838,12 @@ bseq = exp_data %>%
                                            "Midbrain" = "#AC93AD", 
                                            "Hindbrain" = "#6E8B8E",
                                           "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  theme(legend.position = "none", 
-        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+                                          "Forebrain and midbrain")) +  theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
 
 ggsave(bseq, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSeq-ZMYND8.svg"), 
         width = 8, 
@@ -850,9 +875,12 @@ gtex = exp_data %>%
                                            "Midbrain" = "#AC93AD", 
                                            "Hindbrain" = "#6E8B8E",
                                           "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  theme(legend.position = "none", 
-        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+                                          "Forebrain and midbrain"))  + theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
 
 ggsave(gtex, file=here::here("output/Thesis_plots/Examples/NDDs/GTEx-ZMYND8.svg"), 
         width = 8, 
@@ -886,8 +914,12 @@ hdbr = exp_data %>%
                                  "Brain" = "#FFA6B7", 
                                  "Chroid plexus" = "#9D696C"
                                 )) +
-  theme(legend.position = "none", 
-        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+    theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")  
 
 ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/NDDs/HDBR-ZMYND8.svg"), 
         width = 8, 
@@ -909,7 +941,7 @@ pe = exp_data %>%
                                          "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
   drop_na() %>%
   ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
-# geom_violin(position = position_dodge(0.8), color = NA) +
+# geom_violin(position = position_dodge(0.8), color = NA) +w
   geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
   theme_bw() +scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
@@ -921,8 +953,12 @@ pe = exp_data %>%
                                  "Brain" = "#FFA6B7", 
                                  "Chroid plexus" = "#9D696C"
                                 )) +
-  theme(legend.position = "none", 
-        axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+    theme(
+        axis.text.x = element_text(angle = 90), 
+        legend.position = "top", 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+  ylab("log10(RPKM)")
 
 ggsave(pe, file=here::here("output/Thesis_plots/Examples/NDDs/PsychEncode-ZMYND8.svg"), 
         width = 8, 
