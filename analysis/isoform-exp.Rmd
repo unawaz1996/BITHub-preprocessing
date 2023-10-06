@@ -70,7 +70,7 @@ tapply(unlist(gtex_trans), list(row(gtex_trans), a), mean)
 
 ```{r}
 palette = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100)
-zmynd8_heatmap = gtex_trans %>%
+zmynd8_heatmap_gtex = gtex_trans %>%
   as.data.frame() %>%
   rownames_to_column("tx_id") %>%
   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
@@ -85,12 +85,13 @@ dim(zmynd8_heatmap)
 #StructureAcronym
 
 
-average = with(md, setNames(StructureAcronym, SampleID))[names(zmynd8_heatmap)[col(zmynd8_heatmap)]]
+average = with(md, setNames(StructureAcronym, SampleID))[names(zmynd8_heatmap_gtex)[col(zmynd8_heatmap_GTEx)]]
 
-average_exp = tapply(unlist(zmynd8_heatmap), list(row(zmynd8_heatmap), average ), mean)
+average_exp = tapply(unlist(zmynd8_heatmap_gtex), list(row(zmynd8_heatmap_gtex), average ), mean)
 
-rownames(average_exp) = rownames(zmynd8_heatmap)
+rownames(average_exp) = rownames(zmynd8_heatmap_gtex)
 
+order_zmynd8 = rownames(average_exp)
 
 pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = TRUE, 
          cluster_cols= FALSE,cellwidth = 10, cellheight = 10, border_color = "grey", 
@@ -176,6 +177,15 @@ pfc_exp = exp %>%
 
 ## ZMYND8
 
+```{r}
+tx_order = c("ENST00000619049", "ENST00000360911", "ENST00000536340","ENST00000617418",
+             "ENST00000262975", "ENST00000458360", "ENST00000471951", "ENST00000467200",
+             "ENST00000352431", "ENST00000461685", "ENST00000446994", "ENST00000435836",
+             "ENST00000540497", "ENST00000355972", "ENST00000396281", "ENST00000311275", 
+             "ENST00000441977", "ENST00000446894", "ENST00000372023", "ENST00000468376", 
+             "ENST00000611941")
+```
+
 - Age Interval
 
 ```{r}
@@ -256,13 +266,15 @@ average = with(pfc_samples, setNames(AgeInterval,SampleID))[names(zmynd8_heatmap
 average_exp = tapply(unlist(zmynd8_heatmap), list(row(zmynd8_heatmap), average ), mean)
 rownames(average_exp) = rownames(zmynd8_heatmap)
 
+average_exp = average_exp[match(tx_order , rownames(average_exp)), ]
+
 average_exp %<>% 
   as.data.frame() %>%
   dplyr::select(contains("pcw"),contains("mos"),
                 everything()) %>%
   as.matrix()
 
-pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = TRUE, border_color = "grey",
+pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = FALSE, border_color = "grey",
          cluster_cols= FALSE,cellwidth = 10, cellheight = 10, 
          color = palette)
 ```
@@ -286,13 +298,15 @@ average = with(hip_samples, setNames(AgeInterval,SampleID))[names(zmynd8_heatmap
 average_exp = tapply(unlist(zmynd8_heatmap), list(row(zmynd8_heatmap), average ), mean)
 rownames(average_exp) = rownames(zmynd8_heatmap)
 
+average_exp = average_exp[match(tx_order , rownames(average_exp)), ]
+
 average_exp %<>% 
   as.data.frame() %>%
   dplyr::select(contains("pcw"),contains("mos"),
                 everything()) %>%
   as.matrix()
 
-pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = TRUE, border_color = "grey",
+pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = FALSE, border_color = "grey",
          cluster_cols= FALSE,cellwidth = 10, cellheight = 10, 
          color = palette)
 ```

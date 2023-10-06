@@ -1291,5 +1291,27 @@ sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metada
 
 ```
 
+```{r}
+snRNA$vel[,-1] %>% 
+  rownames_to_column("genes") %>% 
+  dplyr::filter(genes == "FMR1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$vel %>% 
+              rownames_to_column("CellID"), by ="CellID") %>% 
+  ggplot(aes(x=MajorCelltype, y = log10(value), fill = diagnosis)) + geom_boxplot() + 
+  theme_bw()
+```
 
+```{r}
+snRNA$vel[,-1] %>% 
+  rownames_to_column("genes") %>% 
+  dplyr::filter(genes == "ZMYND8") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$vel %>% 
+              rownames_to_column("CellID"), by ="CellID") %>% 
+  ggplot(aes(x=MajorCelltype, y = log10(value), fill = diagnosis)) + geom_boxplot() + 
+  theme_bw()
+```
 
