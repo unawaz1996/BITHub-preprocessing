@@ -1411,6 +1411,10 @@ bspan.csb %>%
 ## Export the datasets 
 
 ```{r}
-
+write.csv(as.data.frame(decon_results$BSpan_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-decon.csv" )
+write.csv(as.data.frame(decon_results$BSeq_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-decon.csv" )
+write.csv(as.data.frame(decon_results$GTEx_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-decon.csv")
+write.csv(as.data.frame(decon_results$HDBR_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-decon.csv")
+write.csv(as.data.frame(decon_results$PE_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-decon.csv")
 
 ```
