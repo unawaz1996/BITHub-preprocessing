@@ -363,8 +363,8 @@ pca
 ```{r}
 ggsave(pca, 
        filename = here::here("output/Thesis_plots/Variance/PCA/all-data.svg"), 
-       height = 4, 
-       width = 6, 
+       height = 6, 
+       width = 8, 
        units = "in")
 ```
 
