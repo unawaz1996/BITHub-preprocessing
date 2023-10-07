@@ -125,9 +125,10 @@ bseq = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2) +
   ylab("log10(RPKM)")
 
+bseq
 ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -166,9 +167,9 @@ bspan = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2.5) +
   ylab("log10(RPKM)")
-
+bspan
 ggsave(bspan, file=here::here("output/Thesis_plots/Examples/BrainSpan-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -207,9 +208,9 @@ gtex = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 3) +
   ylab("log10(RPKM)")
-
+gtex
 ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -249,10 +250,10 @@ hdbr  = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2.5) +
   ylab("log10(RPKM)")
 
-
+hdbr
 ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -292,10 +293,10 @@ pe = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2) +
   ylab("log10(RPKM)")
 
-
+pe
 ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -337,9 +338,9 @@ bseq = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 2) +
   ylab("log10(RPKM)")
-
+bseq
 ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-MKI67.svg"), 
         width = 8, 
        height =5, 
@@ -378,7 +379,7 @@ bspan = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 2) +
   ylab("log10(RPKM)")
 
 bspan
@@ -420,9 +421,10 @@ gtex = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 2) +
   ylab("log10(RPKM)")
 
+gtex
 ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-MKI67.svg"), 
         width = 8, 
        height =5, 
@@ -462,10 +464,10 @@ hdbr  = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2.5) +
   ylab("log10(RPKM)")
 
-
+hdbr
 ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-MKI67.svg"), 
         width = 8, 
        height =5, 
@@ -505,10 +507,10 @@ pe = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 2) +
   ylab("log10(RPKM)")
 
-
+pe
 ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-MKI67.svg"), 
         width = 8, 
        height =5, 
@@ -784,9 +786,10 @@ bspan = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 3) +
   ylab("log10(RPKM)")
 
+bspan
 ggsave(bspan, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSpan-ZMYND8.svg"), 
         width = 8, 
        height =5, 
@@ -821,9 +824,10 @@ bseq = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 3.6) +
   ylab("log10(RPKM)")
 
+bseq
 ggsave(bseq, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSeq-ZMYND8.svg"), 
         width = 8, 
        height =5, 
@@ -858,9 +862,9 @@ gtex = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 4.5) +
   ylab("log10(RPKM)")
-
+gtex
 ggsave(gtex, file=here::here("output/Thesis_plots/Examples/NDDs/GTEx-ZMYND8.svg"), 
         width = 8, 
        height =5, 
@@ -897,9 +901,9 @@ hdbr = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 4) +
   ylab("log10(RPKM)")  
-
+hdbr
 ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/NDDs/HDBR-ZMYND8.svg"), 
         width = 8, 
        height =5, 
@@ -936,9 +940,10 @@ pe = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 4.5) +
   ylab("log10(RPKM)")
 
+pe
 ggsave(pe, file=here::here("output/Thesis_plots/Examples/NDDs/PsychEncode-ZMYND8.svg"), 
         width = 8, 
        height =5, 
@@ -1038,7 +1043,7 @@ bspan = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 3.5) +
   ylab("log10(RPKM)")
 
 bspan
@@ -1076,7 +1081,7 @@ bseq = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 3.5) +
   ylab("log10(RPKM)")
 bseq
 ggsave(bseq, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSeq-FMR1.svg"), 
@@ -1113,7 +1118,7 @@ gtex = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 4.5) +
   ylab("log10(RPKM)")
 
 gtex
@@ -1153,7 +1158,7 @@ hdbr = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 4.5) +
   ylab("log10(RPKM)")  
 
 hdbr
@@ -1193,7 +1198,7 @@ pe = exp_data %>%
         axis.text.x = element_text(angle = 90), 
         legend.position = "top", 
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-3, 6) +
+        panel.grid.major.y = element_line( size=.1 )) + ylim(0, 5) +
   ylab("log10(RPKM)")
 
 pe
@@ -1266,9 +1271,22 @@ exp_data %>%
         axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
 ```
 
+## Cell-type deconvolution 
+
+```{r}
+decon_res = list()
+decon_res$BSpan = read.csv("/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-decon.csv", header=TRUE)
+```
+
+```{r}
+decon_res$BSpan %>% 
+  dplyr::rename("SampleID" = "X") %>% 
+  left_join(exp_data$BSpan %>% 
+              dplyr::filter(EnsemblID == "ENSG00000102081"), by = "SampleID") %>% 
+  dplyr::filter()
+```
 
 # Single-nucleus and deconvolution exploration of bulk RNA-seq expression
-
 
 
 ```{r}
