@@ -49,21 +49,6 @@ e$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-exp.csv"),
                    check.names = FALSE, row.names = 1)  %>%
   column_to_rownames("EnsemblID")
 
-md = list()
-md$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-metadata.csv"),
-                    check.names = FALSE, row.names = 1)
-md$PE <- read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-metadata.csv"),
-                  check.names = FALSE)
-md$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-metadata.csv"),
-                    check.names = FALSE)
-md$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-metadata.csv"),
-                    check.names = FALSE, row.names = 1)
-
-md$BSpan <- read.csv(file.path(brain.dir,
-                               "/BrainSpan/Formatted/BrainSpan-metadata.csv"),
-                     check.names = FALSE)
-
-
 datasets = c("BSpan", "HDBR", "BSeq", "GTEx", "PE")
 
 decon_results = list()
