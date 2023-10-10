@@ -15,6 +15,8 @@ libs = c("dplyr", "ggplot2", "reshape2", "tools", "magrittr", "tibble", "readxl"
          "sunburstR", "pheatmap")
 libsLoaded <- lapply(libs,function(l){suppressWarnings(suppressMessages(library(l, character.only = TRUE)))})
 library(EnsDb.Hsapiens.v86)
+source(here::here("code/preprocess/functions.R"))
+source(here::here("code/preprocess/def_stages.R"))
 ```
 
 ```{r annotations}
@@ -1269,6 +1271,8 @@ exp_data %>%
   facet_grid(Dataset~gene_name, scales = "free") + 
   theme(legend.position = "none", 
         axis.text.x = element_text(angle = 90)) + ylim(-3, 6)
+
+
 ```
 
 ## Cell-type deconvolution 
@@ -1276,15 +1280,110 @@ exp_data %>%
 ```{r}
 decon_res = list()
 decon_res$BSpan = read.csv("/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-decon.csv", header=TRUE)
+
+decon_res$GTEx = read.csv("/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-decon.csv", header=TRUE)
 ```
 
 ```{r}
-decon_res$BSpan %>% 
+bspan_prop =decon_res$BSpan %>% 
   dplyr::rename("SampleID" = "X") %>% 
   left_join(exp_data$BSpan %>% 
-              dplyr::filter(EnsemblID == "ENSG00000102081"), by = "SampleID") %>% 
-  dplyr::filter()
+              dplyr::filter(EnsemblID == "ENSG00000101040"), by = "SampleID") %>%
+    ggplot(aes(x=Neurons, y = log10(Exp), color = Regions, shape = Period)) + geom_point(alpha = 0.75, size =3) + theme_bw() +
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + xlab("Neuronal proportion") +
+  theme(axis.text = element_text(size =12, face="bold"))
+
+
+bspan_prop 
+ggsave(bspan_prop, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSpan-ZMYND8-neuronal.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
 ```
+
+
+```{r}
+GTEx_prop =decon_res$GTEx%>% 
+  dplyr::rename("SampleID" = "X") %>% 
+  left_join(exp_data$GTEx %>% 
+              dplyr::filter(EnsemblID == "ENSG00000101040"), by = "SampleID") %>%
+  ggplot(aes(x=Neurons, y = log10(Exp), color = Regions)) + geom_point(alpha = 0.75, size =3) + theme_bw() +
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + xlab("Neuronal proportion") +
+  theme(axis.text = element_text(size =12, face="bold"))
+GTEx_prop 
+ggsave(GTEx_prop, file=here::here("output/Thesis_plots/Examples/NDDs/GTEx-ZMYND8-neuronal.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+```{r}
+bspan_prop =decon_res$BSpan %>% 
+  dplyr::rename("SampleID" = "X") %>% 
+  left_join(exp_data$BSpan %>% 
+              dplyr::filter(EnsemblID == "ENSG00000102081"), by = "SampleID") %>%
+    ggplot(aes(x=Neurons, y = log10(Exp), color = Regions, shape = Period)) + geom_point(alpha = 0.75, size =3) + theme_bw() +
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + xlab("Neuronal proportion") +
+  theme(axis.text = element_text(size =12, face="bold"))
+
+ggsave(bspan_prop, file=here::here("output/Thesis_plots/Examples/NDDs/BrainSpan-FMR1-neuronal.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
+
+```{r}
+GTEx_prop =decon_res$GTEx%>% 
+  dplyr::rename("SampleID" = "X") %>% 
+  left_join(exp_data$GTEx %>% 
+              dplyr::filter(EnsemblID == "ENSG00000102081"), by = "SampleID") %>%
+  ggplot(aes(x=Neurons, y = log10(Exp), color = Regions)) + geom_point(alpha = 0.75, size =3) + theme_bw() +
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + xlab("Neuronal proportion") +
+  theme(axis.text = element_text(size =12, face="bold"))
+
+ggsave(GTEx_prop, file=here::here("output/Thesis_plots/Examples/NDDs/GTEx-FMR1-neuronal.svg"), 
+        width = 8, 
+       height =5, 
+       units = "in")
+```
+
 
 # Single-nucleus and deconvolution exploration of bulk RNA-seq expression
 

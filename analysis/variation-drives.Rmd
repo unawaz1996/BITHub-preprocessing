@@ -1100,7 +1100,7 @@ HDBR_plot = e$Raw$HDBR %>%
      "> 20"
   ))) %>%
   drop_na(PMI.intervals) %>%
-  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  ggplot(aes(x = PMI.intervals,  y = log10(Exp), fill = Regions)) + geom_boxplot() +
   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
                                  "Cerebellum" = "#FFD256",
@@ -1109,7 +1109,7 @@ HDBR_plot = e$Raw$HDBR %>%
                                  "Midbrain" = "#AC93AD",
                                  "Hindbrain" = "#6E8B8E",
                                  "Brain" = "#FFA6B7", 
-                                 "Forebrain and midbrain" = "#9D696C"
+                                 "Chroid plexus" = "#9D696C"
                                 )) + 
     xlab ("PMI Intervals") + ylab("TPM") + 
   theme(legend.position = "top", 
@@ -1531,7 +1531,7 @@ gtex_plot =e$Raw$GTEx %>%
     "> 16 & < 20",
      "> 20"
   ))) %>%
-  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  ggplot(aes(x = PMI.intervals,  y = log10(Exp), fill = Regions)) + geom_boxplot() +
   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
                                  "Cerebellum" = "#FFD256",
@@ -1572,7 +1572,7 @@ bspan_plot = e$Raw$BSpan %>%
      "> 20"
   ))) %>%
   drop_na(PMI.intervals) %>%
-  ggplot(aes(x = PMI.intervals,  y = Exp, fill = Regions)) + geom_boxplot() +
+  ggplot(aes(x = PMI.intervals,  y = log10(Exp), fill = Regions)) + geom_boxplot() +
   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
                                  "Cerebellum" = "#FFD256",
@@ -1709,4 +1709,4 @@ ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSp
        units = "in")
 ```
 
-
+## Time-course with PMI?
