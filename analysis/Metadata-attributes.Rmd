@@ -84,10 +84,10 @@ dir = file.path("/home/neuro/Documents/BrainData/Bulk")
 sn_dir = file.path("/home/neuro/Documents/BrainData/single-cell")
 md = list()
 
-md$BrainSeq = read.csv(file.path(dir,"Brainseq/Formatted/BrainSeq-metadata.csv"), header=TRUE, check.names = FALSE)
-md$BrainSpan = read.csv(file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE)
-md$GTEx =  read.csv(file.path(dir,"GTEx/Formatted/GTEx-metadata.csv"), header=TRUE, check.names = FALSE)
-md$HDBR = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
+md$BrainSeq = read.csv(file.path(dir,"Brainseq/Formatted/BrainSeq-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
+md$BrainSpan = read.csv(file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
+md$GTEx =  read.csv(file.path(dir,"GTEx/Formatted/GTEx-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
+md$HDBR = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
 md$FANTOM5 = read.csv(file.path(dir, "Fantom5/Formatted/FANTOM5-metadata.csv"), header=TRUE, check.names = FALSE)
 #md$Velmeshev = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
 md$Aldringer = read.csv(file.path(sn_dir, "aldinger/Aldringer-metadata.csv"), header=TRUE, check.names = FALSE)
@@ -127,7 +127,7 @@ M = cor(data.matrix(md.clean), use = "complete.obs")
 corrplot(M, order='hclust',
          method = "circle", 
          number.cex = .50, 
-         tl.cex=0.75, type="upper")
+         tl.cex=0.75)
 ```
 
 - GTEx 
@@ -143,11 +143,14 @@ md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(
 
 
 ```{r}
+pdf(here::here("output/Thesis_plots/Metadata/GTEx-cor-seq-metadata.pdf"), height = 10, width=10)
 M = cor(data.matrix(md.clean), use = "complete.obs")
 corrplot(M, order='hclust',
          method = "circle", 
          number.cex = .50, 
-         tl.cex=0.75, type="upper")
+         tl.cex=0.75)
+
+dev.off()
 ```
 
 - FANTOM5
@@ -178,18 +181,35 @@ hdbr_annot_seq = annot$HDBR %>%
   dplyr::filter(Type == "Sequencing metrics")
 
 md.seq = md$HDBR %>%
-  dplyr::select(contains(hdbr_annot_seq$BITColumnName))
+  dplyr::select(contains(hdbr_annot_seq$BITColumnName)) %>%
+  dplyr::select(-c("Percentage_fragment_mapped_unique_exon_fc",
+                   "Total_fragments_assigned_exon_fc",
+                   "Total_fragments_count_unique_exon_fc", 
+                   "Total_fragments_count_unique_assigned_exon_fc", 
+                   "AUC_all_annotated_exons", "AUC_all_annotated_exons_unique",
+                   "BigWigFile", "CellLinePrediction","PredictionType",
+                   "CuratedTypePrediction", "PredictionType", 
+                   "Metadata_source", "Metadata_source", "LibraryName", 
+                   "LibraryStrategy", "LibrarySource", "LibraryLayout", 
+                   "LibrarySelection", "CellTypePrediction", "PatternPredictionType",
+                   "SampleAccPrediction", "CuratedTissuePrediction",
+                   "Mapping_speed_per_hour_STAR", "ReadInfo", "RunAlias",
+                   "Run_Center_Name", "Run_Broker_name", "Run_Center", "Processed_Recount",
+                   "FileSource_Recount", "Organism_recount", "PlatformModel",
+                   "SampleAttributes", "ExperimentAttributes", "SampleName", 
+                   "SampleTitle", "RunPublished", "Size",
+                   "MeanFragmentLength_BAM", "Total_fragments_input_fc_exon_fc"))
 
 md.seq.clean = md.seq  %>% select_if(~ !any(is.na(.)))
 md.seq.clean = md.seq.clean[vapply(md.seq.clean, function(x) length(unique(x)) > 1, logical(1L))]
 ```
 
-```{r fig.height=30, fig.width=30}
+```{r fig.height=25, fig.width=25}
 M = cor(data.matrix(md.seq.clean), use = "complete.obs")
-pdf("../../Results/Thesis_plots/HDBR-corplot.pdf", height = 30, width=30)
+pdf(here::here("output/Thesis_plots/Metadata/HDBR-corplot.pdf"), height = 25, width=25)
 corrplot(M, order='hclust',
          method = "circle", 
-         number.cex = .50, type="upper", 
+         number.cex = .50, 
          cl.cex = 3,
          tl.cex=1.2)
 dev.off()
@@ -326,4 +346,19 @@ x= list("HCA" = hca.tech$BITHubColumnName,
 UpSetR::upset(fromList(x), sets.bar.color = c ("#E85571","#838DE0","#FFD256","#75C7A0"))
 ```
 
+###
 
+```{r}
+
+count_na <- function(x) sum(is.na(x))    
+md$BrainSpan %>%
+  mutate(count_na = apply(., 1, count_na)) %>%
+  ggplot(aes(count_na)) + geom_density()
+
+md$GTEx %>%
+  mutate(count_na = apply(., 1, count_na)) %>%
+  ggplot(aes(count_na)) + geom_density()
+
+#%>% 
+ # ggplot(aes(x=PMI))
+```
