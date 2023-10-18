@@ -124,10 +124,13 @@ md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(
 
 ```{r}
 M = cor(data.matrix(md.clean), use = "complete.obs")
+pdf(here::here("output/Thesis_plots/Metadata/BrainSeq-cor-seq-metadata.pdf"), height = 10, width=10)
 corrplot(M, order='hclust',
          method = "circle", 
          number.cex = .50, 
          tl.cex=0.75)
+dev.off()
+
 ```
 
 - GTEx 

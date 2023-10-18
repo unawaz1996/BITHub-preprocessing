@@ -57,6 +57,7 @@ library(parallel)
 library(preprocessCore)
 library(Metrics)
 library(DTWBI)
+library(firatheme)
 ```
 
 
@@ -67,215 +68,218 @@ brain.dir =file.path("/home/neuro/Documents/BrainData/Bulk")
 
 
 
-<!-- # ```{r load-data} -->
-<!-- #  -->
-<!-- # e <- list() -->
-<!-- #    -->
-<!-- # e$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-exp.csv"),  -->
-<!-- #                        check.names = FALSE, row.names = 1) -->
-<!-- # e$PE <- read.csv(file.path(brain.dir, "/PsychEncode/Formatted/PsychEncode-exp.csv"),  -->
-<!-- #                      row.names =1, check.names = FALSE) -->
-<!-- # e$BSpan <- read.csv(file.path(brain.dir, "/BrainSpan/Formatted/BrainSpan-exp.csv"), -->
-<!-- #                         check.names = FALSE, row.names = 1) -->
-<!-- # e$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-exp.csv"),  -->
-<!-- #                        check.names = FALSE, row.names = 1) -->
-<!-- #  -->
-<!-- # e$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-exp.csv"),  -->
-<!-- #                        check.names = FALSE, row.names = 1)  %>%  -->
-<!-- #   column_to_rownames("EnsemblID") -->
-<!-- # ``` -->
+```{r load-data}
+
+e <- list()
+
+e$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-exp.csv"),
+                       check.names = FALSE, row.names = 1)
+e$PE <- read.csv(file.path(brain.dir, "/PsychEncode/Formatted/PsychEncode-exp.csv"),
+                     row.names =1, check.names = FALSE)
+e$BSpan <- read.csv(file.path(brain.dir, "/BrainSpan/Formatted/BrainSpan-exp.csv"),
+                        check.names = FALSE, row.names = 1)
+e$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-exp.csv"),
+                       check.names = FALSE, row.names = 1)
+
+e$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-exp.csv"),
+                       check.names = FALSE, row.names = 1)  %>%
+  column_to_rownames("EnsemblID")
+```
 
 
 
 ```{r metadata-load}
 md = list()
-md$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-metadata.csv"), 
+md$GTEx <- read.csv(file.path(brain.dir, "/GTEx/Formatted/GTEx-metadata.csv"),
                        check.names = FALSE, row.names = 1)
 md$PE <- read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-metadata.csv"),
                   check.names = FALSE)
-md$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-metadata.csv"), 
+md$BSeq <- read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-metadata.csv"),
                        check.names = FALSE)
-md$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-metadata.csv"), 
-                       check.names = FALSE, row.names = 1) 
+md$HDBR <- read.csv(file.path(brain.dir, "/HDBR/Formatted/HDBR-metadata.csv"),
+                       check.names = FALSE, row.names = 1)
 
 md$BSpan <- read.csv(file.path(brain.dir,
                                "/BrainSpan/Formatted/BrainSpan-metadata.csv"),
                      check.names = FALSE)
-  
+
 
 
 ```
 
-# Analysis 
+# Analysis
 
 <!-- ## Goodness-of-fit -->
 
 
-<!-- ```{r} -->
+```{r}
 
-<!-- gof_results = list() -->
+gof_results = list()
 
-<!-- ## BrainSpan -->
-<!-- gof_results$BSpan_DRS = write.gof(e$BSpan, decon_results$BSpan_DRS, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% -->
-<!--   mutate(Dataset= "BrainSpan", -->
-<!--          Deconvolution = "DeconRNASeq") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("X", "", SampleID)) %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$BSpan %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+## BrainSpan
+gof_results$BSpan_DRS = write.gof(e$BSpan, decon_results$BSpan_DRS, sigsBrain$MB) %>%
+  as.data.frame() %>%
+  mutate(Dataset= "BrainSpan",
+         Deconvolution = "DeconRNASeq") %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("X", "", SampleID)) %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$BSpan %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- gof_results$BSpan_DTG = write.gof(e$BSpan, decon_results$BSpan_DTG, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "BrainSpan", -->
-<!--                              Deconvolution = "Dtangle")  %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--    mutate(SampleID = gsub("X", "", SampleID)) %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$BSpan %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+gof_results$BSpan_DTG = write.gof(e$BSpan, decon_results$BSpan_DTG, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "BrainSpan",
+                             Deconvolution = "Dtangle")  %>%
+  rownames_to_column("SampleID") %>%
+   mutate(SampleID = gsub("X", "", SampleID)) %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$BSpan %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- gof_results$BSpan_CBS = write.gof(e$BSpan, decon_results$BSpan_CIBERSORT, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "BrainSpan", -->
-<!--                              Deconvolution = "Cibersort")  %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("X", "", SampleID)) %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$BSpan %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-
-
-
-<!-- ## BrainSeq -->
-<!-- gof_results$BSeq_DRS = write.gof(e$BSeq, decon_results$BSeq_DRS, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "BrainSeq", -->
-<!--                              Deconvolution = "DeconRNASeq") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   left_join(md$BSeq %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-
-<!-- gof_results$BSeq_DTG = write.gof(e$BSeq, decon_results$BSeq_DTG, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "BrainSeq", -->
-<!--                              Deconvolution = "Dtangle") %>% -->
-<!--   rownames_to_column("SampleID")  %>% -->
-<!--   left_join(md$BSeq %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-
-<!-- gof_results$BSeq_CBS = write.gof(e$BSeq, decon_results$BSeq_CIBERSORT, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "BrainSeq", -->
-<!--                              Deconvolution = "Cibersort")%>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   left_join(md$BSeq %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+gof_results$BSpan_CBS = write.gof(e$BSpan, decon_results$BSpan_CIBERSORT, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "BrainSpan",
+                             Deconvolution = "Cibersort")  %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("X", "", SampleID)) %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$BSpan %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
 
-<!-- ## GTEx -->
-<!-- gof_results$GTEx_DRS = write.gof(e$GTEx, decon_results$GTEx_DRS, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "GTEx", -->
-<!--                              Deconvolution = "DeconRNASeq")%>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID))  %>% -->
-<!--   left_join(md$GTEx %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-
-<!-- gof_results$GTEx_DTG = write.gof(e$GTEx, decon_results$GTEx_DTG, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "GTEx", -->
-<!--                              Deconvolution = "Dtangle")%>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$GTEx %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-
-<!-- gof_results$GTEx_CBS = write.gof(e$GTEx, decon_results$GTEx_CIBERSORT, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "GTEx", -->
-<!--                              Deconvolution = "Cibersort") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$GTEx %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+```
 
 
-<!-- ## PsychEncode -->
-<!-- gof_results$PE_DRS = write.gof(e$PE, decon_results$PE_DRS, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "PsychEncode", -->
-<!--                              Deconvolution = "DeconRNASeq") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("X", "", SampleID), -->
-<!--          SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$PE %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+```{r}
+## BrainSeq
+gof_results$BSeq_DRS = write.gof(e$BSeq, decon_results$BSeq_DRS, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "BrainSeq",
+                             Deconvolution = "DeconRNASeq") %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSeq %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- gof_results$PE_DTG = write.gof(e$PE, decon_results$PE_DTG, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "PsychEncode", -->
-<!--                              Deconvolution = "Dtangle") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("X", "", SampleID), -->
-<!--          SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$PE %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+gof_results$BSeq_DTG = write.gof(e$BSeq, decon_results$BSeq_DTG, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "BrainSeq",
+                             Deconvolution = "Dtangle") %>%
+  rownames_to_column("SampleID")  %>%
+  left_join(md$BSeq %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
+
+gof_results$BSeq_CBS = write.gof(e$BSeq, decon_results$BSeq_CIBERSORT, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "BrainSeq",
+                             Deconvolution = "Cibersort")%>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSeq %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
 
-<!-- gof_results$PE_CBS = write.gof(e$PE, decon_results$PE_CIBERSORT, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "PsychEncode", -->
-<!--                              Deconvolution = "Cibersort") %>% -->
-<!--   rownames_to_column("SampleID") %>% -->
-<!--   mutate(SampleID = gsub("X", "", SampleID), -->
-<!--          SampleID = gsub("\\.", "-", SampleID)) %>% -->
-<!--   left_join(md$PE %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+## GTEx
+gof_results$GTEx_DRS = write.gof(e$GTEx, decon_results$GTEx_DRS, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "GTEx",
+                             Deconvolution = "DeconRNASeq")%>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID))  %>%
+  left_join(md$GTEx %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- ## HDBR -->
-<!-- gof_results$HDBR_DRS = write.gof(e$HDBR, decon_results$HDBR_DRS, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "HDBR", -->
-<!--                              Deconvolution = "DeconRNASeq") %>% -->
-<!--   rownames_to_column("SampleID")  %>% -->
-<!--   left_join(md$HDBR %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+gof_results$GTEx_DTG = write.gof(e$GTEx, decon_results$GTEx_DTG, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "GTEx",
+                             Deconvolution = "Dtangle")%>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$GTEx %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- gof_results$HDBR_DTG = write.gof(e$HDBR, decon_results$HDBR_DTG, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "HDBR", -->
-<!--                              Deconvolution = "Dtangle") %>% -->
-<!--   rownames_to_column("SampleID")  %>% -->
-<!--   left_join(md$HDBR %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
+gof_results$GTEx_CBS = write.gof(e$GTEx, decon_results$GTEx_CIBERSORT, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "GTEx",
+                             Deconvolution = "Cibersort") %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$GTEx %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- gof_results$HDBR_CBS = write.gof(e$HDBR, decon_results$HDBR_CIBERSORT, sigsBrain$MB) %>% -->
-<!--   as.data.frame() %>% mutate(Dataset= "HDBR", -->
-<!--                              Deconvolution = "Cibersort") %>% -->
-<!--   rownames_to_column("SampleID")   %>% -->
-<!--   left_join(md$HDBR %>% -->
-<!--               dplyr::select(SampleID, Regions, Period), by = "SampleID") -->
-<!-- ``` -->
 
-<!-- - Overall -->
+## PsychEncode
+gof_results$PE_DRS = write.gof(e$PE, decon_results$PE_DRS, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "PsychEncode",
+                             Deconvolution = "DeconRNASeq") %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("X", "", SampleID),
+         SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$PE %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- ```{r} -->
-<!-- overall = do.call(rbind, gof_results) %>% -->
-<!--   ggplot(aes(y = r, x = Deconvolution, fill = Deconvolution)) + -->
-<!--   geom_violin( alpha = 0.75) + -->
-<!--       geom_boxplot(width=0.1)+ facet_grid(~Dataset) + -->
-<!--   theme_bw() + -->
-<!--   theme(axis.text.x = element_blank(), -->
-<!--         legend.position = "top", -->
-<!--         axis.title.x = element_blank(), -->
-<!--         axis.text.y = element_text(size = 12), -->
-<!--         axis.title.y = element_text(size = 15), -->
-<!--         panel.grid.major = element_blank(), -->
-<!--         panel.grid.minor = element_blank()) + -->
-<!--   geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') + -->
-<!--   ylab("Goodness of fit (r)") + -->
-<!--   scale_fill_manual(values = -->
-<!--                       c("Cibersort" = "#fdaf91", -->
-<!--                         "DeconRNASeq" = "#ad002b", -->
-<!--                         "Dtangle" = "#925e9f")) -->
+gof_results$PE_DTG = write.gof(e$PE, decon_results$PE_DTG, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "PsychEncode",
+                             Deconvolution = "Dtangle") %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("X", "", SampleID),
+         SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$PE %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
 
-<!-- overall -->
-<!-- ggsave(plot = overall, -->
-<!--        filename = here::here("output/Thesis_plots/Deconvolution/GoF-overall.svg"), -->
-<!--        height = 4, -->
-<!--        width = 7.31, -->
-<!--        units = "in") -->
-<!-- ``` -->
+
+gof_results$PE_CBS = write.gof(e$PE, decon_results$PE_CIBERSORT, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "PsychEncode",
+                             Deconvolution = "Cibersort") %>%
+  rownames_to_column("SampleID") %>%
+  mutate(SampleID = gsub("X", "", SampleID),
+         SampleID = gsub("\\.", "-", SampleID)) %>%
+  left_join(md$PE %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
+
+## HDBR
+gof_results$HDBR_DRS = write.gof(e$HDBR, decon_results$HDBR_DRS, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "HDBR",
+                             Deconvolution = "DeconRNASeq") %>%
+  rownames_to_column("SampleID")  %>%
+  left_join(md$HDBR %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
+
+gof_results$HDBR_DTG = write.gof(e$HDBR, decon_results$HDBR_DTG, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "HDBR",
+                             Deconvolution = "Dtangle") %>%
+  rownames_to_column("SampleID")  %>%
+  left_join(md$HDBR %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
+
+gof_results$HDBR_CBS = write.gof(e$HDBR, decon_results$HDBR_CIBERSORT, sigsBrain$MB) %>%
+  as.data.frame() %>% mutate(Dataset= "HDBR",
+                             Deconvolution = "Cibersort") %>%
+  rownames_to_column("SampleID")   %>%
+  left_join(md$HDBR %>%
+              dplyr::select(SampleID, Regions, Period), by = "SampleID")
+```
+
+- Overall
+
+```{r}
+overall = do.call(rbind, gof_results) %>%
+  ggplot(aes(y = r, x = Deconvolution, fill = Deconvolution)) +
+  geom_violin( alpha = 0.75) +
+      geom_boxplot(width=0.1)+ facet_grid(~Dataset) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        legend.position = "top",
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+  ylab("Goodness of fit (r)") +
+  scale_fill_manual(values =
+                      c("Cibersort" = "#fdaf91",
+                        "DeconRNASeq" = "#ad002b",
+                        "Dtangle" = "#925e9f"))
+
+overall
+ggsave(plot = overall,
+       filename = here::here("output/Thesis_plots/Deconvolution/GoF-overall.svg"),
+       height = 4,
+       width = 7.31,
+       units = "in")
+```
 
 
 
@@ -860,6 +864,65 @@ md$BSpan <- read.csv(file.path(brain.dir,
 <!--                                "Endothelia" = "#FAE47B")) -->
 
 <!-- ``` -->
+
+```{r}
+cbs_regions =do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+    ggplot(aes(Regions, r, fill = Regions)) + geom_violin(width=1, alpha = 0.85) +
+      geom_boxplot(width=0.1, color="white") +
+      theme_bw() +   scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+  geom_hline(yintercept = c(0.5,0.7), color = "grey",linetype='dotted') + 
+  ylab("Goodness of fit (r)") + facet_wrap(~Dataset, scales = "free",  nrow = 6) + 
+  theme(legend.position = "none", 
+        axis.text = element_text(size =10),
+        axis.title  = element_text(size =12))
+cbs_regions
+
+cbs_period =do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  mutate(Period = factor(Period, levels=c("Prenatal", "Postnatal"))) %>% 
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+    ggplot(aes(Period, r, fill = Period)) + geom_violin(width=1, alpha = 0.85) +
+      geom_boxplot(width=0.1, color="white") +
+      theme_bw() +  scale_fill_manual(values = c("Prenatal" = "#FD84B8", 
+                                                "Postnatal" = "#54B4E6")) + 
+  geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') + 
+  ylab("Goodness of fit (r)") + facet_wrap(~Dataset, scales = "free",  nrow = 6) +
+  theme(legend.position = "none", 
+        axis.text = element_text(size =10),
+        axis.title  = element_text(size =12)) 
+
+
+cbs_period 
+
+grid.arrange(cbs_regions, cbs_period, ncol=2)
+
+ggsave(plot = cbs_period, 
+      filename = here::here("output/Thesis_plots/Deconvolution/GoF-period.svg"), 
+      units = "in", 
+      width = 6.48, 
+      height = 12)
+
+ggsave(plot = cbs_regions, 
+      filename = here::here("output/Thesis_plots/Deconvolution/GoF-region.svg"), 
+      units = "in", 
+      width = 6.48, 
+      height = 12)
+```
+
+
 
 ```{r}
 pe.cbs  = decon_results$PE_CIBERSORT %>% 
