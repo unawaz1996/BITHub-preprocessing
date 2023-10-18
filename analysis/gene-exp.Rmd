@@ -361,7 +361,7 @@ pe
 
 ```{r}
 ggsave(filename = here::here("output/Thesis_plots/Examples/ZIC2-all.svg"),
-       height = 20, width = 15, units = "in")
+       height = 15, width = 20, units = "in")
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
