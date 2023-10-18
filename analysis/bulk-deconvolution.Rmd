@@ -992,9 +992,10 @@ cibersort_all = rbind(pe.cbs,
                                     "Cerebellum", "Spinal Cord") )) %>% 
   ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 12), 
-        legend.position = "none") + coord_flip() + 
+  theme(axis.text.x = element_text(size = 10, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif")) + coord_flip() + 
   facet_grid(Dataset~Regions, scales = "free") +ylab("Estimated Proportion") + xlab("") +
   scale_fill_manual(values = c("Neurons" = "#D94A70", 
                                "Astrocytes" = "#5590CC", 
@@ -1025,9 +1026,10 @@ cibersort_hdbr = rbind(pe.cbs,
                                     "Cerebellum", "Spinal Cord") )) %>% 
   ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 12), 
-        legend.position = "none") + coord_flip() + 
+   theme(axis.text.x = element_text(size = 10, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"))  + coord_flip() + 
   facet_grid(Dataset~Regions, scales = "free") +ylab("Estimated Proportion") + xlab("") +
   scale_fill_manual(values = c("Neurons" = "#D94A70", 
                                "Astrocytes" = "#5590CC", 
@@ -1047,6 +1049,12 @@ ggsave(plot = cibersort_hdbr,
        height = 3.07, 
        width = 10.55, 
        units = "in")
+
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-all.pdf"), height =12, 
+    width = 11)
+plot_grid(cibersort_all, cibersort_hdbr, align = "v", nrow = 2, rel_heights = c(1/2, 1/4))
+dev.off()
+#grid.arrange(cibersort_all, cibersort_hdbr, nrow=2)
 ```
 
 - Across age intervals and regions 
@@ -1329,6 +1337,8 @@ bspan.csb %>%
 ## Datasets 
 
 ```{r fig.height=12, fig.width=20}
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-BSeq.pdf"), height =12, 
+    width = 11)
  rbind(pe.cbs,
       bspan.csb,
       bseq.cbs, 
@@ -1358,9 +1368,10 @@ bspan.csb %>%
   dplyr::filter(Dataset == "BrainSeq") %>%
   ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 12), 
-        legend.position = "none") + 
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif")) + 
   facet_grid(variable~Dataset, scales = "free") +ylab("Estimated Proportion") + xlab("") +
   scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
@@ -1372,12 +1383,16 @@ bspan.csb %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 ))
+ 
+ dev.off()
 
 ```
 
 
 
 ```{r fig.height=12, fig.width=20}
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-BSpan.pdf"), height =12, 
+    width = 11)
  rbind(pe.cbs,
       bspan.csb,
       bseq.cbs, 
@@ -1407,9 +1422,10 @@ bspan.csb %>%
   dplyr::filter(Dataset == "BrainSpan") %>%
   ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 12), 
-        legend.position = "none") + 
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"))+ 
   facet_grid(variable~Dataset, scales = "free") +ylab("Estimated Proportion") + xlab("") +
   scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
@@ -1421,10 +1437,15 @@ bspan.csb %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 ))
+ 
+ dev.off()
 
 ```
 
 ```{r fig.height=12, fig.width=20}
+
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-PE.pdf"), height =12, 
+    width = 11)
  rbind(pe.cbs,
       bspan.csb,
       bseq.cbs, 
@@ -1454,9 +1475,10 @@ bspan.csb %>%
   dplyr::filter(Dataset == "PsychEncode") %>%
   ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 12), 
-        legend.position = "none") + 
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif")) + 
   facet_grid(variable~Dataset, scales = "free") +ylab("Estimated Proportion") + xlab("") +
   scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
@@ -1468,9 +1490,112 @@ bspan.csb %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 ))
-
+dev.off()
 ```
 
+
+```{r fig.height=12, fig.width=20}
+
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-HDBR.pdf"), height =12, 
+    width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %>% 
+  as.data.frame %>%
+  melt() %>%
+  drop_na(Regions) %>%
+ # dplyr::filter(Dataset != "HDBR") %>%
+  mutate(variable= factor(variable, levels = c("Neurons","Astrocytes", 
+                                               "Endothelia", "Oligodendrocytes",
+                                               "Microglia"
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c("Brain", "Forebrain","Hindbrain",
+                                    "Midbrain", "Chroid plexus", 
+                                    "Cortex", "Subcortex",
+                                    "Cerebellum", "Spinal Cord")),
+        AgeInterval = factor(AgeInterval, levels = c("4-7pcw", "8-9pcw",
+                                                        "10-12pcw", "13-15pcw", "16-18pcw",
+                                                        "19-24pcw", "25-38pcw", "0-5mos",
+                                                        "6-18mos", "19mos-5yrs", "6-11yrs",
+                                                        "12-19yrs", "20-29yrs", "30-39yrs",
+                                                      "40-49yrs", "50-59yrs", "60-69yrs",
+                                                      "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  dplyr::filter(Dataset == "HDBR") %>%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif")) + 
+  facet_grid(variable~Dataset, scales = "free") +ylab("Estimated Proportion") + xlab("") +
+  scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))
+dev.off()
+```
+
+
+```{r fig.height=12, fig.width=20}
+
+pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-GTEx.pdf"), height =12, 
+    width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %>% 
+  as.data.frame %>%
+  melt() %>%
+  drop_na(Regions) %>%
+ # dplyr::filter(Dataset != "HDBR") %>%
+  mutate(variable= factor(variable, levels = c("Neurons","Astrocytes", 
+                                               "Endothelia", "Oligodendrocytes",
+                                               "Microglia"
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c("Brain", "Forebrain","Hindbrain",
+                                    "Midbrain", "Chroid plexus", 
+                                    "Cortex", "Subcortex",
+                                    "Cerebellum", "Spinal Cord")),
+        AgeInterval = factor(AgeInterval, levels = c("4-7pcw", "8-9pcw",
+                                                        "10-12pcw", "13-15pcw", "16-18pcw",
+                                                        "19-24pcw", "25-38pcw", "0-5mos",
+                                                        "6-18mos", "19mos-5yrs", "6-11yrs",
+                                                        "12-19yrs", "20-29yrs", "30-39yrs",
+                                                      "40-49yrs", "50-59yrs", "60-69yrs",
+                                                      "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  dplyr::filter(Dataset == "HDBR") %>%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif")) + 
+  facet_grid(variable~Dataset, scales = "free") +ylab("Estimated Proportion") + xlab("") +
+  scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))
+dev.off()
+```
 ## Export the datasets 
 
 ```{r}
