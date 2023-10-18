@@ -921,11 +921,63 @@ var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-v
     left_join(gene2symbol, by = "EnsemblID")
 ```
 
+```{r}
+bspan =var_part$BSpan %>% dplyr::select(-gene_name) %>%
+  column_to_rownames("EnsemblID") %>%
+plotVarPart() + ggtitle("BrainSpan") + ylab("Variance Explained (%)") +
+  theme(axis.text = element_text(size=12, family = "serif"),
+        axis.title = element_text(size=12,family = "serif"),
+        plot.title = element_text(hjust = 0, size = 15, family = "serif"))
+
+bseq =var_part$BSeq %>% dplyr::select(-gene_name) %>%
+  column_to_rownames("EnsemblID") %>%
+plotVarPart() + ggtitle("BrainSeq") + ylab("Variance Explained (%)") +
+  theme(axis.text = element_text(size=12, family = "serif"),
+        axis.title = element_text(size=12,family = "serif"),
+        plot.title = element_text(hjust = 0, size = 15, family = "serif"))
+
+
+gtex  =var_part$GTEx %>% dplyr::select(-gene_name) %>%
+  column_to_rownames("EnsemblID") %>%
+plotVarPart() + ggtitle("GTEx") + ylab("Variance Explained (%)") +
+  theme(axis.text = element_text(size=12, family = "serif"),
+        axis.title = element_text(size=12,family = "serif"),
+        plot.title = element_text(hjust = 0, size = 15, family = "serif"))
+
+
+hdbr  =var_part$HDBR %>% dplyr::select(-gene_name) %>%
+  column_to_rownames("EnsemblID") %>%
+plotVarPart() + ggtitle("HDBR") + ylab("Variance Explained (%)") +
+  theme(axis.text = element_text(size=12, family = "serif"),
+        axis.title = element_text(size=12,family = "serif"),
+        plot.title = element_text(hjust = 0, size = 15, family = "serif"))
+
+pe  =var_part$PE %>% dplyr::select(-gene_name) %>%
+  column_to_rownames("EnsemblID") %>%
+plotVarPart() + ggtitle("PsychENCODE") + ylab("Variance Explained (%)") +
+  theme(axis.text = element_text(size=12, family = "serif"),
+        axis.title = element_text(size=12,family = "serif"),
+        plot.title = element_text(hjust = 0, size = 15, family = "serif"))
+
+pdf(file = here::here("output/Thesis_plots/Variance/PCA/varpart-all.pdf"), height =20, width = 15)
+grid.arrange(bseq, bspan,
+             gtex, hdbr, 
+             pe, ncol=2, nrow=3)
+
+dev.off()
+
+```
 
 ```{r}
 median(var_part$BSeq$Sex) * 100
 
 ```
+
+
+
+
+
+
 We want to investigate the impact of genes having previously been altered with respect to PMI levels. 
 Other than BrainSeq and PsychEncode, all other datasets contain PMI values. 
 For ease, made the scale of each PMI consistent into minutes and have it as continuous and categorical values. 
@@ -1709,4 +1761,3 @@ ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSp
        units = "in")
 ```
 
-## Time-course with PMI?
