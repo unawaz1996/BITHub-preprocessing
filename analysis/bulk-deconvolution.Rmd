@@ -1576,7 +1576,7 @@ pdf(file = here::here("output/Thesis_plots/Deconvolution/cbs-estimates-GTEx.pdf"
                                                         "12-19yrs", "20-29yrs", "30-39yrs",
                                                       "40-49yrs", "50-59yrs", "60-69yrs",
                                                       "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
-  dplyr::filter(Dataset == "HDBR") %>%
+  dplyr::filter(Dataset == "GTEx") %>%
   ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
   theme_bw() +
    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),

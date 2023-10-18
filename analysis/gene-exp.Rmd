@@ -98,6 +98,11 @@ for (x in datasets) {
 - BrainSeq 
 
 ```{r}
+
+upper <- as.character(min(exp_data$BSeq$Period[exp_data$BSeq$Period >= "D+"]))
+lower <- as.character(max(data$MathGrade[data$MathGrade <= "C-"]))
+
+
 bseq = exp_data %>% 
   do.call(rbind, .) %>% 
   dplyr::filter((gene_name == "ZIC2" & Dataset == "BSeq")) %>%
@@ -113,28 +118,39 @@ bseq = exp_data %>%
   ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
-  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
-                                           "Subcortex" = "#838DE0",                 
-                                          "Cortex" = "#E85571", 
-                                           "Spinal Cord" = "#C6D14A", 
-                                           "Forebrain" = "#F6B19D",
-                                           "Midbrain" = "#AC93AD", 
-                                           "Hindbrain" = "#6E8B8E",
-                                          "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  #facet_grid(Dataset~gene_name, scales = "free") + 
-  theme(
-        axis.text.x = element_text(angle = 90), 
-        legend.position = "top", 
+  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("BrainSeq") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2) +
-  ylab("log10(RPKM)")
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + ylim(-1, 1.5) +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 3.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM)))
+
+
+
 
 bseq
-ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-ZIC2.svg"), 
-        width = 8, 
-       height =5, 
-       units = "in")
+# ggsave(bseq, file=here::here("output/Thesis_plots/Examples/BrainSeq-ZIC2.svg"), 
+#         width = 8, 
+#        height =5, 
+#        units = "in")
 
 ```
 
@@ -155,23 +171,35 @@ bspan = exp_data %>%
   ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
-  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
-                                           "Subcortex" = "#838DE0",                 
-                                          "Cortex" = "#E85571", 
-                                           "Spinal Cord" = "#C6D14A", 
-                                           "Forebrain" = "#F6B19D",
-                                           "Midbrain" = "#AC93AD", 
-                                           "Hindbrain" = "#6E8B8E",
-                                          "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  #facet_grid(Dataset~gene_name, scales = "free") + 
-  theme(
-        axis.text.x = element_text(angle = 90), 
-        legend.position = "top", 
+   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("BrainSpan") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2.5) +
-  ylab("log10(RPKM)")
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM)))
+
+
 bspan
+
+
 ggsave(bspan, file=here::here("output/Thesis_plots/Examples/BrainSpan-ZIC2.svg"), 
         width = 8, 
        height =5, 
@@ -196,27 +224,36 @@ gtex = exp_data %>%
   ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
-  theme_bw() +scale_fill_manual(values= c("Cerebellum" = "#FFD256",
-                                           "Subcortex" = "#838DE0",                 
-                                          "Cortex" = "#E85571", 
-                                           "Spinal Cord" = "#C6D14A", 
-                                           "Forebrain" = "#F6B19D",
-                                           "Midbrain" = "#AC93AD", 
-                                           "Hindbrain" = "#6E8B8E",
-                                          "Brain fragment" = "#FFA6B7", 
-                                          "Forebrain and midbrain")) +
-  #facet_grid(Dataset~gene_name, scales = "free") + 
-  theme(
-        axis.text.x = element_text(angle = 90), 
-        legend.position = "top", 
+   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("GTEx") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 3) +
-  ylab("log10(RPKM)")
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(TPM)") + geom_vline(xintercept = 0.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM)))
+
 gtex
-ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-ZIC2.svg"), 
-        width = 8, 
-       height =5, 
-       units = "in")
+# ggsave(gtex, file=here::here("output/Thesis_plots/Examples/GTEx-ZIC2.svg"), 
+#         width = 8, 
+#        height =5, 
+#        units = "in")
 ```
 
 - HDBR 
@@ -237,7 +274,7 @@ hdbr  = exp_data %>%
   ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
-  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
                                  "Cerebellum" = "#FFD256",
                                  "Spinal Cord" = "#C6D14A", 
@@ -246,20 +283,28 @@ hdbr  = exp_data %>%
                                  "Hindbrain" = "#6E8B8E",
                                  "Brain" = "#FFA6B7", 
                                  "Chroid plexus" = "#9D696C"
-                                ))  +
-  #facet_grid(Dataset~gene_name, scales = "free") + 
-  theme(
-        axis.text.x = element_text(angle = 90), 
-        legend.position = "top", 
+                                ))  + ggtitle("HDBR") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2.5) +
-  ylab("log10(RPKM)")
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  + ylim(-1, 3) +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](TPM)))
+
 
 hdbr
-ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-ZIC2.svg"), 
-        width = 8, 
-       height =5, 
-       units = "in")
+# ggsave(hdbr, file=here::here("output/Thesis_plots/Examples/HDBR-ZIC2.svg"), 
+#         width = 8, 
+#        height =5, 
+#        units = "in")
 ```
 
 - PsychEncode 
@@ -280,7 +325,7 @@ pe = exp_data %>%
   ggplot(aes(x = AgeInterval, y =log10(Exp), fill = Regions)) +
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
-  theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+    theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
                                  "Subcortex" = "#838DE0", 
                                  "Cerebellum" = "#FFD256",
                                  "Spinal Cord" = "#C6D14A", 
@@ -289,21 +334,38 @@ pe = exp_data %>%
                                  "Hindbrain" = "#6E8B8E",
                                  "Brain" = "#FFA6B7", 
                                  "Chroid plexus" = "#9D696C"
-                                ))  +
-  #facet_grid(Dataset~gene_name, scales = "free") + 
-  theme(
-        axis.text.x = element_text(angle = 90), 
-        legend.position = "top", 
+                                ))  + ggtitle("PsychENCODE") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
         panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line( size=.1 )) + ylim(-2, 2) +
-  ylab("log10(RPKM)")
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](TPM)))
+
 
 pe
-ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-ZIC2.svg"), 
-        width = 8, 
-       height =5, 
-       units = "in")
+# ggsave(pe, file=here::here("output/Thesis_plots/Examples/PsychEncode-ZIC2.svg"), 
+#         width = 8, 
+#        height =5, 
+#        units = "in")
 
+```
+
+```{r}
+ggsave(filename = here::here("output/Thesis_plots/Examples/ZIC2-all.svg"),
+       height = 20, width = 15, units = "in")
+ggarrange(bseq, bspan,
+          gtex, hdbr, pe, ncol=2, nrow=3 )
+
+dev.off()
 ```
 
 ## MKI67
