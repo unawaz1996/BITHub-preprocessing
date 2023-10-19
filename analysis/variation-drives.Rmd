@@ -159,14 +159,25 @@ no_filt= p %>%
                                  "#F9AD79")) +
     geom_density() +
     # geom_histogram() +
-    facet_wrap(~Transform, scales = "free") +
+    facet_wrap(~Transform, scales = "free", 
+               labeller = labeller("Log2(exp + 0.05)" = "Log", "ZScore(log2(exp + 0.05)" = "Log_scale")) +
     theme_bw() +
-    labs(y = "Density", x = "Mean Expression Across Samples", title = "No Expression Filter") +
-  theme(legend.position = "top", 
-        axis.text = element_text(size =10))
+    labs(y = "Density", x = "Mean Expression Across Samples")  + 
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  
 
 
-no_filt
+ggsave(filename = here::here("output/Thesis_plots/Attributes/exp.svg"), 
+       height = 6, width =12, units = "in", plot = no_filt)
+
 ```
 
 <!-- # ```{r} -->
