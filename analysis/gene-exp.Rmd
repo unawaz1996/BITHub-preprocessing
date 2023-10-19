@@ -1516,10 +1516,14 @@ GTEx_prop
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/NDD-prop-all.svg"),
-       height = 10, width = 10, units = "in")
-grid.arrange(bspan_prop_zmynd8,GTEx_prop_zmynd8,
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/NDD-prop-all.pdf"),
+       height = 10, width = 12)
+
+ggarrange(bspan_prop_zmynd8,GTEx_prop_zmynd8,
              bspan_prop_FMRI,GTEx_prop, ncol =2, nrow=2)
+
+
+
 dev.off()
 ```
 
