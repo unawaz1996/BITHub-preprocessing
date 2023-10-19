@@ -1275,31 +1275,37 @@ bspan_fig
 ```
 
 ```{r}
-gtex_var = var_part$GTEx %>% 
+gtex_var_cxcl2 = var_part$GTEx %>% 
   dplyr::filter(gene_name %in% "CXCL2") %>% 
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
-gtex_var
-
-ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-CXL2.svg"), 
-        width = 5, 
-       height =6, 
-       units = "in")
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("CXCL2 - GTEx") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
 ```
 
 ```{r}
-bspan_var= var_part$BSpan %>% 
+bspan_var_cxlc2 = var_part$BSpan %>% 
   dplyr::filter(gene_name %in% "CXCL2") %>% 
   melt() %>%
     ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
-bspan_var
-
-ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-CXL2.svg"), 
-        width = 5, 
-       height =6, 
-       units = "in")
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("")  + ggtitle("CXCL2 - BrainSpan") +  
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ))
 ```
 
 
@@ -1401,31 +1407,39 @@ bspan_plot_EGR3
 ```
 
 ```{r}
-gtex_var =var_part$GTEx %>% 
+gtex_var_egr3 =var_part$GTEx %>% 
   dplyr::filter(gene_name %in% "EGR3") %>% 
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
-gtex_var
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + ggtitle("EGR3 - GTEx") + xlab("") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
 
-ggsave(gtex_var, file=here::here("output/Thesis_plots/Variance/Examples/GTEx-varPart-EGR3.svg"), 
-        width = 5, 
-       height =6, 
-       units = "in")
 ```
 
 ```{r}
-bspan_var =var_part$BSpan %>% 
+bspan_var_egr3 =var_part$BSpan %>% 
   dplyr::filter(gene_name %in% "EGR3") %>% 
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
-bspan_var
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("EGR3 - BrainSpan") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
 
-ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-EGR3.svg"), 
-        width = 5, 
-       height =6, 
-       units = "in")
 ```
 
  - HBA1
@@ -1531,7 +1545,16 @@ gtex_var_hba1 = var_part$GTEx %>%
   dplyr::filter(gene_name %in% "HBA1") %>% 
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("HBA1 - GTEx") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ))
 ```
 
 
@@ -1541,13 +1564,17 @@ bspan_var_hba1 =var_part$BSpan %>%
   dplyr::filter(gene_name %in% "HBA1") %>% 
   melt()  %>% 
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
-  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") 
-bspan_var
+  coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("HBA1 - BrainSpan") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
 
-ggsave(bspan_var, file=here::here("output/Thesis_plots/Variance/Examples/BrainSpan-varPart-HBA1.svg"), 
-        width = 5, 
-       height =6, 
-       units = "in")
 ```
 
 
@@ -1558,4 +1585,13 @@ ggarrange(bspan_fig_RNASE2, gtex_fig_RNASE2,
           bspan_plot_HBA1, gtex_plot_HBA1, 
           bspan_plot_EGR3, gtex_plot_egr3, ncol=2, nrow=4)
 dev.off()
+```
+
+```{r}
+pdf(file = here::here("output/Thesis_plots/Variance/Examples/RNA-degradation_varPart.pdf"), height=15, width=10)
+ggarrange(bspan_var_cxlc2, gtex_var_cxcl2, 
+          bspan_var_hba1, gtex_var_hba1, 
+          bspan_var_egr3, gtex_var_egr3, ncol=2, nrow=3)
+dev.off()
+
 ```

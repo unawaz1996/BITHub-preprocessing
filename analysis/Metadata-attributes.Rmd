@@ -88,9 +88,10 @@ md$BrainSeq = read.csv(file.path(dir,"Brainseq/Formatted/BrainSeq-metadata.csv")
 md$BrainSpan = read.csv(file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
 md$GTEx =  read.csv(file.path(dir,"GTEx/Formatted/GTEx-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
 md$HDBR = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
-md$FANTOM5 = read.csv(file.path(dir, "Fantom5/Formatted/FANTOM5-metadata.csv"), header=TRUE, check.names = FALSE)
+#md$FANTOM5 = read.csv(file.path(dir, "Fantom5/Formatted/FANTOM5-metadata.csv"), header=TRUE, check.names = FALSE)
+md$PsychEncode = read.csv(file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata.csv"), header=TRUE, check.names = FALSE)
 #md$Velmeshev = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
-md$Aldringer = read.csv(file.path(sn_dir, "aldinger/Aldringer-metadata.csv"), header=TRUE, check.names = FALSE)
+#md$Aldringer = read.csv(file.path(sn_dir, "aldinger/Aldringer-metadata.csv"), header=TRUE, check.names = FALSE)
 ```
 
 ## Filtering of redudant metadata labels 
@@ -364,4 +365,56 @@ md$GTEx %>%
 
 #%>% 
  # ggplot(aes(x=PMI))
+```
+
+```{r}
+annot = lapply(annot, function(x){
+  x %<>% 
+    dplyr::filter(Include..Yes.No....Interest == "Yes")
+  return(x)
+  })
+
+
+md$BrainSeq %<>% dplyr::select(contains(annot$BrainSeq$BITColumnName)) %>% dplyr::select(-trimmed)
+md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName)) 
+md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
+md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName))
+md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
+```
+
+```{r}
+na_calc = lapply(md, function(x){
+  x %<>%  
+    mutate(count_na = apply(., 1, count_na)) %>% 
+    dplyr::select(count_na)
+  return(x)
+})
+
+
+ggsave(filename = here::here("output/Thesis_plots/Metadata/missing_md.svg"), height=6, width = 7, units = "in")
+do.call(rbind, na_calc) %>% 
+  rownames_to_column("DataSet") %>%
+  mutate(DataSet = gsub("\\..*", "", DataSet)) %>% 
+   ggplot(aes(count_na, fill= DataSet)) +
+  geom_density(alpha = 0.75) + 
+  theme_bw()  +
+     scale_fill_manual(values =c("BrainSeq" ="#F1605F",
+                               "BrainSpan" = "#49215F", 
+                               "GTEx" = "#7DA1D4", 
+                               "HDBR" = "#E11F28", 
+                               "PsychEncode" = "#FAAD79"))+
+  xlab("Number of missing metadata") +
+  ylab("Proportion of samples") +    
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")
+dev.off()
+
 ```
