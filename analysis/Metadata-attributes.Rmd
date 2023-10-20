@@ -319,6 +319,18 @@ pheno.metrics = lapply(annot, function(x){
      dplyr::filter(Type == "Phenotype")
   return(x)
 })
+
+
+annot = lapply(annot, function(x){
+  x = x %>% 
+    mutate(Type = gsub("Sample charactertics", "Sample characteristics", Type))
+  return(x)
+})
+sample.metrics = lapply(annot, function(x){
+  x = x %>% 
+     dplyr::filter(Type == "Sample characteristics")
+  return(x)
+})
 ```
 
 ```{r}
@@ -327,7 +339,7 @@ x= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName,
           "BrainSpan" = seq.metrics$BrainSpan$BITColumnName, 
           "GTEx" = seq.metrics$GTEx$BITColumnName, 
           "HDBR" = seq.metrics$HDBR$BITColumnName, 
-          "PsychEncode" = seq.metrics$PsychEncode$BITColumnName,
+          "PsychEncode" = seq.metrics$PsychEncode$BITColumnName
        #  "HCA" = hca.tech$BITHubColumnName,
         # "Cameron et al" = cam.tech$BITHubColumnName, 
          #"Velmeshev et al" = vel.tech$BITColumnName, 
@@ -337,8 +349,66 @@ x= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName,
          )
 
 
-UpSetR::upset(fromList(x), sets.bar.color = c ("#75C7A0","#E11F28","#7DA1D4","#F1605F", "#46CEB3"))
+UpSetR::upset(fromList(x), sets.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49215F"),
+              main.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49215F",
+                                 "#808080","#808080","#808080","#808080",
+                                 "#808080","#808080"), 
+              mainbar.y.label = "Overlap of Sequencing Metrics",
+              sets.x.label = "Total Sequencing Metrics",
+                text.scale = c(1.2, 2, 1.2), 
+              point.size = 4)
 ```
+
+```{r}
+x= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName, 
+          "BrainSpan" = pheno.metrics$BrainSpan$BITColumnName, 
+          "GTEx" = pheno.metrics$GTEx$BITColumnName, 
+          "HDBR" = pheno.metrics$HDBR$BITColumnName, 
+          "PsychEncode" = pheno.metrics$PsychEncode$BITColumnName
+       #  "HCA" = hca.tech$BITHubColumnName,
+        # "Cameron et al" = cam.tech$BITHubColumnName, 
+         #"Velmeshev et al" = vel.tech$BITColumnName, 
+         #"Aldringer et al" = adl.tech$BITHubColumnName
+         #, 
+        #  "Ramaker" = ram.tech$BITColumnName
+         )
+
+
+UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7DA1D4","#49215F"),
+              main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
+                                "#808080","#808080","#808080"), 
+              mainbar.y.label = "Overlap of Phenotype Data",
+              sets.x.label = "Total Phenotype Data",
+                text.scale = c(1.2, 2, 1.2), 
+              point.size = 4)
+
+```
+
+```{r}
+x= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName, 
+          "BrainSpan" = sample.metrics$BrainSpan$BITColumnName, 
+          "GTEx" = sample.metrics$GTEx$BITColumnName, 
+          "HDBR" = sample.metrics$HDBR$BITColumnName, 
+          "PsychEncode" = sample.metrics$PsychEncode$BITColumnName
+       #  "HCA" = hca.tech$BITHubColumnName,
+        # "Cameron et al" = cam.tech$BITHubColumnName, 
+         #"Velmeshev et al" = vel.tech$BITColumnName, 
+         #"Aldringer et al" = adl.tech$BITHubColumnName
+         #, 
+        #  "Ramaker" = ram.tech$BITColumnName
+         )
+
+
+UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#7DA1D4","#F1605F","#E11F28","#49215F"),
+              main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
+                                "#808080","#808080","#808080", "#808080"), 
+              mainbar.y.label = "Overlap of Sample Characteristics",
+              sets.x.label = "Total Sample Characteristics",
+                text.scale = c(1.2, 2, 1.2), 
+              point.size = 4)
+
+```
+
 
 ```{r}
 
