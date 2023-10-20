@@ -242,6 +242,27 @@ corrplot(M, order='hclust',
 
 # Final metadata descriptions on BITHub 
 
+```{r}
+annot = lapply(annot, function(x){
+  x %<>% 
+    dplyr::filter(Include..Yes.No....Interest == "Yes")
+  return(x)
+  })
+
+
+md$BrainSeq %<>% dplyr::select(contains(annot$BrainSeq$BITColumnName)) %>% dplyr::select(-trimmed)
+md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName)) 
+md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
+md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName))
+md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
+
+
+#write.csv(file = file.path(dir,"Brainseq/Formatted/BrainSeq-metadata-subset.csv"), md$BrainSeq)
+#write.csv(file= file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata-subset.csv"), md$BrainSpan)
+#write.csv(file = file.path(dir,"GTEx/Formatted/GTEx-metadata-subset.csv"), md$GTEx)
+#write.csv(file= file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata-subset.csv"), md$PsychEncode)
+#write.csv(file = file.path(dir, "HDBR/Formatted/HDBR-metadata-subset.csv"), md$HDBR)
+```
 
 ## Heatmap showing metadata variables in at least 2 datasets 
 
@@ -285,45 +306,28 @@ ggsave(file = here::here("output/Thesis_plots/Metadata/summary-heatmap.svg"),  m
 ## Shared sequencing metrics 
 
 ```{r}
-bseq.tech = annot$BrainSeq %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
 
-bspan.tech = annot$BrainSpan %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
+seq.metrics = lapply(annot, function(x){
+  x = x %>% 
+     dplyr::filter(Type == "Sequencing metrics")
+  return(x)
+})
 
-gtex.tech = annot$GTEx %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
 
-hdbr.tech = annot$HDBR %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
-
-pe.tech = annot$PsychEncode %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
-
-f5.tech = annot$FANTOM5 %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
-
-vel.tech = annot$Velmeshev %>%
-  dplyr::filter(`Include..Yes.No....Interest` == "Yes" & Type == "Sequencing metrics")
-
-hca.tech = annot$HCA %>%
-  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
-
-cam.tech = annot$Cameron %>%
-  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
-
-adl.tech = annot$Aldringer %>%
-  dplyr::filter(`Include.Yes.No.` == "Yes" & Type == "Sequencing metrics")
+pheno.metrics = lapply(annot, function(x){
+  x = x %>% 
+     dplyr::filter(Type == "Phenotype")
+  return(x)
+})
 ```
 
 ```{r}
 
-x= list( "BrainSeq" = bseq.tech$BITColumnName, 
-          "BrainSpan" = bspan.tech$BITColumnName, 
-          "GTEx" = gtex.tech$BITColumnName, 
-          "HDBR" = hdbr.tech$BITColumnName, 
-          "PsychEncode" = pe.tech$BITColumnName,
-          "FANTOM5" =f5.tech$BITHubName
+x= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName, 
+          "BrainSpan" = seq.metrics$BrainSpan$BITColumnName, 
+          "GTEx" = seq.metrics$GTEx$BITColumnName, 
+          "HDBR" = seq.metrics$HDBR$BITColumnName, 
+          "PsychEncode" = seq.metrics$PsychEncode$BITColumnName,
        #  "HCA" = hca.tech$BITHubColumnName,
         # "Cameron et al" = cam.tech$BITHubColumnName, 
          #"Velmeshev et al" = vel.tech$BITColumnName, 
@@ -367,27 +371,7 @@ md$GTEx %>%
  # ggplot(aes(x=PMI))
 ```
 
-```{r}
-annot = lapply(annot, function(x){
-  x %<>% 
-    dplyr::filter(Include..Yes.No....Interest == "Yes")
-  return(x)
-  })
 
-
-md$BrainSeq %<>% dplyr::select(contains(annot$BrainSeq$BITColumnName)) %>% dplyr::select(-trimmed)
-md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName)) 
-md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
-md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName))
-md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
-
-
-write.csv(file = file.path(dir,"Brainseq/Formatted/BrainSeq-metadata-subset.csv"), md$BrainSeq)
-write.csv(file= file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata-subset.csv"), md$BrainSpan)
-write.csv(file = file.path(dir,"GTEx/Formatted/GTEx-metadata-subset.csv"), md$GTEx)
-write.csv(file= file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata-subset.csv"), md$PsychEncode)
-write.csv(file = file.path(dir, "HDBR/Formatted/HDBR-metadata-subset.csv"), md$HDBR)
-```
 
 ```{r}
 na_calc = lapply(md, function(x){
