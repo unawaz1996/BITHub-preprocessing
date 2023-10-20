@@ -380,6 +380,13 @@ md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName))
 md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
 md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName))
 md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
+
+
+write.csv(file = file.path(dir,"Brainseq/Formatted/BrainSeq-metadata-subset.csv"), md$BrainSeq)
+write.csv(file= file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata-subset.csv"), md$BrainSpan)
+write.csv(file = file.path(dir,"GTEx/Formatted/GTEx-metadata-subset.csv"), md$GTEx)
+write.csv(file= file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata-subset.csv"), md$PsychEncode)
+write.csv(file = file.path(dir, "HDBR/Formatted/HDBR-metadata-subset.csv"), md$HDBR)
 ```
 
 ```{r}
