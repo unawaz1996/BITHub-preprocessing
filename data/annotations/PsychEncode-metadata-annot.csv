@@ -38,9 +38,9 @@ causeDeath,causeDeath,Yes,Phenotype
 brainWeight,brainWeight,Yes,Phenotype
 height,height,Yes,Phenotype
 weight,weight,Yes,Phenotype
-ageBiopsy,ageBiopsy,Yes,Sample charactertics
-smellTestScore,smellTestScore,Yes,Sample charactertics
-smoker,smoker,Yes,Phenotype
+ageBiopsy,ageBiopsy,No,Sample charactertics
+smellTestScore,smellTestScore,No,Sample charactertics
+smoker,smoker,No,Phenotype
 notes,Notes,No,Sample charactertics
 Capstone_4,Capstone_4,Yes,Sample charactertics
 NA,Period,Yes,Phenotype
