@@ -19,14 +19,14 @@ Age,AgeNumeric,Yes,Phenotype
 Sex,Sex,Yes,Phenotype
 Race,Ethnicity,Yes,Phenotype
 Dx,Diagnosis,Yes,Phenotype
-Fetal_replicating,Dev.Replicating,Yes,Sample charactertics
-Fetal_quiescent,Dev.Quiescent,Yes,Sample charactertics
-OPC,Adult.OPC,Yes,Sample charactertics
-Neurons,Adult.Neurons,Yes,Sample charactertics
-Astrocytes,Adult.Astrocytes,Yes,Sample charactertics
-Oligodendrocytes,Adult.Oligo,Yes,Sample charactertics
-Microglia,Adult.Microglia,Yes,Sample charactertics
-Endothelial,Adult.Endothelial,Yes,Sample charactertics
+Fetal_replicating,Dev.Replicating,Yes,Cell-Type
+Fetal_quiescent,Dev.Quiescent,Yes,Cell-Type
+OPC,Adult.OPC,Yes,Cell-Type
+Neurons,Adult.Neurons,Yes,Cell-Type
+Astrocytes,Adult.Astrocytes,Yes,Cell-Type
+Oligodendrocytes,Adult.Oligo,Yes,Cell-Type
+Microglia,Adult.Microglia,Yes,Cell-Type
+Endothelial,Adult.Endothelial,Yes,Cell-Type
 NA,AgeInterval,Yes,Phenotype
 NA,Period,Yes,Phenotype
 NA,Regions,Yes,Sample charactertics
