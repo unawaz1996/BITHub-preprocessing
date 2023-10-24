@@ -40,7 +40,7 @@ height,height,Yes,Phenotype
 weight,weight,Yes,Phenotype
 ageBiopsy,ageBiopsy,Yes,Sample charactertics
 smellTestScore,smellTestScore,Yes,Sample charactertics
-smoker,smoker,Yes,Sample charactertics
+smoker,smoker,Yes,Phenotype
 notes,Notes,No,Sample charactertics
 Capstone_4,Capstone_4,Yes,Sample charactertics
 NA,Period,Yes,Phenotype
