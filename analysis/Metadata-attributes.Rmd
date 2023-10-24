@@ -494,3 +494,9 @@ do.call(rbind, na_calc) %>%
 dev.off()
 
 ```
+
+
+```{r}
+md$BrainSpan %>% apply(., 2, count_na)
+
+```
