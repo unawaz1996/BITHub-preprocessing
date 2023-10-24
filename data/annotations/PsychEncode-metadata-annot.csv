@@ -33,7 +33,7 @@ ROW_ID,Row_ID,No,Sample charactertics
 ROW_VERSION,Row_version,No,Sample charactertics
 contributingStudy,ContributingStudy,No,Sample charactertics
 individualIDSource,individualIDSource,No,Phenotype
-ageOnset,ageOnset,Yes,Phenotype
+ageOnset,ageOnset,No,Phenotype
 causeDeath,causeDeath,Yes,Phenotype
 brainWeight,brainWeight,Yes,Phenotype
 height,height,Yes,Phenotype
