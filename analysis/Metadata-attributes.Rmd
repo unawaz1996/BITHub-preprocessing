@@ -253,7 +253,7 @@ annot = lapply(annot, function(x){
 md$BrainSeq %<>% dplyr::select(contains(annot$BrainSeq$BITColumnName)) %>% dplyr::select(-trimmed)
 md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName)) 
 md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
-md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName)) %>% dplyr::select(-c("Age"))
+md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName)) 
 md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
 
 
@@ -412,8 +412,8 @@ v= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName,
 
 
 UpSetR::upset(fromList(v), sets.bar.color = c("#7DA1D4","#FAAD79","#E11F28","#F1605F","#49215F"),
-              main.bar.color = c("#7DA1D4","#FAAD79","#E11F28",
-             "#808080","#808080", "#808080"), 
+              main.bar.color = c("#7DA1D4","#FAAD79",
+             "#808080","#808080"), 
               mainbar.y.label = "Overlap of Sample Characteristics",
               sets.x.label = "Total Sample Characteristics",
                 text.scale = c(1.2, 2, 1.2), 
