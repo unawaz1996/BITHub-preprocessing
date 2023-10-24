@@ -253,7 +253,7 @@ annot = lapply(annot, function(x){
 md$BrainSeq %<>% dplyr::select(contains(annot$BrainSeq$BITColumnName)) %>% dplyr::select(-trimmed)
 md$BrainSpan %<>% dplyr::select(contains(annot$BrainSpan$BITColumnName)) 
 md$GTEx %<>% dplyr::select(contains(annot$GTEx$BITColumnName)) 
-md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName))
+md$HDBR %<>% dplyr::select(contains(annot$HDBR$BITColumnName)) %>% dplyr::select(-c("Age"))
 md$PsychEncode %<>% dplyr::select(contains(annot$PsychEncode$BITColumnName))
 
 
@@ -361,7 +361,7 @@ plot =UpSetR::upset(fromList(v), sets.bar.color = c("#7DA1D4","#E11F28","#F1605F
                 text.scale = c(1.2, 2, 1.2), 
               point.size = 4)
 
-
+plot
 combos <- Reduce(c,lapply(2:length(v), 
                           function(x) combn(1:length(v),x,simplify=FALSE) ))
 intersect <- lapply(combos, function(x) Reduce(intersect,v[x]) )
@@ -381,7 +381,7 @@ v= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName,
         #  "Ramaker" = ram.tech$BITColumnName
          )
 
-a=calculate.overlap(x)
+
 
 UpSetR::upset(fromList(v), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7DA1D4","#49215F"),
               main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
