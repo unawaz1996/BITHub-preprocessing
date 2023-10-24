@@ -948,6 +948,8 @@ dev.off()
 
 ggarrange(plotCorrMatrix(C.hdbr), plotCorrMatrix(C.gtex))
 ```
+
+
 ## Determining the utlity of factors of unwanted variation 
 
 ```{r}
@@ -1049,6 +1051,50 @@ Categorical values have the PMI binned into intervals of based on the GTEx Biosp
 -  RNASE2
 
 ```{r}
+## Our flexible plotting function.
+## Mainly requires a gene symbol.
+plot_gene <- function(symb, type = 'cleaned', study) {
+    ## Keep the jitter reproducible
+    set.seed(20180303)
+    
+    ## Find the gene based on the symbol
+    i <- gene_i[grep(symb, names(gene_i))]
+    
+    ## Define what type of expression we are looking at
+    if(type == 'cleaned') {
+        y <- cleaned[i, ]
+        ylab <- 'Norm Expr: disease status and project removed'
+    } else if (type == 'norm') {
+        y <- log2(rpkm[i, ] + 0.5) 
+        ylab <- 'Normalized Expression'
+    }
+    x <- colData(rse_gene)$pmilvl
+    ylim <- abs(range(y)) * c(0.95, 1.05) * sign(range(y))
+    
+    ## Subset to a given study
+    if(!missing(study)) {
+        y <- y[rse_gene$project == study]
+        x <- x[rse_gene$project == study]
+    }
+    
+    ## Plot components
+    f <- lm(y ~ as.integer(x))
+    title <- paste(symb, 'p-value', signif(summary(f)$coef[2, 4], 3))
+    if(!missing(study)) title <- paste(title, 'study', study)
+    
+    ## Make the plot ^_^
+    plot(y ~ x, xlab = 'PMI interval (h)', ylab = ylab, outline = FALSE,
+        ylim = ylim, main = title)
+    ## Colors from color blind friendly palette at
+    ## http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+    points(y ~ jitter(as.integer(x), 0.6),
+        bg = c("#009E73", "#0072B2", "#E69F00", "#D55E00")[
+            as.integer(x)], pch = 21)
+    abline(f, lwd = 3, col = "#CC79A7")
+}
+```
+
+```{r}
 md$GTEx %<>% 
   mutate(PMI.hours = PMI/60) %>% 
   mutate(PMI.intervals = case_when(
@@ -1109,9 +1155,73 @@ gtex_fig_RNASE2  = e$Raw$GTEx %>%
 gtex_fig_RNASE2
 
 
+calc_lm = function(gene, dataset, region, md){
+   
+    subset = md %>% 
+      dplyr::filter(Regions == region )
+    
+    exp = dataset %>% 
+    as.data.frame() %>%
+    dplyr::select(contains(subset$SampleID)) %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% gene) %>% 
+      column_to_rownames("EnsemblID") %>% melt()
   
+  f <- lm(exp ~ as.integer(md$PMI.intervals))
+  return(f)
+    
+    # ## Make the plot ^_^
+    # plot(y ~ x, xlab = 'PMI interval (h)', ylab = ylab, outline = FALSE,
+    #     ylim = ylim, main = title)
+    # ## Colors from color blind friendly palette at
+    # ## http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+    # points(y ~ jitter(as.integer(x), 0.6),
+    #     bg = c("#009E73", "#0072B2", "#E69F00", "#D55E00")[
+    #         as.integer(x)], pch = 21)
+    # abline(f, lwd = 3, col = "#CC79A7")
+  
+}
+
+
+trial = calc_lm("RNASE2", e$Raw$GTEx, "Cerebellum", md$GTEx)
+
+
+
+  subset = md$GTEx %>% 
+      dplyr::filter(Regions == "Cerebellum" )
+    
+    exp = e$Raw$GTEx %>% 
+    as.data.frame() %>%
+    dplyr::select(contains(subset$SampleID)) %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "RNASE2") %>% 
+      column_to_rownames("EnsemblID") %>% melt() %>% 
+      dplyr::select()
+  
+  f <- lm(exp ~ as.integer(md$PMI.intervals))
+
+f <- lm(y ~ as.integer(x))
+    title <- paste(symb, 'p-value', signif(summary(f)$coef[2, 4], 3))
+    if(!missing(study)) title <- paste(title, 'study', study)
+    
+    ## Make the plot ^_^
+    plot(y ~ x, xlab = 'PMI interval (h)', ylab = ylab, outline = FALSE,
+        ylim = ylim, main = title)
+    ## Colors from color blind friendly palette at
+    ## http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+    points(y ~ jitter(as.integer(x), 0.6),
+        bg = c("#009E73", "#0072B2", "#E69F00", "#D55E00")[
+            as.integer(x)], pch = 21)
+    abline(f, lwd = 3, col = "#CC79A7")
+    
+    
 ```
 
+```{r}
+cor.test()
+```
 
 ```{r}
 md$BSpan %<>%

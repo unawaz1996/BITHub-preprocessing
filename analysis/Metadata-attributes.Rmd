@@ -335,7 +335,8 @@ sample.metrics = lapply(annot, function(x){
 
 ```{r}
 
-x= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName, 
+library(VennDiagram)
+v= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName, 
           "BrainSpan" = seq.metrics$BrainSpan$BITColumnName, 
           "GTEx" = seq.metrics$GTEx$BITColumnName, 
           "HDBR" = seq.metrics$HDBR$BITColumnName, 
@@ -349,7 +350,9 @@ x= list( "BrainSeq" = seq.metrics$BrainSeq$BITColumnName,
          )
 
 
-UpSetR::upset(fromList(x), sets.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49215F"),
+a=calculate.overlap(x)
+
+plot =UpSetR::upset(fromList(v), sets.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49215F"),
               main.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49215F",
                                  "#808080","#808080","#808080","#808080",
                                  "#808080","#808080"), 
@@ -357,10 +360,15 @@ UpSetR::upset(fromList(x), sets.bar.color = c("#7DA1D4","#E11F28","#F1605F","#49
               sets.x.label = "Total Sequencing Metrics",
                 text.scale = c(1.2, 2, 1.2), 
               point.size = 4)
+
+
+combos <- Reduce(c,lapply(2:length(v), 
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect <- lapply(combos, function(x) Reduce(intersect,v[x]) )
 ```
 
 ```{r}
-x= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName, 
+v= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName, 
           "BrainSpan" = pheno.metrics$BrainSpan$BITColumnName, 
           "GTEx" = pheno.metrics$GTEx$BITColumnName, 
           "HDBR" = pheno.metrics$HDBR$BITColumnName, 
@@ -373,8 +381,9 @@ x= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName,
         #  "Ramaker" = ram.tech$BITColumnName
          )
 
+a=calculate.overlap(x)
 
-UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7DA1D4","#49215F"),
+UpSetR::upset(fromList(v), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7DA1D4","#49215F"),
               main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
                                 "#808080","#808080","#808080"), 
               mainbar.y.label = "Overlap of Phenotype Data",
@@ -382,10 +391,13 @@ UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7D
                 text.scale = c(1.2, 2, 1.2), 
               point.size = 4)
 
+combos <- Reduce(c,lapply(2:length(v), 
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect <- lapply(combos, function(x) Reduce(intersect,v[x]) )
 ```
 
 ```{r}
-x= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName, 
+v= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName, 
           "BrainSpan" = sample.metrics$BrainSpan$BITColumnName, 
           "GTEx" = sample.metrics$GTEx$BITColumnName, 
           "HDBR" = sample.metrics$HDBR$BITColumnName, 
@@ -399,7 +411,7 @@ x= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName,
          )
 
 
-UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#7DA1D4","#F1605F","#E11F28","#49215F"),
+UpSetR::upset(fromList(v), sets.bar.color = c("#FAAD79","#7DA1D4","#F1605F","#E11F28","#49215F"),
               main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
                                 "#808080","#808080","#808080", "#808080"), 
               mainbar.y.label = "Overlap of Sample Characteristics",
@@ -407,6 +419,9 @@ UpSetR::upset(fromList(x), sets.bar.color = c("#FAAD79","#7DA1D4","#F1605F","#E1
                 text.scale = c(1.2, 2, 1.2), 
               point.size = 4)
 
+combos <- Reduce(c,lapply(2:length(v), 
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect <- lapply(combos, function(x) Reduce(intersect,v[x]) )
 ```
 
 
