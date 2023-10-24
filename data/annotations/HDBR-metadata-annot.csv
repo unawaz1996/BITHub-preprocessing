@@ -2,7 +2,7 @@ OriginalMetadataColumnName,BITColumnName,Include (Yes/No) - Interest,Type
 Run,SampleID,Yes,Sample charactertics
 Sample.Characteristic.block.,SequencingBatch,Yes,Sequencing metrics
 Sample.Characteristic.Ontology.Term.block.,Block,Yes,Sequencing metrics
-Sample.Characteristic.developmental.stage.,Age,Yes,Phenotype
+Sample.Characteristic.developmental.stage.,Age,No,Phenotype
 Sample.Characteristic.individual.,DonorID,Yes,Phenotype
 Sample.Characteristic.karyotype.,Sex,Yes,Phenotype
 Sample.Characteristic.organism.part.,Structure,Yes,Sample charactertics

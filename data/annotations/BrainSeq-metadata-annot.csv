@@ -11,7 +11,7 @@ mitoMapped,mitoMapped,Yes,Sequencing metrics
 mitoRate,mito_ratio,Yes,Sequencing metrics
 totalAssignedGene,totalAssignedGene,Yes,Sequencing metrics
 rRNA_rate,rRNA_ratio,Yes,Sequencing metrics
-RNum,SampleID,Yes,Phenotype
+RNum,Rnum,No,Phenotype
 BrNum,DonorID,Yes,Phenotype
 Region,StructureAcronym,Yes,Sample charactertics
 RIN,RIN,Yes,Sequencing metrics
