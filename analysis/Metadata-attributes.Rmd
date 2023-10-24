@@ -384,10 +384,10 @@ v= list( "BrainSeq" = pheno.metrics$BrainSeq$BITColumnName,
 
 
 UpSetR::upset(fromList(v), sets.bar.color = c("#FAAD79","#F1605F","#E11F28","#7DA1D4","#49215F"),
-              main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
+              main.bar.color = c("#FAAD79","#7DA1D4",
                                 "#808080","#808080","#808080"), 
-              mainbar.y.label = "Overlap of Phenotype Data",
-              sets.x.label = "Total Phenotype Data",
+              mainbar.y.label = "Overlap of Phenotype Attributes",
+              sets.x.label = "Total Phenotype Attributes",
                 text.scale = c(1.2, 2, 1.2), 
               point.size = 4)
 
@@ -411,9 +411,9 @@ v= list( "BrainSeq" = sample.metrics$BrainSeq$BITColumnName,
          )
 
 
-UpSetR::upset(fromList(v), sets.bar.color = c("#FAAD79","#7DA1D4","#F1605F","#E11F28","#49215F"),
-              main.bar.color = c("#FAAD79","#7DA1D4","#E11F28","#F1605F",
-                                "#808080","#808080","#808080", "#808080"), 
+UpSetR::upset(fromList(v), sets.bar.color = c("#7DA1D4","#FAAD79","#E11F28","#F1605F","#49215F"),
+              main.bar.color = c("#7DA1D4","#FAAD79","#E11F28",
+             "#808080","#808080", "#808080"), 
               mainbar.y.label = "Overlap of Sample Characteristics",
               sets.x.label = "Total Sample Characteristics",
                 text.scale = c(1.2, 2, 1.2), 
