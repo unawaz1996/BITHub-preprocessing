@@ -18,19 +18,19 @@ SMTSPAX,Time_spent_in_PAXgene_fixative,Yes,Sequencing metrics
 SME2MPRT,End_2_mapping_rate,Yes,Sequencing metrics
 SMCHMPRS,ChimericPairs,Yes,Sequencing metrics
 SMNTRART,IntragenicRate,Yes,Sequencing metrics
-SMNUMGPS,No_of_Gaps,Yes,Sequencing metrics
+SMNUMGPS,No_of_Gaps,No,Sequencing metrics
 SMMAPRT,MappingRate,Yes,Sequencing metrics
 SMEXNCRT,ExonicRate,Yes,Sequencing metrics
-SM550NRM,BasedNormalised,Yes,Sequencing metrics
+SM550NRM,BasedNormalised,No,Sequencing metrics
 SMGNSDTC,GenesDetected,Yes,Sequencing metrics
 SMUNMPRT,UniqueRate_mapped,No,Sequencing metrics
-SM350NRM,BaseNormilization,Yes,Sequencing metrics
+SM350NRM,BaseNormilization,No,Sequencing metrics
 SMESTLBS,LibrarySize,Yes,Sequencing metrics
 SMMPPD,ReadsMapped,Yes,Sequencing metrics
 SMNTERRT,IntergenicRate,Yes,Sequencing metrics
 SMRRNANM,rRNA,Yes,Sequencing metrics
 SMRDTTL,TotalNReads,Yes,Sequencing metrics
-SMMNCV,Mean_Coeff_Variation,Yes,Sequencing metrics
+SMMNCV,Mean_Coeff_Variation,No,Sequencing metrics
 SMTRSCPT,TranscriptsDetected,Yes,Sequencing metrics
 SMMPPDPR,MappedPairs,Yes,Sequencing metrics
 SMUNPDRD,UnpairedReads,Yes,Sequencing metrics
@@ -46,7 +46,7 @@ SME1SNSE,End_1_Sense,Yes,Sequencing metrics
 SME1PCTS,End_1_Sense_percentage,Yes,Sequencing metrics
 SMRRNART,rRNA_ratio,Yes,Sequencing metrics
 SME1MPRT,End_1_Mapping_rate,Yes,Sequencing metrics
-SMNUM5CD,Num_of_Reads_Covered_5prime,Yes,Sequencing metrics
+SMNUM5CD,Num_of_Reads_Covered_5prime,No,Sequencing metrics
 SMDPMPRT,DuplicationRateMapped,Yes,Sequencing metrics
 SME2PCTS,Percentage_IntragenicEnd_2_Reads,Yes,Sequencing metrics
 SUBJID,DonorID,Yes,Phenotype
