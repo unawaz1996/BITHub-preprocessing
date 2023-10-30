@@ -584,8 +584,8 @@ period_scale$BSpan_Prenatal %>%
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/ZIC2-zscore.svg"),
-       height = 6, width = 18, units = "in")
+pdf(file = here::here("output/Thesis_plots/Examples/ZIC2-zscore.pdf"),
+       height = 6, width = 18)
 ggarrange(dataset_zscore_zic2 , regions_zscore_zic2,
           period_zscore_zic2, ncol=3, nrow=1 )
 
@@ -831,8 +831,8 @@ pe
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/MKI67-all.svg"),
-       height = 14, width = 16, units = "in")
+pdf(file = here::here("output/Thesis_plots/Examples/MKI67-all.pdf"),
+       height = 14, width = 16)
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
