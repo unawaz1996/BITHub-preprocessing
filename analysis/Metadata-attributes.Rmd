@@ -448,10 +448,22 @@ md$BrainSpan %>%
   mutate(count_na = apply(., 1, count_na)) %>%
   ggplot(aes(count_na)) + geom_density()
 
+na_calc = lapply(md, function(x){
+  x %<>%  
+    mutate(count_na = apply(., 1, count_na)) %>% 
+    dplyr::select(count_na)
+  return(x)
+})
+
 md$GTEx %>%
   mutate(count_na = apply(., 1, count_na)) %>%
   ggplot(aes(count_na)) + geom_density()
 
+
+md$PsychEncode %<>%
+  mutate(count_na = apply(., 1, count_na))
+
+table(md$PsychEncode$count_na)
 #%>% 
  # ggplot(aes(x=PMI))
 
@@ -463,12 +475,6 @@ total_nb = do.call(rbind, na_calc) %>%
 
 
 ```{r}
-na_calc = lapply(md, function(x){
-  x %<>%  
-    mutate(count_na = apply(., 1, count_na)) %>% 
-    dplyr::select(count_na)
-  return(x)
-})
 
 
 ggsave(filename = here::here("output/Thesis_plots/Metadata/missing_md.svg"), height=6, width = 7, units = "in")
@@ -504,6 +510,6 @@ dev.off()
 md$GTEx %>% apply(., 2, count_na)
 md$HDBR %>% apply(.,2, count_na)
 md$PsychEncode%>% apply(.,2, count_na)
-
+md$BrainSpan %>% apply(.,2, count_na)
 
 ```

@@ -446,6 +446,37 @@ exp = list.files(psych, full.names = TRUE, pattern = "\\Gene_expression_matrix_T
       read.table(., header=TRUE, row.names = 1, check.names = FALSE)
 md = list.files(psych, full.names = TRUE, pattern = "Job*") %>% read.csv(., header=TRUE) %>% 
   dplyr::filter(individualID != "2015-1")
+md.clinical = read.csv(file.path(psych, "PEC_capstone_data_map_clinical.csv"), header=TRUE, check.names = FALSE)
+
+```
+
+```{r}
+library(ggvenn)
+library(VennDiagram)
+
+pe.overlap = list("md individual ID" = md.clinical$`Synapse: individualID`, 
+                #  "md pe individual ID" = md.clinical$`resource.psychencode.org: individualID`,
+                  "md original" = md$individualID,
+                  "exp" = colnames(exp))
+ggvenn(pe.overlap)
+
+x = calculate.overlap(pe.overlap)
+
+xmd_only = x$a1[!x$a1 %in% x$a3]
+exp_only = x$a2[!x$a2 %in% x$a3]
+
+
+
+ind_id = x$a4
+in_exp = x$a5
+in_resource_id = x$a6
+
+
+
+```
+
+
+```{r}
 comp = list.files(psych, full.names = TRUE, pattern = "\\Cell_fractions*") %>% read_excel() %>%
       as.data.frame() %>% 
       column_to_rownames("CellType")
@@ -510,6 +541,9 @@ write.csv(md, file = file.path(psych,"Formatted/PsychEncode-metadata.csv"))
 ```
 
 
+```{r}
+pe.processed = read.csv(file.path(psych, "Formatted/PsychEncode-exp.csv"), header=TRUE, row.names=1)
+```
 ```{r}
 rm(md)
 rm(exp)
@@ -596,4 +630,40 @@ md_f5 = apply(md_f5,2,as.character)
 ```{r}
 write.csv(exp, "/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-exp.csv")
 write.csv(md_f5, "/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-metadata.csv")
+```
+
+
+### FANTOM5 dataset
+
+
+```{r}
+f5.md = read.csv("/home/neuro/Documents/BrainData/Bulk/Fantom5/Formatted/FANTOM5-metadata.csv", header=TRUE, row.names = 1)
+```
+
+```{r}
+f5.md$FF.ID.Description %>%
+  head(1)
+
+table(f5.md$Tissue)
+table(f5.md$Sample)
+colnames(f5.md)
+t1 = as.data.frame(table(f5.md$Tissue))
+```
+
+```{r}
+table(f5.md$Experiment.description)
+```
+
+
+```{r}
+f5.md %>%
+  dplyr::filter(Tissue == "ANATOMICAL SYSTEM") %>%
+  head()
+
+ont = table(f5.md$FF.ID.Description) %>% as.data.frame()
+a = f5.md[grep("ANATOMICAL", f5.md$Tissue),]
+
+b = f5.md[grep("brain", f5.md$Tissue),]
+
+b_ont = table(b$FF.ID.Description) %>% as.data.frame()
 ```

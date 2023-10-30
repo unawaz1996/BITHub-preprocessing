@@ -864,7 +864,7 @@ ggsave(plot = overall,
 <!--                                "Endothelia" = "#FAE47B")) -->
 
 <!-- ``` -->
-
+## GoF
 ```{r}
 cbs_regions =do.call(rbind, gof_results) %>%
   as.data.frame() %>%
@@ -971,7 +971,10 @@ bspan.csb = decon_results$BSpan_CIBERSORT%>%
   left_join(md$BSpan %>% 
               dplyr::select(SampleID, Regions, Period, AgeInterval), by = "SampleID") 
 
+```
 
+## Cell-fractions 
+```{r}
 cibersort_all = rbind(pe.cbs,
       bspan.csb,
       bseq.cbs, 
@@ -1598,6 +1601,132 @@ dev.off()
 ```
 
 
+## Impact of cell fractions on gene expression 
+
+```{r}
+thresh <- function(x) {
+      y <- x > 1
+      keep <- rowSums(y) > (ncol(y) / 10)
+      return(x[keep,])
+    }
+```
+
+```{r}
+gtex <- thresh(e$GTEx)
+span <- thresh(e$BSpan)
+seq <- thresh(e$BSeq)
+pe <- thresh(e$PE)
+hdbr <- thresh(e$HDBR)
+
+```
+
+- BrainSeq
+
+```{r}
+pc = log(seq + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+```
+
+```{r}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(bseq.cbs) %>%
+  left_join(md$BSeq %>% 
+              dplyr::select(SampleID, DonorID, 
+                            Sex, Ethnicity, 
+                            Diagnosis, Period)) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+         Microglia,
+        Endothelia,
+        Period, 
+        Regions,
+        DonorID, 
+        Diagnosis
+        
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+            DonorID = as.numeric(as.factor(DonorID)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
+```{r}
+bseq.cbs %>% 
+  dplyr::select(SampleID, Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+         Microglia,
+        Endothelia) %>%
+  left_join(md$BSeq %>% 
+              dplyr::select(SampleID,"Dev.Replicating", "Dev.Quiescent","Adult.Neurons",
+                            "Adult.Astrocytes", "Adult.Oligo",
+                            "Adult.Microglia")) %>%
+  dplyr::select(-SampleID) %>%
+   cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+  
+
+```
+
+- BrainSpan
+
+```{r}
+pc = log(span + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+```
+
+```{r}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(bspan.csb) %>%
+  left_join(md$BSpan %>% 
+              dplyr::select(SampleID, DonorID, 
+                            Sex, Ethnicity, 
+                            StructureAcronym, Period)) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+         Microglia,
+        Endothelia,
+        Period, 
+        Regions,
+        DonorID, 
+        StructureAcronym
+        
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+            DonorID = as.numeric(as.factor(DonorID)), 
+          StructureAcronym = as.numeric(as.factor(StructureAcronym))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
 
 <!-- ## Export the datasets  -->
 

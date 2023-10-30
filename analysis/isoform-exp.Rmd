@@ -25,15 +25,17 @@ library(corrplot)
 library(edgeR)
 library(pheatmap)
 library(viridis)
+
+
+txdf = transcripts(EnsDb.Hsapiens.v86, return.type="DataFrame")
+tx2gene = as.data.frame(txdf[,c("gene_id", "tx_id")])
+
 ```
 
 ```{r}
 gtex_trans = read.gct("/home/neuro/Documents/BrainData/Bulk/GTEx/GTEx_Analysis_2017-06-05_v8_RSEMv1.3.0_transcript_tpm.gct.gz")
 colnames(gtex_trans ) <- gsub("\\.", "-", colnames(gtex_trans))
 
-
-txdf = transcripts(EnsDb.Hsapiens.v86, return.type="DataFrame")
-tx2gene = as.data.frame(txdf[,c("gene_id", "tx_id")])
 
 ```
 
@@ -152,7 +154,12 @@ bseq.md = read.csv(file.path(dir, "Brainseq/Formatted/BrainSeq-metadata.csv"),
   mutate(Age_rounded = as.character(sapply(na.omit(.$AgeNumeric), num_to_round)))
 load(file.path(bseq, "rse_tx_unfiltered.Rdata"), envir = .GlobalEnv)
 
-exp = rse_tx@assays@.xData$data$tpm
+exp = rse_tx@assays@.xData$data$tpm %>%
+  as.data.frame() %>% 
+  rownames_to_column("tx_id") %>%
+  mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>%
+  column_to_rownames("tx_id")
+
 ```
 
 ```{r}
@@ -170,12 +177,47 @@ pfc_samples = bseq.md %>%
 
 pfc_exp = exp %>%
   as.data.frame()%>%
-  dplyr::select(contains(pfc_samples$SampleID))
-
+  dplyr::select(contains(pfc_samples$SampleID)) 
 ```
 
 
 ## ZMYND8
+
+Average all data 
+```{r}
+
+average = with(bseq.md, setNames(AgeInterval,SampleID))[names(exp)[col(exp)]]
+
+average_exp = tapply(unlist(exp), list(row(exp), average ), mean)
+
+rownames(average_exp) = rownames(exp)
+
+write.csv(average_exp, "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-tx-exp.csv")
+```
+
+
+```{r}
+average = with(hip_samples, setNames(AgeInterval,SampleID))[names(hip_exp)[col(hip_exp)]]
+
+average_exp = tapply(unlist(hip_exp), list(row(hip_exp), average ), mean)
+
+rownames(average_exp) = rownames(hip_exp)
+
+write.csv(average_exp, "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-tx-hip-exp.csv")
+
+```
+
+```{r}
+average = with(pfc_samples, setNames(AgeInterval,SampleID))[names(pfc_exp)[col(pfc_exp)]]
+
+average_exp = tapply(unlist(pfc_exp), list(row(pfc_exp), average ), mean)
+
+rownames(average_exp) = rownames(pfc_exp)
+
+write.csv(average_exp, "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-tx-pfc-exp.csv")
+
+
+```
 
 ```{r}
 tx_order = c("ENST00000619049", "ENST00000360911", "ENST00000536340","ENST00000617418",
