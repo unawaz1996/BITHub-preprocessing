@@ -984,7 +984,8 @@ var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-v
 
 ```{r}
 bspan =var_part$BSpan %>% dplyr::select(-gene_name) %>%
-  column_to_rownames("EnsemblID") %>%
+  column_to_rownames("EnsemblID")
+#%>%
 plotVarPart() + ggtitle("BrainSpan") + ylab("Variance Explained (%)") +
   theme(axis.text = element_text(size=12, family = "serif"),
         axis.title = element_text(size=12,family = "serif"),
