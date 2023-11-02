@@ -2073,7 +2073,7 @@ for (x in datasets) {
 ```
 
 
-
+### Cerebral Palsy genes
 
 
 - SPAST
@@ -2745,6 +2745,14 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
   ylab(bquote(log["10"](TPM)))
 ```
 
+```{r}
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/ATL1-all.svg"),
+       height = 14, width = 16, units = "in")
+ggarrange(bseq, bspan,
+          gtex, hdbr, pe, ncol=2, nrow=3 )
+
+dev.off()
+```
 
 - KCNQ2
 
@@ -3056,7 +3064,54 @@ bseq
 ```
 
 ```{r}
+fmr1_bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((gene_name == "FMR1" & Dataset == "BSpan"& Regions == "Subcortex")) %>%
+  dplyr::filter(!StructureAcronym %in% c("CGE", "DTH", "LGE")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = StructureAcronym)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+   theme_bw()  + ggtitle("BrainSpan") +
+  scale_fill_manual(values = c("AMY" = "#d8e2dc", 
+                               "HIP" = "#ffe5d9", 
+                               "MD" = "#f4acb7",
+                               "STR" = "#9d8189")) +
+  xlab("") + facet_wrap(~StructureAcronym) +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM))) 
 
+```
+
+
+
+```{r}
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/FMR1-BSpan-structures.svg"),
+       height = 14, width = 16, units = "in")
+ggarrange(bseq, bspan,
+          gtex, hdbr, pe, ncol=2, nrow=3 )
+
+dev.off()
+```
 
 ```
 
