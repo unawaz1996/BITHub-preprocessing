@@ -922,7 +922,48 @@ ggsave(plot = cbs_regions,
       height = 12)
 ```
 
+```{r}
+cortex.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Regions == "Cortex")
 
+subcortex.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Regions == "Subcortex")
+
+cortex.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Regions == "Cortex")
+
+cer.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Regions == "Cerebellum")
+
+hdbr.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Dataset == "HDBR")
+median(hdbr.gof$r)
+
+
+dev.gof = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort") %>% 
+  dplyr::filter(Period == "Postnatal")
+
+
+median(dev.gof$r)
+```
 
 ```{r}
 pe.cbs  = decon_results$PE_CIBERSORT %>% 
@@ -1337,6 +1378,19 @@ bspan.csb %>%
 
 ```
 
+
+```{r}
+bseq.cbs %>% 
+  dplyr::select(Regions, Neurons, Astrocytes, Oligodendrocytes,Microglia, Endothelia ) %>%
+  group_by(Regions) %>% dplyr::summarise(across(everything(), list(mean)) * 100)
+
+
+gtex.cbs %>% 
+  dplyr::select(Regions, Neurons, Astrocytes, Oligodendrocytes,Microglia, Endothelia ) %>%
+  group_by(Regions) %>% dplyr::summarise(across(everything(), list(mean)) * 100)
+```
+
+
 ## Datasets 
 
 ```{r fig.height=12, fig.width=20}
@@ -1726,6 +1780,86 @@ pc = log(span + 0.05) %>%
         diag = FALSE, 
         addCoef.col = 1, 
         number.cex = 0.75)
+```
+
+- BrainSpan
+
+```{r}
+pc = log(gtex + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+```
+
+```{r}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(gtex.cbs) %>%
+  left_join(md$GTEx %>% 
+              dplyr::select(SampleID, DonorID, 
+                            Sex,
+                            StructureAcronym, Period)) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+         Microglia,
+        Endothelia,
+        Regions,
+        DonorID, 
+        StructureAcronym
+        
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(
+          Regions = as.numeric(as.factor(Regions)),
+            DonorID = as.numeric(as.factor(DonorID)), 
+          StructureAcronym = as.numeric(as.factor(StructureAcronym))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
+
+
+```{r}
+pc = log(pe + 0.05) %>% 
+  t() %>% 
+   prcomp(scale = TRUE)
+```
+
+```{r}
+ pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(pe.cbs) %>%
+  left_join(md$PE %>% 
+              dplyr::select(SampleID, Diagnosis, AgeNumeric)) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+         Microglia,
+        Endothelia,
+        Period,
+        Diagnosis
+        
+    ) %>%
+   mutate(Period = as.numeric(as.factor(Period)),
+            Diagnosis = as.numeric(as.factor(Diagnosis))) %>%
+    cor() %>% 
+    corrplot(
+        type = "lower", 
+        diag = FALSE, 
+        addCoef.col = 1, 
+        number.cex = 0.75)
+```
+
 ```
 
 <!-- ## Export the datasets  -->
