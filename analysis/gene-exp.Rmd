@@ -2047,7 +2047,7 @@ dev.off()
 ## Understanding spatiotemporal properties of Neurodevelopmental disorder genes
 
 ```{r}
-genes_of_interest = c("FMR1", "ZMYND8", "UPF1", "SPAST", "ATL1", "CTNNB1", "KCNQ2")
+genes_of_interest = c("FMR1", "ZMYND8", "UPF1", "SPAST", "ATL1", "CTNNB1", "KCNQ2", "SPR")
 exp_data = list()
 datasets = c("BSpan", "GTEx", "BSeq", "PE", "HDBR")
 for (x in datasets) {
@@ -2294,8 +2294,8 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/SPAST-all.svg"),
-       height = 14, width = 16, units = "in")
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/SPAST-all.pdf"),
+       height = 14, width = 16)
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
@@ -2520,8 +2520,8 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/CTNNB1-all.svg"),
-       height = 14, width = 16, units = "in")
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/CTNNB1-all.pdf"),
+       height = 14, width = 16)
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
@@ -2746,20 +2746,20 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
 ```
 
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/ATL1-all.svg"),
-       height = 14, width = 16, units = "in")
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/ATL1-all.pdf"),
+       height = 14, width = 16)
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
 dev.off()
 ```
 
-- KCNQ2
+- SPR
 
 ```{r}
-exp_data %>% 
+bseq = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((gene_name == "KCNQ2" & Dataset == "BSeq")) %>%
+  dplyr::filter((gene_name == "SPR" & Dataset == "BSeq")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -2800,9 +2800,9 @@ exp_data %>%
 ```
 
 ```{r}
-exp_data %>% 
+bspan = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((gene_name == "KCNQ2" & Dataset == "BSpan")) %>%
+  dplyr::filter((gene_name == "SPR" & Dataset == "BSpan")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -2844,9 +2844,9 @@ exp_data %>%
 
 
 ```{r}
-exp_data %>% 
+gtex = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((gene_name == "KCNQ2" & Dataset == "GTEx")) %>%
+  dplyr::filter((gene_name == "SPR" & Dataset == "GTEx")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -2887,9 +2887,9 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
 ```
 
 ```{r}
-exp_data %>% 
+hdbr = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((gene_name == "KCNQ2" & Dataset == "HDBR")) %>%
+  dplyr::filter((gene_name == "SPR" & Dataset == "HDBR")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -2930,9 +2930,9 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
 
 
 ```{r}
-exp_data %>% 
+pe = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((gene_name == "KCNQ2" & Dataset == "PE")) %>%
+  dplyr::filter((gene_name == "SPR" & Dataset == "PE")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -2971,6 +2971,63 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
   ylab(bquote(log["10"](TPM)))
 ```
 
+```{r}
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/SPR.pdf"),
+       height = 14, width = 16)
+ggarrange(bseq, bspan,
+          gtex, hdbr, pe, ncol=2, nrow=3 )
+
+dev.off()
+```
+
+
+
+- Brain structures in cerebral palsy genes
+
+```{r}
+cp_genes_structures = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSpan"& Regions == "Subcortex")) %>%
+  dplyr::filter(gene_name %in% c("ATL1", "SPR", "CTNNB1", "SPAST")) %>%
+  dplyr::filter(!StructureAcronym %in% c("CGE", "DTH", "LGE")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = StructureAcronym)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+   theme_bw()  + ggtitle("BrainSpan") +
+  scale_fill_manual(values = c("AMY" = "#d8e2dc", 
+                               "HIP" = "#ffe5d9", 
+                               "MD" = "#f4acb7",
+                               "STR" = "#9d8189")) +
+  xlab("") + facet_grid(gene_name~StructureAcronym, scales = "free") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM))) 
+
+
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/CP_genes_structure.pdf"),
+       height = 16, width = 16)
+cp_genes_structures 
+dev.off()
+```
 
 
 ```{r}
@@ -3106,14 +3163,12 @@ fmr1_bspan = exp_data %>%
 
 ```{r}
 ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/FMR1-BSpan-structures.svg"),
-       height = 14, width = 16, units = "in")
-ggarrange(bseq, bspan,
-          gtex, hdbr, pe, ncol=2, nrow=3 )
+       height = 10, width = 16, units = "in", plot = fmr1_bspan)
 
-dev.off()
-```
 
 ```
+
+
 
 
 - ZMYND8 
@@ -3731,6 +3786,9 @@ sn_md$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-metadata.csv"),
 sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metadata.csv"), 
                      header=TRUE, check.names = FALSE, row.names = 1)
 
+colnames(sn_md$hca)[9:13] = c("MajorCellType", "Age", 
+                              "AgeNumeric", "AgeInterval", "Regions")
+
 ```
 
 ```{r}
@@ -3757,3 +3815,124 @@ snRNA$vel[,-1] %>%
   theme_bw()
 ```
 
+
+## Cerebral palsy genes 
+
+```{r}
+ctnnb1 = snRNA$hca %>% 
+  dplyr::filter(Symbol == "CTNNB1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("CTNNB1") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99"))
+```
+
+
+```{r}
+spast =snRNA$hca %>% 
+  dplyr::filter(Symbol == "SPAST") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("SPAST") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99"))
+```
+
+
+```{r}
+spr = snRNA$hca %>% 
+  dplyr::filter(Symbol == "SPR") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("SPR") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99"))
+```
+
+```{r}
+atl1 =snRNA$hca %>% 
+  dplyr::filter(Symbol == "ATL1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+    theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("ATL1") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99"))
+```
+
+```{r}
+
+```
+
+
+```{r}
+pdf(file = here::here("output/Thesis_plots/Examples/NDDs/CP-cell-types-HCA.pdf"),
+       height = 14, width = 16)
+ggarrange(atl1, ctnnb1, spast, spr, 
+          ncol = 2, nrow = 2, common.legend = TRUE)
+dev.off()
+```
