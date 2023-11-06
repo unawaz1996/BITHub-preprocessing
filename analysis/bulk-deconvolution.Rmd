@@ -1748,7 +1748,7 @@ pc = log(span + 0.05) %>%
 ```
 
 ```{r}
- pc$x  %>%
+ cor.bspan =pc$x  %>%
     as.data.frame() %>%
   rownames_to_column("SampleID") %>%
   left_join(bspan.csb) %>%
@@ -1774,15 +1774,16 @@ pc = log(span + 0.05) %>%
           Regions = as.numeric(as.factor(Regions)),
             DonorID = as.numeric(as.factor(DonorID)), 
           StructureAcronym = as.numeric(as.factor(StructureAcronym))) %>%
-    cor() %>% 
-    corrplot(
-        type = "lower", 
-        diag = FALSE, 
+    cor() 
+cor.bspan = cor.bspan[-c(1:3),]
+cor.bspan = cor.bspan[,c(1:3)]
+cor.bspan %>% corrplot(
         addCoef.col = 1, 
-        number.cex = 0.75)
+        number.cex = 0.75, 
+        method = 'color')
 ```
 
-- BrainSpan
+- GTEx
 
 ```{r}
 pc = log(gtex + 0.05) %>% 
@@ -1791,14 +1792,14 @@ pc = log(gtex + 0.05) %>%
 ```
 
 ```{r}
- pc$x  %>%
+ cor.gtex =pc$x  %>%
     as.data.frame() %>%
   rownames_to_column("SampleID") %>%
   left_join(gtex.cbs) %>%
   left_join(md$GTEx %>% 
               dplyr::select(SampleID, DonorID, 
                             Sex,
-                            StructureAcronym, Period)) %>%
+                            StructureAcronym, Period, rRNA_ratio, PMI)) %>%
     dplyr::select(
         PC1, PC2, PC3,
         Neurons,
@@ -1808,7 +1809,9 @@ pc = log(gtex + 0.05) %>%
         Endothelia,
         Regions,
         DonorID, 
-        StructureAcronym
+        StructureAcronym, 
+        rRNA_ratio, 
+        PMI
         
     ) %>% 
   drop_na(Regions) %>%
@@ -1816,12 +1819,14 @@ pc = log(gtex + 0.05) %>%
           Regions = as.numeric(as.factor(Regions)),
             DonorID = as.numeric(as.factor(DonorID)), 
           StructureAcronym = as.numeric(as.factor(StructureAcronym))) %>%
-    cor() %>% 
-    corrplot(
-        type = "lower", 
-        diag = FALSE, 
+    cor() 
+
+cor.gtex = cor.gtex[-c(1:3),]
+cor.gtex = cor.gtex[,c(1:3)]
+cor.gtex %>% corrplot(
         addCoef.col = 1, 
-        number.cex = 0.75)
+        number.cex = 0.75, 
+        method = 'color')
 ```
 
 

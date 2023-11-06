@@ -78,7 +78,8 @@ write.csv(varPar.bseq, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/For
 
 ## BrainSpan
 
-form.bspan <- ~ AgeNumeric  + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore
+form.bspan <- ~ AgeNumeric  + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore +Neurons +
+  Astrocytes
 varPar.bspan <- fitExtractVarPartModel(span,form.bspan ,md$BSpan)
 varPar.bspan = sortCols(varPar.bspan)
 plot_varPart = plotVarPart(varPar.bspan)

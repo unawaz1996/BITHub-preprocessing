@@ -2987,9 +2987,10 @@ dev.off()
 ```{r}
 cp_genes_structures = exp_data %>% 
   do.call(rbind, .) %>% 
-  dplyr::filter((Dataset == "BSpan"& Regions == "Subcortex")) %>%
-  dplyr::filter(gene_name %in% c("ATL1", "SPR", "CTNNB1", "SPAST")) %>%
-  dplyr::filter(!StructureAcronym %in% c("CGE", "DTH", "LGE")) %>%
+  dplyr::filter((Dataset == "BSpan"& Regions == "Cortex")) %>%
+  dplyr::filter(gene_name %in% c( "CTNNB1")) %>%
+  dplyr::filter(!StructureAcronym %in% c("TCx", "Ocx", "MGE",
+                                         "M1C-S1C", "PCx")) %>%
     mutate(AgeInterval = factor(AgeInterval, 
                               levels = c("4-7pcw", "8-9pcw",
                                          "10-12pcw", "13-15pcw", "16-18pcw",
@@ -3003,11 +3004,11 @@ cp_genes_structures = exp_data %>%
 # geom_violin(position = position_dodge(0.8), color = NA) +
   geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
    theme_bw()  + ggtitle("BrainSpan") +
-  scale_fill_manual(values = c("AMY" = "#d8e2dc", 
-                               "HIP" = "#ffe5d9", 
-                               "MD" = "#f4acb7",
-                               "STR" = "#9d8189")) +
-  xlab("") + facet_grid(gene_name~StructureAcronym, scales = "free") +
+  #scale_fill_manual(values = c("AMY" = "#d8e2dc", 
+  #                             "HIP" = "#ffe5d9", 
+   #                            "MD" = "#f4acb7",
+   #                            "STR" = "#9d8189")) +
+  xlab("") + facet_wrap(~StructureAcronym, scales = "free") +
   #facet_grid(Dataset~gene_name, scales = "free") +
   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
         axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
@@ -3777,6 +3778,9 @@ snRNA$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-exp.csv"),
                      header=TRUE, check.names = FALSE, row.names = 1)
 snRNA$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-exp.csv"), 
                      header=TRUE, check.names = FALSE, row.names = 1)
+
+snRNA$cer = read.csv(file.path(sn.dir, "aldinger/Aldringer-exp.csv"), header=TRUE, 
+                     check.names = FALSE, row.names = 1)
 #snRNA$cameron 
 
 sn_md = list()
@@ -3785,10 +3789,13 @@ sn_md$hca = read.csv(file.path(sn.dir, "hca/Processed/HCA-metadata.csv"),
                      header=TRUE, check.names = FALSE, row.names = 1)
 sn_md$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-metadata.csv"), 
                      header=TRUE, check.names = FALSE, row.names = 1)
+sn_md$cer = read.csv(file.path(sn.dir, "aldinger/Aldringer-metadata.csv"), 
+                     header=TRUE, check.names =FALSE)
 
 colnames(sn_md$hca)[9:13] = c("MajorCellType", "Age", 
                               "AgeNumeric", "AgeInterval", "Regions")
 
+colnames(sn_md$vel)[6] = c("Age")
 ```
 
 ```{r}
@@ -3815,9 +3822,28 @@ snRNA$vel[,-1] %>%
   theme_bw()
 ```
 
+```{r}
+snRNA$vel %>% 
+  dplyr::filter(Symbol == "FMR1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$vel, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = Diagnosus)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("FMR1") 
+```
 
 ## Cerebral palsy genes 
 
+- HCA (postnatal)
 ```{r}
 ctnnb1 = snRNA$hca %>% 
   dplyr::filter(Symbol == "CTNNB1") %>% 
@@ -3925,14 +3951,18 @@ atl1 =snRNA$hca %>%
 ```
 
 ```{r}
-
-```
-
-
-```{r}
 pdf(file = here::here("output/Thesis_plots/Examples/NDDs/CP-cell-types-HCA.pdf"),
        height = 14, width = 16)
 ggarrange(atl1, ctnnb1, spast, spr, 
           ncol = 2, nrow = 2, common.legend = TRUE)
 dev.off()
+```
+
+
+- Cameron (prenatal)
+
+```{r}
+cer.thal = read.csv("/home/neuro/Documents/BrainData/single-cell/cameron/Cameron-thal-exp.csv", header=TRUE, check.names = FALSE)
+head(cer.thal)[1:10]
+
 ```
