@@ -440,7 +440,9 @@ plot.data  %>%
 pc = log(seq + 0.05) %>% 
   t() %>% 
    prcomp(scale = TRUE)
+```
 
+```{r}
 pca_bseq =pc$x %>% 
   as.data.frame() %>%
   dplyr::select(PC1, PC2, PC3) %>%
@@ -478,23 +480,23 @@ ggsave(pca_bseq,
 ```
 
 ```{r}
- cor.bseq =pc$x  %>%
+ cor.bseq.test =pc$x  %>%
     as.data.frame() %>%
   rownames_to_column("SampleID") %>%
   left_join(md$BSeq) %>%
     dplyr::select(
         PC1, PC2, PC3,
-        mito_ratio, 
-        Period, 
-        Regions,
+        mito_ratio,
         rRNA_ratio, 
-        AgeNumeric,
         RIN, 
         TotalNReads, 
         MappingRate, 
+        Period, 
+        AgeInterval,
         Diagnosis,
         Sex, 
         DonorID,
+        Regions,
         Neurons,
         Astrocytes, 
         Oligodendrocytes, 
@@ -507,15 +509,56 @@ ggsave(pca_bseq,
           Regions = as.numeric(as.factor(Regions)),
           Sex = as.numeric(as.factor(Sex)), 
           DonorID = as.numeric(as.factor(DonorID)), 
-          Diagnosis = as.numeric(as.factor(Diagnosis))) %>%
-    cor() 
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          AgeInterval = as.numeric(as.factor(AgeInterval))) %>%
+    cor.mtest()
+
+ cor.bseq =pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSeq) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        mito_ratio,
+        rRNA_ratio, 
+        RIN, 
+        TotalNReads, 
+        MappingRate, 
+        Period, 
+        AgeInterval,
+        Diagnosis,
+        Sex, 
+        DonorID,
+        Regions,
+        Neurons,
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia,
+        Endothelia
+        
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          AgeInterval = as.numeric(as.factor(AgeInterval))) %>%
+    cor()
+
+corrplot(cor.bseq, p.mat =cor.bseq.test$p, method = 'color', diag = FALSE, type = 'upper',
+         sig.level = c(0.05), pch.cex = 0.9,
+         insig = 'label_sig', pch.col = 'grey20', order = 'AOE')
 
 cor.bseq = cor.bseq[-c(1:3),]
 cor.bseq = cor.bseq[,c(1:3)]
+cor.bseq.test$p = cor.bseq.test$p[-c(1:3),]
+cor.bseq.test$p = cor.bseq.test$p[,c(1:3)]
 cor.bseq %>% corrplot(
-        addCoef.col = 1, 
-        number.cex = 0.75, 
-        method = 'color')
+        method = 'color',
+        p.mat =cor.bseq.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
 
 ```
 
@@ -540,7 +583,9 @@ The correlation plot reveals that many of the selected covariates do not correla
 pc = log(span + 0.05) %>% 
   t() %>% 
    prcomp(scale = TRUE)
+```
 
+```{r}
 pca_bspan  = pc$x %>% 
   as.data.frame() %>%
   dplyr::select(PC1, PC2, PC3) %>%
@@ -584,7 +629,6 @@ ggsave(pca_bspan,
     dplyr::select(
         PC1, PC2, PC3, 
         Period, 
-        AgeNumeric,
         AgeInterval,
         DonorID,
         Regions, 
@@ -623,11 +667,10 @@ ggsave(pca_bspan,
         Period, 
         PMI, 
         RIN,
-        AgeNumeric,
-        DonorID,
-        AgeInterval,
         pH, 
         Dissectionscore,
+        DonorID,
+        AgeInterval,
         Sex,
         Regions,
         Neurons, 
@@ -643,13 +686,43 @@ ggsave(pca_bspan,
           AgeInterval= as.numeric(as.factor(AgeInterval))) %>%
     cor()
 
-
+cor.bspan.test = pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$BSpan) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        Period, 
+        PMI, 
+        RIN,
+        pH, 
+        Dissectionscore,
+        DonorID,
+        AgeInterval,
+        Sex,
+        Regions,
+        Neurons, 
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia, 
+        Endothelia) %>% 
+  drop_na(RIN, pH) %>%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %>%
+    cor.mtest()
 cor.bspan = cor.bspan[-c(1:3),]
 cor.bspan = cor.bspan[,c(1:3)]
-cor.bspan  %>% corrplot(
-        addCoef.col = 1, 
-        number.cex = 0.75, 
-        method = 'color')
+cor.bspan.test$p = cor.bspan.test$p[-c(1:3),]
+cor.bspan.test$p = cor.bspan.test$p[,c(1:3)]
+cor.bspan %>% corrplot(
+        method = 'color',
+        p.mat =cor.bspan.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
+
 ```
 
 Variance partition 
@@ -725,17 +798,17 @@ cor.gtex = pc$x  %>%
         rRNA_ratio,
         ExonicRate, 
         IntronicRate,
-        Regions, 
-        RIN, 
         TotalNReads, 
-        AgeInterval,
         MappingRate, 
+        SequencingBatch,
+        BSS_Collection_side_code, 
+        RIN,
+        PMI, 
         Sex, 
         DonorID,
-        SequencingBatch,
-        PMI, 
         HardyScale, 
-        BSS_Collection_side_code, 
+        AgeInterval,
+        Regions, 
         Neurons, 
         Astrocytes, 
         Oligodendrocytes, 
@@ -960,15 +1033,15 @@ cor.hdbr =pc$x  %>%
         PC1, PC2, PC3, 
         IntronicRate, 
         MappingRate,
-        AgeInterval,
-        Sex, 
         ExonicRate,
-        DonorID,
         TotalNReads,
+        SequencingBatch,
+        PMI, 
+        Sex, 
+        DonorID,
+        AgeInterval,
         Regions,
         Hemisphere, 
-        PMI, 
-        SequencingBatch,
         Neurons, 
         Astrocytes, 
         Oligodendrocytes, 
