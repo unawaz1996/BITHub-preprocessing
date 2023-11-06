@@ -74,7 +74,7 @@ ggsave(plot_varPart,
        units = "in")
 
 
-write.csv(varPar.bseq, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart.csv")
+write.csv(varPar.bseq, file = "/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart-decon.csv")
 
 ## BrainSpan
 

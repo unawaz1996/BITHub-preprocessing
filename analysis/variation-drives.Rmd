@@ -742,7 +742,9 @@ plotCorrMatrix( C.bspan )
 pc = log(gtex + 0.05) %>% 
   t() %>% 
    prcomp(scale = TRUE)
+```
 
+```{r}
 pca_gtex = pc$x %>% 
   as.data.frame() %>%
   dplyr::select(PC1, PC2, PC3) %>%
@@ -829,16 +831,60 @@ cor.gtex = pc$x  %>%
           BSS_Collection_side_code =  as.numeric(as.factor(SequencingBatch))) %>%
     cor()
 
+
+cor.gtex.test = pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$GTEx) %>%
+    dplyr::select(
+        PC1, PC2, PC3,
+        rRNA_ratio,
+        ExonicRate, 
+        IntronicRate,
+        TotalNReads, 
+        MappingRate, 
+        SequencingBatch,
+        BSS_Collection_side_code, 
+        RIN,
+        PMI, 
+        Sex, 
+        DonorID,
+        HardyScale, 
+        AgeInterval,
+        Regions, 
+        Neurons, 
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia, 
+        Endothelia
+       
+    ) %>% 
+  drop_na(Regions) %>%
+   mutate(RIN = as.numeric(as.factor(RIN)), 
+          TotalNReads = as.numeric(as.factor(TotalNReads)), 
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          rRNA_ratio = as.numeric(as.factor(rRNA_ratio)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch)),
+          BSS_Collection_side_code =  as.numeric(as.factor(SequencingBatch))) %>%
+    cor.mtest()
+
 cor.gtex = cor.gtex[-c(1:3),]
 cor.gtex = cor.gtex[,c(1:3)]
-cor.gtex  %>% corrplot(
-        addCoef.col = 1, 
-        number.cex = 0.75, 
-        method = 'color')
+cor.gtex.test$p = cor.gtex.test$p[-c(1:3),]
+cor.gtex.test$p = cor.gtex.test$p[,c(1:3)]
+cor.gtex %>% corrplot(
+        method = 'color',
+        p.mat =cor.gtex.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
 ```
 
 ```{r}
-gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch) + (1|DateofBatch) + (1|BSS_Collection_side_code) + (1|AgeInterval) + (1|Sex) + (1|Regions) + IntergenicRate + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate
+gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch) + (1|DateofBatch) + (1|BSS_Collection_side_code) + (1|AgeInterval) + (1|Sex) + (1|Regions) + IntergenicRate + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate + Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
 C.gtex = canCorPairs(gtex.form, md$GTEx)
 plotCorrMatrix(C.gtex)
 ```
@@ -909,12 +955,47 @@ cor.pe =pc$x  %>%
           causeDeath = as.numeric(as.factor(causeDeath))) %>%
     cor() 
 
+cor.pe.test =pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$PE) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        individualIDSource,
+        Sex, 
+        ContributingStudy, 
+        Period, 
+        #brainWeight, 
+        AgeNumeric,
+        Diagnosis,
+        causeDeath,
+        AgeInterval, 
+        Neurons, 
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia, 
+        Endothelia
+    ) %>% 
+  #drop_na(brainWeight) %>%
+   mutate(#RIN = as.numeric(as.factor(RIN)), 
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          individualIDSource = as.numeric(as.factor(individualIDSource)), 
+          ContributingStudy = as.numeric(as.factor(ContributingStudy)), 
+          Period = as.numeric(as.factor(Period)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis)), 
+          causeDeath = as.numeric(as.factor(causeDeath))) %>%
+    cor.mtest() 
+
 cor.pe = cor.pe[-c(1:3),]
 cor.pe = cor.pe[,c(1:3)]
-cor.pe  %>% corrplot(
-        addCoef.col = 1, 
-        number.cex = 0.75, 
-        method = 'color')
+cor.pe.test$p = cor.pe.test$p[-c(1:3),]
+cor.pe.test$p = cor.pe.test$p[,c(1:3)]
+cor.pe %>% corrplot(
+        method = 'color',
+        p.mat =cor.pe.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
 
 ggsave(pca_pe,
        filename = here::here("output/Thesis_plots/Variance/PCA/PsychEncode/PE-PCA.svg"), 
@@ -926,7 +1007,7 @@ ggsave(pca_pe,
 
 ```{r fig.height =5, fig.width=5, fig.cap="*Assessing correlation between covariates of interest from the PsychEncode data*"}
 pe.form <- ~ (1|Sex) + (1|Diagnosis) + AgeNumeric + (1|Ethnicity) + 
-  (1|Period) + (1|individualIDSource) + (1|Death)
+  (1|Period) + (1|individualIDSource) + (1|Death) +  Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
 
 C.pe = canCorPairs(pe.form, md$PE)
 plotCorrMatrix(C.pe)
@@ -1058,16 +1139,53 @@ cor.hdbr =pc$x  %>%
           Hemisphere = as.numeric(as.factor(Hemisphere)),
           SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
     cor()
+
+cor.hdbr.test =pc$x  %>%
+    as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  left_join(md$HDBR) %>%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        IntronicRate, 
+        MappingRate,
+        ExonicRate,
+        TotalNReads,
+        SequencingBatch,
+        PMI, 
+        Sex, 
+        DonorID,
+        AgeInterval,
+        Regions,
+        Hemisphere, 
+        Neurons, 
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia, 
+        Endothelia) %>% 
+  drop_na(PMI, Regions) %>%
+   mutate(#RIN = as.numeric(as.factor(RIN)), 
+          TotalNReads = as.numeric(as.factor(TotalNReads)), 
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %>%
+    cor.mtest()
 cor.hdbr = cor.hdbr[-c(1:3),]
 cor.hdbr = cor.hdbr[,c(1:3)]
-cor.hdbr  %>%corrplot(
-        addCoef.col = 1, 
-        number.cex = 0.75, 
-        method = 'color')
+cor.hdbr.test$p = cor.hdbr.test$p[-c(1:3),]
+cor.hdbr.test$p = cor.hdbr.test$p[,c(1:3)]
+cor.hdbr %>% corrplot(
+        method = 'color',
+        p.mat =cor.hdbr.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
 ```
 
 ```{r}
-form.hdbr <- ~ (1|Age) + (1|StructureAcronym) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval)
+form.hdbr <- ~ (1|Age) + (1|StructureAcronym) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval) +  Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
 C.hdbr = canCorPairs(form.hdbr, md$HDBR)
 plotCorrMatrix(C.hdbr)
 ```
