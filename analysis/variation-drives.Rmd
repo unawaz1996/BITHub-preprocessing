@@ -555,7 +555,7 @@ cor.bseq = cor.bseq[,c(1:3)]
 cor.bseq.test$p = cor.bseq.test$p[-c(1:3),]
 cor.bseq.test$p = cor.bseq.test$p[,c(1:3)]
 cor.bseq %>% corrplot(
-        method = 'color',
+        method = 'number',
         p.mat =cor.bseq.test$p,
          sig.level = c(0.05), pch.cex = 1.5,
          insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
@@ -564,14 +564,26 @@ cor.bseq %>% corrplot(
 
 
 ```{r}
-form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) + Neurons + Astrocytes + Oligodendrocytes + Endothelia
+form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) + Neurons + Astrocytes + Oligodendrocytes + Endothelia + Microglia
 C.bseq = canCorPairs(form.bseq, md$BSeq)
 plotCorrMatrix( C.bseq )
 ```
 
 ```{r}
+form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) + Neurons + Astrocytes + Oligodendrocytes + Endothelia
+
+```
+
+```{r}
 varPar.bseq <- fitExtractVarPartModel(seq, form.bseq, md$BSeq)
 ```
+
+```{r}
+varPar.bseq  = sortCols(varPar.bseq )
+plotVarPart(varPar.bseq )
+write.csv(varPar.bseq , file="/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart-all.csv")
+```
+
 
 
 The correlation plot reveals that many of the selected covariates do not correlate highly within their respective category, and therefore we will feed these into the mixed linear model. 
@@ -718,22 +730,31 @@ cor.bspan = cor.bspan[,c(1:3)]
 cor.bspan.test$p = cor.bspan.test$p[-c(1:3),]
 cor.bspan.test$p = cor.bspan.test$p[,c(1:3)]
 cor.bspan %>% corrplot(
-        method = 'color',
+        method = 'number',
         p.mat =cor.bspan.test$p,
-         sig.level = c(0.05), pch.cex = 1.5,
-         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
+         sig.level = c(0.05), pch.cex = 1.5, pch.col = 'black', cl.pos = 'n',
+         )
 
 ```
 
 Variance partition 
 
 ```{r}
-form.bspan <- ~ AgeNumeric + (1|StructureAcronym) + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore + (1| AgeInterval) +
-  Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
+form.bspan <- ~ AgeNumeric + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore  +
+  Neurons + Astrocytes + Oligodendrocytes  + Endothelia
 C.bspan = canCorPairs(form.bspan, md$BSpan)
 plotCorrMatrix( C.bspan )
 ```
 
+```{r}
+varPar.bspan <- fitExtractVarPartModel(span,form.bspan ,md$BSpan)
+varPar.bspan = sortCols(varPar.bspan)
+plot_varPart = plotVarPart(varPar.bspan)
+```
+
+```{r}
+write.csv(varPar.bspan, file="/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-varPart-all.csv")
+```
 
 - GTEx
 
@@ -877,18 +898,32 @@ cor.gtex = cor.gtex[,c(1:3)]
 cor.gtex.test$p = cor.gtex.test$p[-c(1:3),]
 cor.gtex.test$p = cor.gtex.test$p[,c(1:3)]
 cor.gtex %>% corrplot(
-        method = 'color',
+        method = 'number',
         p.mat =cor.gtex.test$p,
          sig.level = c(0.05), pch.cex = 1.5,
          insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
 ```
 
 ```{r}
-gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch) + (1|DateofBatch) + (1|BSS_Collection_side_code) + (1|AgeInterval) + (1|Sex) + (1|Regions) + IntergenicRate + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate + Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
+gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate + Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
 C.gtex = canCorPairs(gtex.form, md$GTEx)
 plotCorrMatrix(C.gtex)
 ```
 
+```{r}
+gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate +  Neurons + Astrocytes + Oligodendrocytes +  Endothelia
+
+varPar.gtex <- fitExtractVarPartModel(gtex,gtex.form ,md$GTEx)
+```
+
+```{r}
+varPar.gtex = sortCols(varPar.gtex)
+plot_varPart = plotVarPart(varPar.gtex)
+```
+
+```{r}
+write.csv(varPar.gtex,"/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-varPart-all.csv")
+```
 
 
 - PyschEncode
@@ -992,10 +1027,10 @@ cor.pe = cor.pe[,c(1:3)]
 cor.pe.test$p = cor.pe.test$p[-c(1:3),]
 cor.pe.test$p = cor.pe.test$p[,c(1:3)]
 cor.pe %>% corrplot(
-        method = 'color',
+        method = 'number',
         p.mat =cor.pe.test$p,
          sig.level = c(0.05), pch.cex = 1.5,
-         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
+          pch.col = 'black', cl.pos = 'n')
 
 ggsave(pca_pe,
        filename = here::here("output/Thesis_plots/Variance/PCA/PsychEncode/PE-PCA.svg"), 
@@ -1007,13 +1042,29 @@ ggsave(pca_pe,
 
 ```{r fig.height =5, fig.width=5, fig.cap="*Assessing correlation between covariates of interest from the PsychEncode data*"}
 pe.form <- ~ (1|Sex) + (1|Diagnosis) + AgeNumeric + (1|Ethnicity) + 
-  (1|Period) + (1|individualIDSource) + (1|Death) +  Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
+  (1|Period) + (1|individualIDSource) + (1|Death) +  Neurons + Astrocytes + Oligodendrocytes + Endothelia
 
 C.pe = canCorPairs(pe.form, md$PE)
 plotCorrMatrix(C.pe)
 ```
 
 
+```{r}
+md$PE= md$PE[!duplicated(md$PE[,c('SampleID')]),]
+varPar.pe <- fitExtractVarPartModel(pe, pe.form, md$PE)
+
+
+```
+
+
+```{r}
+varPar.pe = sortCols(varPar.pe)
+plot_varPart = plotVarPart(varPar.pe)
+```
+
+```{r}
+write.csv(varPar.pe,"/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-varPart-all.csv")
+```
 
 - HDBR
 
@@ -1178,16 +1229,24 @@ cor.hdbr = cor.hdbr[,c(1:3)]
 cor.hdbr.test$p = cor.hdbr.test$p[-c(1:3),]
 cor.hdbr.test$p = cor.hdbr.test$p[,c(1:3)]
 cor.hdbr %>% corrplot(
-        method = 'color',
+        method = 'number',
         p.mat =cor.hdbr.test$p,
-         sig.level = c(0.05), pch.cex = 1.5,
-         insig = 'label_sig', pch.col = 'black', cl.pos = 'n')
+         sig.level = c(0.05), pch.cex = 1.5,pch.col = 'black', cl.pos = 'n')
 ```
 
 ```{r}
-form.hdbr <- ~ (1|Age) + (1|StructureAcronym) + (1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval) +  Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia
+form.hdbr <- ~(1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval) +  Neurons + Astrocytes + Oligodendrocytes + Endothelia
 C.hdbr = canCorPairs(form.hdbr, md$HDBR)
 plotCorrMatrix(C.hdbr)
+```
+
+```{r}
+varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR)
+varPar.hdbr = sortCols(varPar.hdbr)
+
+hdbr.varpart =plot_varPart = plotVarPart(varPar.hdbr)
+
+write.csv(varPar.hdbr , file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-varPart-all.csv")
 ```
 
 
@@ -1212,27 +1271,27 @@ ggarrange(plotCorrMatrix(C.hdbr), plotCorrMatrix(C.gtex))
 ```{r}
 var_part = list()
 
-var_part$BSpan = read.csv(file.path(brain.dir,"/BrainSpan/Formatted/BrainSpan-varPart.csv"), header=TRUE, 
+var_part$BSpan = read.csv(file.path(brain.dir,"/BrainSpan/Formatted/BrainSpan-varPart-all.csv"), header=TRUE, 
                                     row.names =1)  %>% 
     as.data.frame() %>%
     rownames_to_column("EnsemblID") %>%
     left_join(gene2symbol, by = "EnsemblID")
-var_part$BSeq = read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-varPart.csv"), 
+var_part$BSeq = read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-varPart-all.csv"), 
                                    header=TRUE, row.names=1) %>% 
     as.data.frame() %>%
     rownames_to_column("EnsemblID") %>%
     left_join(gene2symbol, by = "EnsemblID")
-var_part$GTEx = read.csv(file.path(brain.dir,"/GTEx/Formatted/GTEx-varPart.csv"), header=TRUE, 
+var_part$GTEx = read.csv(file.path(brain.dir,"/GTEx/Formatted/GTEx-varPart-all.csv"), header=TRUE, 
                                    row.names=1) %>% 
     as.data.frame() %>%
     rownames_to_column("EnsemblID") %>%
     left_join(gene2symbol, by = "EnsemblID")
-var_part$HDBR = read.csv(file.path(brain.dir,"/HDBR/Formatted/HDBR-varPart.csv"), header=TRUE, 
+var_part$HDBR = read.csv(file.path(brain.dir,"/HDBR/Formatted/HDBR-varPart-all.csv"), header=TRUE, 
                                    row.names=1) %>% 
     as.data.frame() %>%
     rownames_to_column("EnsemblID") %>%
     left_join(gene2symbol, by = "EnsemblID")
-var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-varPart.csv"), header=TRUE, 
+var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-varPart-all.csv"), header=TRUE, 
                                    row.names=1) %>% 
     as.data.frame() %>%
     rownames_to_column("EnsemblID") %>%
@@ -1241,8 +1300,7 @@ var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-v
 
 ```{r}
 bspan =var_part$BSpan %>% dplyr::select(-gene_name) %>%
-  column_to_rownames("EnsemblID")
-#%>%
+  column_to_rownames("EnsemblID") %>%
 plotVarPart() + ggtitle("BrainSpan") + ylab("Variance Explained (%)") +
   theme(axis.text = element_text(size=12, family = "serif"),
         axis.title = element_text(size=12,family = "serif"),
@@ -1278,7 +1336,7 @@ plotVarPart() + ggtitle("PsychENCODE") + ylab("Variance Explained (%)") +
         axis.title = element_text(size=12,family = "serif"),
         plot.title = element_text(hjust = 0, size = 15, family = "serif"))
 
-pdf(file = here::here("output/Thesis_plots/Variance/PCA/varpart-all.pdf"), height =20, width = 15)
+pdf(file = here::here("output/Thesis_plots/Variance/PCA/varpart-all-update2.pdf"), height =20, width = 15)
 grid.arrange(bseq, bspan,
              gtex, hdbr, 
              pe, ncol=2, nrow=3)
