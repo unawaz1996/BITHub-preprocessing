@@ -3848,7 +3848,12 @@ sn_md$cer = read.csv(file.path(sn.dir, "cameron/Cameron-metadata.csv"),
 colnames(sn_md$hca)[9:13] = c("MajorCellType", "Age", 
                               "AgeNumeric", "AgeInterval", "Regions")
 
-colnames(sn_md$vel)[6] = c("Age")
+colnames(sn_md$vel)[c(6,8)] = c("Age", "Diagnosis")
+colnames(sn_md$vel)[c(19,20)] = c("AgeInterval", "Regions") 
+write.csv(sn_md$hca, "/home/neuro/Documents/BrainData/single-cell/hca/Processed/HCA-metadata.csv")
+
+write.csv(sn_md$vel, "/home/neuro/Documents/BrainData/single-cell/velmeshev/FormattedData/Velmeshev-metadata.csv")
+
 ```
 
 ```{r}
@@ -3959,9 +3964,81 @@ cam_fmr1 = snRNA$cam[,-1] %>%
 ```
 
 ```{r}
-pdf(file = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Thesis_plots/Examples/NDDs/CT-exp-FMR1.pdf", height = 6, width =8)
-ggarrange(cam_fmr1, hca_fmr1)
-dev.off
+pdf(file = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Thesis_plots/Examples/NDDs/CT-exp-FMR1.pdf", height = 8, width =18)
+cam_fmr1 + hca_fmr1
+dev.off()
+```
+
+
+## ZMYND8 
+
+
+```{r}
+hca_zmynd8 = snRNA$hca %>% 
+  dplyr::filter(Symbol == "FMR1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("ZMYND8 - HCA") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99")) + labs(fill  ="Major Cell Type")
+
+```
+
+
+```{r}
+cam_zmynd8 = snRNA$cam[,-1] %>% 
+  dplyr::filter(Symbol == "FMR1") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$cer %>%
+              dplyr::rename("CellID" = "cellID"), by ="CellID") %>% 
+  ggplot(aes(x= CellTypeGroup, y = log10(value), fill =  CellTypeGroup)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("ZMYND8 - Cameron dataset") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPC" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Endothelial" = "#ffcf99", 
+                               "Cajal-Retzius cell" = "#6d6875",
+                               "Cycling progenitor cell" = "#4a4e69",
+                               "Radial glia" = "#e9edc9",
+                               "Intermediate progenitor" = "#fefae0",
+                               "Undefined class Neurons" = "#e5e5e5")) + 
+  labs(fill  ="Major Cell Type") + ylim(0, 3.5)
+
+```
+
+```{r}
+pdf(file = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Thesis_plots/Examples/NDDs/CT-exp-ZMYND8.pdf", height = 8, width =18)
+cam_zmynd8 + hca_zmynd8
+dev.off()
 ```
 
 
@@ -4114,3 +4191,29 @@ snRNA$hca %>%
                                "Vasculature" = "#ffcf99"))
 ```
 
+
+```{r} 
+snRNA$hca %>% 
+  dplyr::filter(Symbol == "GFAP") %>% 
+  melt() %>% 
+  dplyr::rename("CellID"= "variable") %>% 
+  left_join(sn_md$hca, by ="CellID") %>% 
+  ggplot(aes(x=MajorCellType, y = log10(value), fill = MajorCellType)) + geom_boxplot() + 
+  theme_bw() +  theme_bw() + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top") + xlab("") +  ylab(bquote(log["10"](CPM))) + ggtitle("GFAP - HCA") + 
+  scale_fill_manual(values = c("Astrocytes" = "#778da9",
+                                "Microglia" = "#c89f9c", 
+                                "Oligodendrocytes" = "#d5c6e0",
+                                "OPCs" = "#5e548e",
+                                "Excitatory Neurons" = "#ffa69e", 
+                                "Inhibitory Neurons" = "#e26d5c",
+                               "Vasculature" = "#ffcf99")) + labs(fill  ="Major Cell Type")
+```
