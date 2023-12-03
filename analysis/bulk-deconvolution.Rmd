@@ -866,7 +866,7 @@ ggsave(plot = overall,
 <!-- ``` -->
 ## GoF
 ```{r}
-cbs_regions =do.call(rbind, gof_results) %>%
+cbs_regions = do.call(rbind, gof_results) %>%
   as.data.frame() %>%
   drop_na(Regions) %>%
   dplyr::filter(Deconvolution == "Cibersort") %>% 
@@ -1865,7 +1865,7 @@ pc = log(pe + 0.05) %>%
         number.cex = 0.75)
 ```
 
-```
+
 
 <!-- ## Export the datasets  -->
 
@@ -1876,4 +1876,158 @@ pc = log(pe + 0.05) %>%
 <!-- write.csv(as.data.frame(decon_results$HDBR_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-decon.csv") -->
 <!-- write.csv(as.data.frame(decon_results$PE_CIBERSORT), file = "/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-decon.csv") -->
 
-<!-- ``` -->
+
+## GOF poster 
+
+```{r}
+library(ggstatsplot)
+brainSeq_region = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort" & Dataset == "BrainSeq") %>% 
+  ggbetweenstats(
+  x     = Regions,
+  y     = r, 
+  package = "RColorBrewer",
+  palette = "Pastel1"
+) + theme_bw() + geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+   ylab("Goodness of fit (r)") + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"), 
+        rect = element_rect(fill = "transparent")) + 
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+  ggtitle("BrainSeq")
+
+```
+
+```{r}
+brainSpan_region = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort" & Dataset == "BrainSpan") %>% 
+  ggbetweenstats(
+  x     = Regions,
+  y     = r, 
+  package = "RColorBrewer",
+  palette = "Pastel1"
+) + theme_bw() + geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+   ylab("Goodness of fit (r)") + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"), 
+        rect = element_rect(fill = "transparent")) + 
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+  ggtitle("BrainSpan")
+```
+
+
+```{r}
+gtex_region = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort" & Dataset == "GTEx") %>% 
+  ggbetweenstats(
+  x     = Regions,
+  y     = r, 
+  package = "RColorBrewer",
+  palette = "Pastel1"
+) + theme_bw() + geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+   ylab("Goodness of fit (r)") + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"), 
+        rect = element_rect(fill = "transparent")) + 
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Forebrain and midbrain" = "#9D696C"
+                                )) + 
+  ggtitle("GTEx")
+```
+
+```{r}
+hdbr_region = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort" & Dataset == "HDBR") %>% 
+  ggbetweenstats(
+  x     = Regions,
+  y     = r, 
+  package = "RColorBrewer",
+  palette = "Pastel1"
+) + theme_bw() + geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+   ylab("Goodness of fit (r)") + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"), 
+        rect = element_rect(fill = "transparent")) + 
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + 
+  ggtitle("HDBR")
+```
+
+```{r}
+pe_region = do.call(rbind, gof_results) %>%
+  as.data.frame() %>%
+  drop_na(Regions) %>%
+  dplyr::filter(Deconvolution == "Cibersort" & Dataset == "PsychEncode") %>% 
+  ggbetweenstats(
+  x     = Regions,
+  y     = r, 
+  package = "RColorBrewer",
+  palette = "Pastel1"
+) + theme_bw() + geom_hline(yintercept = c(0.5,0.7), color = "black",linetype='dotted') +
+   ylab("Goodness of fit (r)") + theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        legend.position = "none", 
+        strip.text = element_text(size = 12,family = "serif"), 
+        rect = element_rect(fill = "transparent")) + 
+  scale_color_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                )) + 
+  ggtitle("PE")
+```
+
+```{r}
+ggsave(brainSpan_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/Brainspan-deconvolution-region.svg", height = 7, width = 8, units = "in")
+
+```
