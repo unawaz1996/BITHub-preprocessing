@@ -2031,3 +2031,22 @@ pe_region = do.call(rbind, gof_results) %>%
 ggsave(brainSpan_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/Brainspan-deconvolution-region.svg", height = 7, width = 8, units = "in")
 
 ```
+
+```{r}
+ggsave(brainSeq_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/Brainseq-deconvolution-region.svg", height = 7, width = 8, units = "in")
+
+```
+
+```{r}
+ggsave(gtex_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/GTEx-deconvolution-region.svg", height = 7, width = 8, units = "in")
+
+```
+
+```{r}
+ggsave(hdbr_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/HDBR-deconvolution-region.svg", height = 7, width = 8, units = "in")
+
+```
+```{r}
+ggsave(pe_region, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/PE-deconvolution-region.svg", height = 7, width = 8, units = "in")
+
+```
