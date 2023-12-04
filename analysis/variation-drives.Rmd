@@ -1352,7 +1352,90 @@ median(var_part$BSeq$Sex) * 100
 
 
 
+```{r}
+upf1_1 = var_part$BSpan %>% 
+  dplyr::filter(gene_name == "UPF1") %>%
+  dplyr::select(-gene_name) %>% 
+  column_to_rownames("EnsemblID") %>% 
+  melt()  %>% 
+  ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") +
+  coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("UPF1 - BrainSpan") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
+```
 
+```{r}
+fmr1_1 = var_part$BSpan %>% 
+  dplyr::filter(gene_name == "FMR1") %>%
+  dplyr::select(-gene_name) %>% 
+  column_to_rownames("EnsemblID") %>% 
+  melt()  %>% 
+  ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") +
+  coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("FMR1 - BrainSpan") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
+```
 
+```{r}
+upf1_2 =var_part$GTEx %>% 
+  dplyr::filter(gene_name == "UPF1") %>%
+  dplyr::select(-gene_name) %>% 
+  column_to_rownames("EnsemblID") %>% 
+  melt()  %>% 
+  ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") +
+  coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("UPF1 - GTEx") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
+```
 
+```{r}
+fmr1_2 = var_part$GTEx %>% 
+  dplyr::filter(gene_name == "FMR1") %>%
+  dplyr::select(-gene_name) %>% 
+  column_to_rownames("EnsemblID") %>% 
+  melt()  %>% 
+  ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") +
+  coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("FMR1 - GTEx") +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 )) 
+```
 
+```{r}
+ggsave(upf1_1, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-bs.svg", height = 10, width =8, units = 
+         "in")
+ggsave(upf1_2, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-gtex.svg", height = 10, width =8, units = 
+         "in")
+ggsave(fmr1_1, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-bs.svg", height = 10, width =8, units = 
+         "in")
+
+ggsave(fmr1_2, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-gtex.svg", height = 10, width =8, units = 
+         "in")
+```

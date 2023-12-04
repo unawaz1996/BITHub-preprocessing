@@ -513,3 +513,109 @@ md$PsychEncode%>% apply(.,2, count_na)
 md$BrainSpan %>% apply(.,2, count_na)
 
 ```
+
+
+```{r}
+brainspan = read.csv("/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-metadata-subset.csv", header=TRUE, check.names = FALSE, row.names =1)
+
+brainspan_decon = read.csv("/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-decon.csv", header=TRUE, check.names = FALSE, row.names =1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("SampleID")
+```
+
+```{r}
+brainspan_full = brainspan %>% 
+  left_join(brainspan_decon %>% 
+              dplyr::select("SampleID", "Neurons",
+                            "Astrocytes", "Oligodendrocytes",
+                            "Microglia", "Endothelia"), by = "SampleID")
+
+write.csv(brainspan_full ,"/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-metadata-all.csv" )
+```
+
+
+```{r}
+brainseq = read.csv("/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-metadata-subset.csv", header=TRUE, check.names = FALSE, row.names =1)
+
+
+brainseq_decon = read.csv("/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-decon.csv", header=TRUE, check.names = FALSE, row.names =1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("SampleID")
+```
+
+```{r}
+brainseq_full = brainseq %>%
+  dplyr::select(-c("Dev.Replicating", "Dev.Quiescent", "Adult.OPC", "Adult.Neurons", "Adult.Astrocytes", "Adult.Oligo", "Adult.Microglia", "Adult.Endothelial")) %>%
+  left_join(brainseq_decon %>% 
+              dplyr::select("SampleID", "Neurons",
+                            "Astrocytes", "Oligodendrocytes",
+                            "Microglia", "Endothelia"), by = "SampleID")
+
+write.csv(brainseq_full ,"/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-metadata-all.csv" )
+```
+
+```{r}
+gtex = read.csv("/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-metadata-subset.csv", header=TRUE, check.names = FALSE, row.names =1)
+
+gtex_decon = read.csv("/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-decon.csv", header=TRUE, check.names = FALSE, row.names =1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("SampleID")
+```
+
+```{r}
+gtex_full = gtex %>%
+  left_join(gtex_decon %>% 
+              dplyr::select("SampleID", "Neurons",
+                            "Astrocytes", "Oligodendrocytes",
+                            "Microglia", "Endothelia"), by = "SampleID")
+```
+
+```{r}
+write.csv(gtex_full ,"/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-metadata-all.csv" )
+```
+
+
+```{r}
+hdbr = read.csv("/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-metadata-subset.csv", header=TRUE, check.names = FALSE, row.names =1)
+
+hdbr_decon = read.csv("/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-decon.csv", header=TRUE, check.names = FALSE, row.names =1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("SampleID")
+
+```
+
+```{r}
+hdbr_full = hdbr %>%
+  left_join(hdbr_decon  %>% 
+              dplyr::select("SampleID", "Neurons",
+                            "Astrocytes", "Oligodendrocytes",
+                            "Microglia", "Endothelia"), by = "SampleID")
+```
+
+```{r}
+write.csv(hdbr_full ,"/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-metadata-all.csv" )
+```
+
+```{r}
+pe = read.csv("/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-metadata-subset.csv", header=TRUE, check.names = FALSE, row.names =1)
+
+pe_decon = read.csv("/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-decon.csv", header=TRUE, check.names = FALSE, row.names =1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("SampleID")
+
+
+```
+
+```{r}
+pe_full = pe %>%
+  left_join(pe_decon %>% 
+              dplyr::select("SampleID", "Neurons",
+                            "Astrocytes", "Oligodendrocytes",
+                            "Microglia", "Endothelia"), by = "SampleID")
+```
+
+
+```{r}
+write.csv(pe_full ,"/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-metadata-all.csv" )
+
+```
