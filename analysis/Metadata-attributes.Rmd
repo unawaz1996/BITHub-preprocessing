@@ -157,25 +157,25 @@ corrplot(M, order='hclust',
 dev.off()
 ```
 
-- FANTOM5
+<!-- - FANTOM5 -->
 
-```{r f5-cor}
-annot_seq = annot$FANTOM5 %>%
-  dplyr::filter(Type == "Sequencing")
-md.clean = md$FANTOM5 %>% 
-  dplyr::select(contains(annot_seq$BITHubName))
-md.clean = md.clean %>% select_if(~ !any(is.na(.)))
-md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(1L))]
-```
+<!-- ```{r f5-cor} -->
+<!-- annot_seq = annot$FANTOM5 %>% -->
+<!--   dplyr::filter(Type == "Sequencing") -->
+<!-- md.clean = md$FANTOM5 %>%  -->
+<!--   dplyr::select(contains(annot_seq$BITHubName)) -->
+<!-- md.clean = md.clean %>% select_if(~ !any(is.na(.))) -->
+<!-- md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) > 1, logical(1L))] -->
+<!-- ``` -->
 
 
-```{r}
-M = cor(data.matrix(md.clean), use = "complete.obs")
-corrplot(M, order='hclust',
-         method = "circle", 
-         number.cex = .50, 
-         tl.cex=0.75, type="upper")
-```
+<!-- ```{r} -->
+<!-- M = cor(data.matrix(md.clean), use = "complete.obs") -->
+<!-- corrplot(M, order='hclust', -->
+<!--          method = "circle",  -->
+<!--          number.cex = .50,  -->
+<!--          tl.cex=0.75, type="upper") -->
+<!-- ``` -->
 
 
 - HDBR 
@@ -617,5 +617,4 @@ pe_full = pe %>%
 
 ```{r}
 write.csv(pe_full ,"/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-metadata-all.csv" )
-
 ```

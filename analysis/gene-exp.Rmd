@@ -977,7 +977,7 @@ period_region_scale$BSpan_Prenatal_Cerebellum %>%
 ```
 
 ```{r}
-pdf(file = here::here("output/Thesis_plots/Examples/MKI67-zscore.pdf"),
+ggsave(file = here::here("output/Thesis_plots/Examples/MKI67-zscore.png"),
        height = 6, width = 18)
 ggarrange(pe_zscore_mki67 , cortex_zscore_mki67,
           bspan_zscore_mki67, ncol=3, nrow=1 )
@@ -3650,8 +3650,278 @@ pe
 
 ```
 
+## UPF1
+
 ```{r}
-ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/FMR1-all.svg"),
+bspan = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSpan" & gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+   theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("BrainSpan") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM)))
+
+bspan
+```
+
+
+```{r}
+upf1_cor =exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSpan"& Regions == "Cortex")) %>%
+  dplyr::filter(gene_name %in% c( "UPF1")) %>%
+  dplyr::filter(!StructureAcronym %in% c("TCx", "Ocx", "MGE",
+                                         "M1C-S1C", "PCx")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log10(Exp), fill = StructureAcronym)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), linewidth =0.3) + 
+   theme_bw()  + ggtitle("BrainSpan") +
+ # scale_fill_manual(values = c("AMY" = "#d8e2dc", 
+  #                             "HIP" = "#ffe5d9", 
+   #                           "MD" = "#f4acb7",
+    #                           "STR" = "#9d8189")) +
+  xlab("") + facet_wrap(~StructureAcronym, scales = "free") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM))) + scale_fill_viridis(discrete = TRUE)
+
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/FMR1-BSpan-cor-structures.svg"),
+       height = 10, width = 16, units = "in", plot = fmr1_cor)
+
+```
+
+
+```{r}
+bseq = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "BSeq" & gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+    theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("BrainSeq") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 3.5,lty = "dashed") +
+  ylab(bquote(log["10"](RPKM)))
+bseq
+
+```
+
+```{r}
+gtex = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "GTEx" & gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("GTEx") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 0.5,lty = "dashed") +
+  ylab(bquote(log["10"](TPM)))
+gtex
+
+```
+
+```{r}
+hdbr = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "HDBR" & gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("HDBR") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 6.5,lty = "dashed") +
+  ylab(bquote(log["10"](TPM)))
+
+hdbr
+
+```
+
+```{r}
+pe = exp_data %>% 
+  do.call(rbind, .) %>% 
+  dplyr::filter((Dataset == "PE" & gene_name == "UPF1")) %>%
+    mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>% 
+  drop_na() %>%
+  ggplot(aes(x = AgeInterval, y =log(Exp), fill = Regions)) +
+# geom_violin(position = position_dodge(0.8), color = NA) +w
+  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA, linewidth = 0.3) + 
+theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571", 
+                                 "Subcortex" = "#838DE0", 
+                                 "Cerebellum" = "#FFD256",
+                                 "Spinal Cord" = "#C6D14A", 
+                                 "Forebrain" = "#F6B19D", #
+                                 "Midbrain" = "#AC93AD",
+                                 "Hindbrain" = "#6E8B8E",
+                                 "Brain" = "#FFA6B7", 
+                                 "Chroid plexus" = "#9D696C"
+                                ))  + ggtitle("PsychENCODE") +
+  xlab("") +
+  #facet_grid(Dataset~gene_name, scales = "free") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")  +
+  ylab("log10(RPKM)") + geom_vline(xintercept = 5.5,lty = "dashed") +
+  ylab(bquote(log["10"](TPM)))
+pe
+
+```
+
+
+```{r}
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/UPF1-all.png"),
        height = 14, width = 16, units = "in")
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
@@ -4216,4 +4486,218 @@ snRNA$hca %>%
                                 "Excitatory Neurons" = "#ffa69e", 
                                 "Inhibitory Neurons" = "#e26d5c",
                                "Vasculature" = "#ffcf99")) + labs(fill  ="Major Cell Type")
+```
+
+
+
+### DIPC2 paper
+
+
+```{r}
+md$BSpan$Regions_additional[md$BSpan$StructureAcronym == "OFC" | 
+                           md$BSpan$StructureAcronym  == "DLPFC" |
+                           md$BSpan$StructureAcronym == "VFC" |
+                             md$BSpan$StructureAcronym == "ACC" |
+                           md$BSpan$StructureAcronym  ==  "MFC" | 
+                           md$BSpan$StructureAcronym  == "M1C" |  ## frontal cortex
+                           md$BSpan$StructureAcronym  == "M1C-S1C" | 
+                           md$BSpan$StructureAcronym  == "IPC" | 
+                           md$BSpan$StructureAcronym  == "S1C" |  ### parietal cortex 
+                          md$BSpan$StructureAcronym  == "A1C" | 
+                           md$BSpan$StructureAcronym  == "STC" |  
+                           md$BSpan$StructureAcronym  == "ITC" | ##temporal cortex
+                           md$BSpan$StructureAcronym  == "V1C" |
+                           md$BSpan$StructureAcronym == "Ocx" |
+                           md$BSpan$StructureAcronym  == "PCx" | 
+                           md$BSpan$StructureAcronym  == "TCx" |
+                            md$BSpan$StructureAcronym  == "MGE"] <- "NCX"
+
+
+md$BSpan$Regions_additional[
+                           md$BSpan$StructureAcronym  == "LGE" | 
+                           md$BSpan$StructureAcronym  == "CGE" | 
+                           md$BSpan$StructureAcronym  == "STR" |
+                           md$BSpan$StructureAcronym  ==  "HIP" | 
+                           md$BSpan$StructureAcronym  == "AMY" |
+                           md$BSpan$StructureAcronym  == "DTH" | 
+                           md$BSpan$StructureAcronym  == "MD" |
+                           md$BSpan$StructureAcronym  == "URL" | 
+                          md$BSpan$StructureAcronym  == "CBC" | 
+                           md$BSpan$StructureAcronym == "CB"] <- "Other_regions"
+
+
+```
+
+```{r}
+
+
+sub = e$Raw$BSpan %>% 
+    as.data.frame() %>%
+    rownames_to_column("EnsemblID") %>%
+    left_join(gene2symbol, by = "EnsemblID") %>% 
+    dplyr::filter(gene_name %in% "DIP2C") %>% 
+    melt() %>%
+    dplyr::rename("SampleID" = "variable", "Exp" = "value") %>% 
+    left_join(md$BSpan %>% 
+                dplyr::select(SampleID, Regions,
+                              StructureAcronym, Period, 
+                              AgeInterval, Regions_additional), by = "SampleID")
+
+```
+
+
+```{r}
+ncx = sub %>%
+  mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>%
+  dplyr::filter(Regions_additional == "NCX") %>%
+  ggplot(aes(AgeInterval, Exp))  + 
+  geom_boxplot(aes(fill=AgeInterval), alpha=0.65)  + 
+  geom_jitter(size=2.5) +
+  scale_color_viridis(discrete = TRUE, option = "magma")+ theme_bw() +
+  scale_fill_viridis(discrete = TRUE, direction = 1)  +
+  xlab("Stage") + ylab("RPKM") +
+  theme(legend.position = "none", 
+        axis.text=element_text(size=11, face="bold", color="black"), 
+        axis.title = element_text(siz=12, face="bold", color="black"), 
+        axis.text.x = element_text(angle=90)) +
+  ggtitle("Neocortex") + 
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none") + 
+  geom_vline(xintercept = 6.5,lty = "dashed") 
+
+
+other_regions = sub %>%
+  mutate(AgeInterval = factor(AgeInterval, 
+                              levels = c("4-7pcw", "8-9pcw",
+                                         "10-12pcw", "13-15pcw", "16-18pcw",
+                                         "19-24pcw", "25-38pcw", "0-5mos",
+                                         "6-18mos", "19mos-5yrs", "6-11yrs",
+                                         "12-19yrs", "20-29yrs", "30-39yrs",
+                                         "40-49yrs", "50-59yrs", "60-69yrs",
+                                         "70-79yrs", "80-89yrs", "90-99yrs"))) %>%
+  dplyr::filter(Regions_additional == "Other_regions") %>%
+  ggplot(aes(AgeInterval, Exp))  + 
+  geom_boxplot(aes(fill=AgeInterval), alpha=0.65)  + 
+  geom_jitter(size=2.5) +
+  scale_color_viridis(discrete = TRUE, option = "magma")+ theme_bw() +
+  scale_fill_viridis(discrete = TRUE, direction = 1)  +
+  xlab("Stage") + ylab("RPKM") +
+  theme(legend.position = "none", 
+        axis.text=element_text(size=11, face="bold", color="black"), 
+        axis.title = element_text(siz=12, face="bold", color="black"), 
+        axis.text.x = element_text(angle=90)) +
+  ggtitle("Other regions") + 
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none") + 
+  geom_vline(xintercept = 6.5,lty = "dashed") 
+```
+
+
+```{r}
+prenatal =sub %>%  
+  dplyr::filter(Period == "Prenatal") %>%
+  ggplot(aes(StructureAcronym, Exp))  + 
+  geom_boxplot(aes(fill=StructureAcronym), alpha=0.65)  + 
+  geom_jitter(size=2.5) +
+  scale_color_viridis(discrete = TRUE, option = "magma")+ theme_bw() +
+  scale_fill_viridis(discrete = TRUE, direction = 1)  +
+  xlab("Region") + ylab("RPKM") + ylim(0, 30) +
+  theme(legend.position = "none", 
+        axis.text=element_text(size=11, face="bold", color="black"), 
+        axis.title = element_text(siz=12, face="bold", color="black"), 
+        axis.text.x = element_text(angle=90)) + ggtitle("Prenatal Expression") + 
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none") 
+```
+
+```{r}
+postnatal =sub %>%  
+  dplyr::filter(Period == "Postnatal") %>%
+  ggplot(aes(StructureAcronym, Exp))  + 
+  geom_boxplot(aes(fill=StructureAcronym), alpha=0.65)  + 
+  geom_jitter(size=2.5) +
+  scale_color_viridis(discrete = TRUE, option = "magma")+ theme_bw() +
+  scale_fill_viridis(discrete = TRUE, direction = 1)  +
+  xlab("Region") + ylab("RPKM") + ylim(0, 30) +
+  theme(legend.position = "none", 
+        axis.text=element_text(size=11, face="bold", color="black"), 
+        axis.title = element_text(siz=12, face="bold", color="black"), 
+        axis.text.x = element_text(angle=90)) + ggtitle("Prenatal Expression") + 
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none") 
+```
+
+
+```{r}
+pdf(file = here::here("output/Thesis_plots/Examples/DIP2C-regions.pdf"),
+       height = 6, width = 15)
+ggarrange(ncx, other_regions, ncol=2)
+
+dev.off()
+
+
+pdf(file = here::here("output/Thesis_plots/Examples/DIP2C-development.pdf"),
+       height = 6, width = 15)
+ggarrange(prenatal, postnatal, ncol=2)
+
+dev.off()
+```
+
+
+```{r}
+prenatal_structures <- sub %>%  
+  dplyr::filter(Period == "Prenatal")
+
+
+model_pren=lm(prenatal_structures$Exp ~ prenatal_structures$StructureAcronym); aov(model_pren)
+summary(aov(model_pren))
+
+
+##### postnatal
+
+postnatal_structures <- ZMYND8_data %>%  
+  dplyr::filter(period == "postnatal") %>%
+  dplyr::filter(structure_acronym %in% as.character(postn_R_structures$Var1))
+
+model_postn=lm(postnatal_structures$value ~ postnatal_structures$structure_acronym)
+summary(aov(model_postn))
 ```

@@ -755,3 +755,48 @@ ggsave(file = here::here("output/Thesis_plots/Attributes/Donor_and_sample/PsychE
        height = 1.89, units = "in")
 
 ```
+
+
+```{r}
+regions_per_interval %>% 
+    do.call(rbind,.) %>% 
+        dplyr::group_by(Dataset, Regions) %>% 
+        dplyr::summarise(n = n())  %>% 
+        as.data.frame() %>% 
+        mutate(Dataset = dataset)
+```
+
+
+```{r}
+regions_per_dataset = list()
+
+for (f in directory){
+    md = list.files(f, full.names = TRUE, pattern = "\\-metadata.csv$")
+    
+    for (j in md){
+        ct_file = read.csv(j, header= TRUE)
+        dataset = gsub(pattern, "", j)
+        dataset = gsub("\\-metadata.csv","", dataset)
+        message("Now calculating statistics for ", dataset)
+        stats = ct_file %>% 
+        dplyr::group_by(Regions) %>% 
+        dplyr::summarise(n = n()) %>% 
+          as.data.frame() %>% 
+        mutate(Dataset = dataset)
+        
+        regions_per_dataset[[paste(dataset)]] = stats
+    }
+    
+}
+
+regions_per_dataset %<>% 
+  do.call(rbind, .) %>% 
+  rownames_to_column("names") %>% 
+  dplyr::select(-c("names"))
+
+
+write.csv(regions_per_dataset, "total_regions.csv")
+
+
+md_cam = read.csv("/home/neuro/Documents/BrainData/single-cell/cameron/Cameron-metadata.csv", header=TRUE)
+```
