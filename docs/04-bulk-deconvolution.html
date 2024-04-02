@@ -351,11 +351,21 @@ div.tocify {
     </li>
   </ul>
 </li>
-<li>
-  <a href="03-metadata-attributes.html">Dataset characteristics</a>
-</li>
-<li>
-  <a href="04-bulk-deconvolution.html">Deconvolution of bulk RNA-seq datasets</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Dataset characteristics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-metadata-attributes.html">Metadata attributes</a>
+    </li>
+    <li>
+      <a href="04-bulk-deconvolution.html">Deconvolution of bulk RNA-seq datasets</a>
+    </li>
+    <li class="dropdown-header">Drivers of variation</li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -643,15 +653,15 @@ output/Poster_plots/PE-deconvolution-period.svg
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree7007796461ad04b7464369609f5b9977d7947023targetblank7007796a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreea450b04a57e549a928e1aa7059291f74d8437bedtargetblanka450b04a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/7007796461ad04b7464369609f5b9977d7947023" target="_blank">7007796</a>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/a450b04a57e549a928e1aa7059291f74d8437bed" target="_blank">a450b04</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree7007796461ad04b7464369609f5b9977d7947023targetblank7007796a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreea450b04a57e549a928e1aa7059291f74d8437bedtargetblanka450b04a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -661,7 +671,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/7007796461ad04b7464369609f5b9977d7947023" target="_blank">7007796</a>.
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/a450b04a57e549a928e1aa7059291f74d8437bed" target="_blank">a450b04</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -681,6 +691,7 @@ Ignored files:
 
 Unstaged changes:
     Deleted:    HDBR-PC-cor-filt.pdf
+    Modified:   analysis/_site.yml
     Deleted:    cerebroViz_output_outer_1.svg
     Deleted:    cerebroViz_output_slice_1.svg
 
@@ -728,6 +739,41 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/a450b04a57e549a928e1aa7059291f74d8437bed/analysis/04-bulk-deconvolution.Rmd" target="_blank">a450b04</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+wflow_publish(c("analysis/04-bulk-deconvolution.Rmd",
+"analysis/03-metadata-attributes.Rmd",
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/unawaz1996/BITHub-preprocessing/20c235ad9071bcb20693e5cf468fba1c60976e4f/docs/04-bulk-deconvolution.html" target="_blank">20c235a</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -785,6 +831,69 @@ to the location of where the input files for preprocessing are stored.
 All directories are defined in each dataset section.</p>
 <p>All other files are stored within the data folder of this R workflow
 directory.</p>
+<pre class="r"><code>source(&quot;code/preprocess/functions.R&quot;)
+source(&quot;code/deconvolution/utility_functions.R&quot;)
+source(&quot;code/deconvolution/fun-cibersort.R&quot;)
+load(here::here(&quot;data/signatures/sigsBrain.rda&quot;))
+library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(AnnotationHub)
+library(stargazer)
+library(ggfortify)
+library(glue)
+library(cowplot)
+library(broom)
+library(glmpca)
+library(naniar)
+library(DeconRNASeq)
+library(dtangle)
+library(e1071)
+library(parallel)
+library(preprocessCore)
+library(Metrics)
+library(DTWBI)
+library(firatheme)</code></pre>
+<pre class="r"><code>load(file = here::here(&quot;output/Results/Deconvolution/decon-estimates.Rda&quot;))
+brain.dir =file.path(&quot;/home/neuro/Documents/BrainData/Bulk&quot;)</code></pre>
+<pre class="r"><code>e &lt;- list()
+
+e$GTEx &lt;- read.csv(file.path(brain.dir, &quot;/GTEx/Formatted/GTEx-exp.csv&quot;),
+                       check.names = FALSE, row.names = 1)
+e$PE &lt;- read.csv(file.path(brain.dir, &quot;/PsychEncode/Formatted/PsychEncode-exp.csv&quot;),
+                     row.names =1, check.names = FALSE)
+e$BSpan &lt;- read.csv(file.path(brain.dir, &quot;/BrainSpan/Formatted/BrainSpan-exp.csv&quot;),
+                        check.names = FALSE, row.names = 1)
+e$BSeq &lt;- read.csv(file.path(brain.dir,&quot;/Brainseq/Formatted/BrainSeq-exp.csv&quot;),
+                       check.names = FALSE, row.names = 1)
+
+e$HDBR &lt;- read.csv(file.path(brain.dir, &quot;/HDBR/Formatted/HDBR-exp.csv&quot;),
+                       check.names = FALSE, row.names = 1)  %&gt;%
+  column_to_rownames(&quot;EnsemblID&quot;)</code></pre>
+<pre class="r"><code>md = list()
+md$GTEx &lt;- read.csv(file.path(brain.dir, &quot;/GTEx/Formatted/GTEx-metadata.csv&quot;),
+                       check.names = FALSE, row.names = 1)
+md$PE &lt;- read.csv(file.path(brain.dir,&quot;/PsychEncode/Formatted/PsychEncode-metadata.csv&quot;),
+                  check.names = FALSE)
+md$BSeq &lt;- read.csv(file.path(brain.dir,&quot;/Brainseq/Formatted/BrainSeq-metadata.csv&quot;),
+                       check.names = FALSE)
+md$HDBR &lt;- read.csv(file.path(brain.dir, &quot;/HDBR/Formatted/HDBR-metadata.csv&quot;),
+                       check.names = FALSE, row.names = 1)
+
+md$BSpan &lt;- read.csv(file.path(brain.dir,
+                               &quot;/BrainSpan/Formatted/BrainSpan-metadata.csv&quot;),
+                     check.names = FALSE)</code></pre>
 </div>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
@@ -796,6 +905,69 @@ performance of the deconvolution analysis was evaluated using a
 goodness-of-fit (r) measurement, which is based on the Pearson’s
 correlation coefficient between the expression data and measured
 expression data.</p>
+<pre class="r"><code>gof_results = list()
+
+gof_results$BSpan_CBS = write.gof(e$BSpan, decon_results$BSpan_CIBERSORT, sigsBrain$MB) %&gt;%
+  as.data.frame() %&gt;% mutate(Dataset= &quot;BrainSpan&quot;,
+                             Deconvolution = &quot;Cibersort&quot;)  %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  mutate(SampleID = gsub(&quot;X&quot;, &quot;&quot;, SampleID)) %&gt;%
+  mutate(SampleID = gsub(&quot;\\.&quot;, &quot;-&quot;, SampleID)) %&gt;%
+  left_join(md$BSpan %&gt;%
+              dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)
+
+gof_results$BSeq_CBS = write.gof(e$BSeq, decon_results$BSeq_CIBERSORT, sigsBrain$MB) %&gt;%
+  as.data.frame() %&gt;% mutate(Dataset= &quot;BrainSeq&quot;,
+                             Deconvolution = &quot;Cibersort&quot;)%&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSeq %&gt;%
+              dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)
+
+gof_results$GTEx_CBS = write.gof(e$GTEx, decon_results$GTEx_CIBERSORT, sigsBrain$MB) %&gt;%
+  as.data.frame() %&gt;% mutate(Dataset= &quot;GTEx&quot;,
+                             Deconvolution = &quot;Cibersort&quot;) %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  mutate(SampleID = gsub(&quot;\\.&quot;, &quot;-&quot;, SampleID)) %&gt;%
+  left_join(md$GTEx %&gt;%
+              dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)
+
+gof_results$PE_CBS = write.gof(e$PE, decon_results$PE_CIBERSORT, sigsBrain$MB) %&gt;%
+  as.data.frame() %&gt;% mutate(Dataset= &quot;PsychEncode&quot;,
+                             Deconvolution = &quot;Cibersort&quot;) %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  mutate(SampleID = gsub(&quot;X&quot;, &quot;&quot;, SampleID),
+         SampleID = gsub(&quot;\\.&quot;, &quot;-&quot;, SampleID)) %&gt;%
+  left_join(md$PE %&gt;%
+              dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)
+
+gof_results$HDBR_CBS = write.gof(e$HDBR, decon_results$HDBR_CIBERSORT, sigsBrain$MB) %&gt;%
+  as.data.frame() %&gt;% mutate(Dataset= &quot;HDBR&quot;,
+                             Deconvolution = &quot;Cibersort&quot;) %&gt;%
+  rownames_to_column(&quot;SampleID&quot;)   %&gt;%
+  left_join(md$HDBR %&gt;%
+              dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)</code></pre>
+<pre class="r"><code>cbs_regions = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+    ggplot(aes(Regions, r, fill = Regions)) + geom_violin(width=1, alpha = 0.85) +
+      geom_boxplot(width=0.1, color=&quot;white&quot;) +
+      theme_bw() +   scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Forebrain and midbrain&quot; = &quot;#9D696C&quot;
+                                )) + 
+  geom_hline(yintercept = c(0.5,0.7), color = &quot;grey&quot;,linetype=&#39;dotted&#39;) + 
+  ylab(&quot;Goodness of fit (r)&quot;) + facet_wrap(~Dataset, scales = &quot;free&quot;,  nrow = 6) + 
+  theme(legend.position = &quot;none&quot;, 
+        axis.text = element_text(size =10),
+        axis.title  = element_text(size =12))
+cbs_regions</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-4-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
@@ -834,6 +1006,23 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>cbs_period =do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  mutate(Period = factor(Period, levels=c(&quot;Prenatal&quot;, &quot;Postnatal&quot;))) %&gt;% 
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+    ggplot(aes(Period, r, fill = Period)) + geom_violin(width=1, alpha = 0.85) +
+      geom_boxplot(width=0.1, color=&quot;white&quot;) +
+      theme_bw() +  scale_fill_manual(values = c(&quot;Prenatal&quot; = &quot;#FD84B8&quot;, 
+                                                &quot;Postnatal&quot; = &quot;#54B4E6&quot;)) + 
+  geom_hline(yintercept = c(0.5,0.7), color = &quot;black&quot;,linetype=&#39;dotted&#39;) + 
+  ylab(&quot;Goodness of fit (r)&quot;) + facet_wrap(~Dataset, scales = &quot;free&quot;,  nrow = 6) +
+  theme(legend.position = &quot;none&quot;, 
+        axis.text = element_text(size =10),
+        axis.title  = element_text(size =12)) 
+
+
+cbs_period </code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-4-2.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
@@ -872,6 +1061,7 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>grid.arrange(cbs_regions, cbs_period, ncol=2)</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-4-3.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-3">
@@ -910,13 +1100,127 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>cortex.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Regions == &quot;Cortex&quot;)
+
+subcortex.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Regions == &quot;Subcortex&quot;)
+
+cortex.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Regions == &quot;Cortex&quot;)
+
+cer.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Regions == &quot;Cerebellum&quot;)
+
+hdbr.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Dataset == &quot;HDBR&quot;)
+median(hdbr.gof$r)</code></pre>
 <pre><code>[1] 0.4825263</code></pre>
+<pre class="r"><code>dev.gof = do.call(rbind, gof_results) %&gt;%
+  as.data.frame() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Deconvolution == &quot;Cibersort&quot;) %&gt;% 
+  dplyr::filter(Period == &quot;Postnatal&quot;)
+
+
+median(dev.gof$r)</code></pre>
 <pre><code>[1] 0.6266852</code></pre>
 </div>
 <div id="cell-type-proportion-trends" class="section level2">
 <h2>Cell-type proportion trends</h2>
+<pre class="r"><code>pe.cbs  = decon_results$PE_CIBERSORT %&gt;% 
+  as.data.frame() %&gt;%
+  mutate(Dataset = &quot;PsychEncode&quot;) %&gt;% 
+  rownames_to_column(&quot;SampleID&quot;) %&gt;% 
+  dplyr::select(SampleID, Neurons, Astrocytes,
+                Oligodendrocytes, Microglia, Endothelia, Dataset) %&gt;%
+  left_join(md$PE %&gt;% 
+              dplyr::select(SampleID, Regions, Period, AgeInterval), by = &quot;SampleID&quot;)
+
+
+gtex.cbs = decon_results$GTEx_CIBERSORT %&gt;% 
+  as.data.frame() %&gt;%
+  mutate(Dataset = &quot;GTEx&quot;) %&gt;% 
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  dplyr::select(SampleID, Neurons, Astrocytes,
+                Oligodendrocytes, Microglia, Endothelia, Dataset) %&gt;%
+  left_join(md$GTEx %&gt;% 
+              dplyr::select(SampleID, Regions, Period, AgeInterval), by = &quot;SampleID&quot;)
+
+hdbr.cbs = decon_results$HDBR_CIBERSORT %&gt;% 
+  as.data.frame() %&gt;%
+  mutate(Dataset = &quot;HDBR&quot;) %&gt;% 
+  rownames_to_column(&quot;SampleID&quot;) %&gt;% 
+  dplyr::select(SampleID, Neurons, Astrocytes,
+                Oligodendrocytes, Microglia, Endothelia, Dataset) %&gt;%
+  left_join(md$HDBR %&gt;% 
+              dplyr::select(SampleID, Regions, Period, AgeInterval), by = &quot;SampleID&quot;)
+
+bseq.cbs = decon_results$BSeq_CIBERSORT %&gt;% 
+  as.data.frame() %&gt;%
+  mutate(Dataset = &quot;BrainSeq&quot;) %&gt;% 
+  
+  rownames_to_column(&quot;SampleID&quot;) %&gt;% 
+  dplyr::select(SampleID, Neurons, Astrocytes,
+                Oligodendrocytes, Microglia, Endothelia, Dataset) %&gt;%
+  left_join(md$BSeq%&gt;% 
+              dplyr::select(SampleID, Regions, Period, AgeInterval), by = &quot;SampleID&quot;)
+bspan.csb = decon_results$BSpan_CIBERSORT%&gt;% 
+  as.data.frame() %&gt;%
+  mutate(Dataset = &quot;BrainSpan&quot;) %&gt;% 
+  rownames_to_column(&quot;SampleID&quot;) %&gt;% 
+  dplyr::select(SampleID, Neurons, Astrocytes,
+                Oligodendrocytes, Microglia, Endothelia, Dataset) %&gt;%
+  left_join(md$BSpan %&gt;% 
+              dplyr::select(SampleID, Regions, Period, AgeInterval), by = &quot;SampleID&quot;) </code></pre>
 <div id="across-regions" class="section level3">
 <h3>Across regions</h3>
+<pre class="r"><code>cibersort_all = rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      hdbr.cbs, 
+      gtex.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Endothelia&quot;, &quot;Microglia&quot;, 
+                                              &quot;Oligodendrocytes&quot;, 
+                                              &quot;Astrocytes&quot;, 
+                                              &quot;Neurons&quot;)),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Chroid plexus&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;) )) %&gt;% 
+  ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 10, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;)) + coord_flip() + 
+  facet_grid(Dataset~Regions, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Neurons&quot; = &quot;#D94A70&quot;, 
+                               &quot;Astrocytes&quot; = &quot;#5590CC&quot;, 
+                               &quot;Oligodendrocytes&quot; = &quot;#AF9DCB&quot;, 
+                               &quot;Microglia&quot; = &quot;#69C9CF&quot;, 
+                               &quot;Endothelia&quot; = &quot;#FAE47B&quot;)) #+
+cibersort_all</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
@@ -955,6 +1259,56 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#facet_wrap(Dataset~Regions)
+
+
+cibersort_hdbr = rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      hdbr.cbs, 
+      gtex.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+  dplyr::filter(Dataset == &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Endothelia&quot;, &quot;Microglia&quot;, 
+                                              &quot;Oligodendrocytes&quot;, 
+                                              &quot;Astrocytes&quot;, 
+                                              &quot;Neurons&quot;)),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Chroid plexus&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;) )) %&gt;% 
+  ggplot(aes(x = variable, y = value, fill = variable)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 10, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;))  + coord_flip() + 
+  facet_grid(Dataset~Regions, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Neurons&quot; = &quot;#D94A70&quot;, 
+                               &quot;Astrocytes&quot; = &quot;#5590CC&quot;, 
+                               &quot;Oligodendrocytes&quot; = &quot;#AF9DCB&quot;, 
+                               &quot;Microglia&quot; = &quot;#69C9CF&quot;, 
+                               &quot;Endothelia&quot; = &quot;#FAE47B&quot;))
+
+# cibersort_hdbr 
+# ggsave(plot = cibersort_all, 
+#        filename = here::here(&quot;output/Thesis_plots/Deconvolution/cibersort-estimates-all.svg&quot;), 
+#        height = 9.30, 
+#        width = 10.55, 
+#        units = &quot;in&quot;)
+# 
+# ggsave(plot = cibersort_hdbr, 
+#        filename = here::here(&quot;output/Thesis_plots/Deconvolution/cibersort-estimates-hdbr.svg&quot;), 
+#        height = 3.07, 
+#        width = 10.55, 
+#        units = &quot;in&quot;)
+# 
+# pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-all.pdf&quot;), height =12, 
+#     width = 11)
+plot_grid(cibersort_all, cibersort_hdbr, align = &quot;v&quot;, nrow = 2, rel_heights = c(1/2, 1/4))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-2">
@@ -993,9 +1347,57 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code># dev.off()
+#grid.arrange(cibersort_all, cibersort_hdbr, nrow=2)</code></pre>
 </div>
 <div id="across-age-intervals-and-regions" class="section level3">
 <h3>Across age intervals and regions</h3>
+<pre class="r"><code># pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-BSeq.pdf&quot;), height =12, 
+#     width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+ # dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Neurons&quot;,&quot;Astrocytes&quot;, 
+                                               &quot;Endothelia&quot;, &quot;Oligodendrocytes&quot;,
+                                               &quot;Microglia&quot;
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Forebrain and midbrain&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;)),
+        AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;% 
+  dplyr::filter(Dataset == &quot;BrainSeq&quot;) %&gt;%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+    theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;)) + 
+  facet_grid(variable~Dataset, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Forebrain and midbrain&quot; = &quot;#9D696C&quot;
+                                ))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-8-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
@@ -1034,6 +1436,53 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code> # dev.off()</code></pre>
+<pre class="r"><code># pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-BSpan.pdf&quot;), height =12, 
+#     width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+ # dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Neurons&quot;,&quot;Astrocytes&quot;, 
+                                               &quot;Endothelia&quot;, &quot;Oligodendrocytes&quot;,
+                                               &quot;Microglia&quot;
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Forebrain and midbrain&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;)),
+        AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;% 
+  dplyr::filter(Dataset == &quot;BrainSpan&quot;) %&gt;%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;))+ 
+  facet_grid(variable~Dataset, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Forebrain and midbrain&quot; = &quot;#9D696C&quot;
+                                ))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-9-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
@@ -1072,6 +1521,54 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code> #dev.off()</code></pre>
+<pre class="r"><code># 
+# pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-PE.pdf&quot;), height =12, 
+#     width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+ # dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Neurons&quot;,&quot;Astrocytes&quot;, 
+                                               &quot;Endothelia&quot;, &quot;Oligodendrocytes&quot;,
+                                               &quot;Microglia&quot;
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Forebrain and midbrain&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;)),
+        AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;% 
+  dplyr::filter(Dataset == &quot;PsychEncode&quot;) %&gt;%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;)) + 
+  facet_grid(variable~Dataset, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Forebrain and midbrain&quot; = &quot;#9D696C&quot;
+                                ))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-10-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
@@ -1110,6 +1607,53 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
+<pre class="r"><code># pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-HDBR.pdf&quot;), height =12, 
+#     width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+ # dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Neurons&quot;,&quot;Astrocytes&quot;, 
+                                               &quot;Endothelia&quot;, &quot;Oligodendrocytes&quot;,
+                                               &quot;Microglia&quot;
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Chroid plexus&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;)),
+        AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;% 
+  dplyr::filter(Dataset == &quot;HDBR&quot;) %&gt;%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;)) + 
+  facet_grid(variable~Dataset, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Chroid plexus&quot; = &quot;#9D696C&quot;
+                                ))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-11-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
@@ -1148,6 +1692,53 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
+<pre class="r"><code># pdf(file = here::here(&quot;output/Thesis_plots/Deconvolution/cbs-estimates-GTEx.pdf&quot;), height =12, 
+#     width = 11)
+ rbind(pe.cbs,
+      bspan.csb,
+      bseq.cbs, 
+      gtex.cbs, 
+      hdbr.cbs) %&gt;% 
+  as.data.frame %&gt;%
+  melt() %&gt;%
+  drop_na(Regions) %&gt;%
+ # dplyr::filter(Dataset != &quot;HDBR&quot;) %&gt;%
+  mutate(variable= factor(variable, levels = c(&quot;Neurons&quot;,&quot;Astrocytes&quot;, 
+                                               &quot;Endothelia&quot;, &quot;Oligodendrocytes&quot;,
+                                               &quot;Microglia&quot;
+                                              
+                                              )),
+        Regions = factor(Regions, 
+                         levels = c(&quot;Brain&quot;, &quot;Forebrain&quot;,&quot;Hindbrain&quot;,
+                                    &quot;Midbrain&quot;, &quot;Chroid plexus&quot;, 
+                                    &quot;Cortex&quot;, &quot;Subcortex&quot;,
+                                    &quot;Cerebellum&quot;, &quot;Spinal Cord&quot;)),
+        AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;% 
+  dplyr::filter(Dataset == &quot;GTEx&quot;) %&gt;%
+  ggplot(aes(x = AgeInterval, y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+   theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 12,family = &quot;serif&quot;)) + 
+  facet_grid(variable~Dataset, scales = &quot;free&quot;) +ylab(&quot;Estimated Proportion&quot;) + xlab(&quot;&quot;) +
+  scale_fill_manual(values = c(&quot;Cortex&quot; = &quot;#E85571&quot;, 
+                                 &quot;Subcortex&quot; = &quot;#838DE0&quot;, 
+                                 &quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                 &quot;Spinal Cord&quot; = &quot;#C6D14A&quot;, 
+                                 &quot;Forebrain&quot; = &quot;#F6B19D&quot;, #
+                                 &quot;Midbrain&quot; = &quot;#AC93AD&quot;,
+                                 &quot;Hindbrain&quot; = &quot;#6E8B8E&quot;,
+                                 &quot;Brain&quot; = &quot;#FFA6B7&quot;, 
+                                 &quot;Chroid plexus&quot; = &quot;#9D696C&quot;
+                                ))</code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-12-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
@@ -1186,6 +1777,7 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
 <!-- - Across age intervals and regions  -->
 <!-- ```{r} -->
 <!-- bseq.cbs %>%  -->
@@ -1203,6 +1795,20 @@ urwahnawaz
 <!--         axis.text.y = element_text(size = 12),  -->
 <!--         legend.position = "none") + facet_grid(~variable)  -->
 <!-- ``` -->
+<pre class="r"><code>bspan.csb %&gt;% 
+  melt() %&gt;%
+  mutate(AgeInterval = factor(AgeInterval, levels = c(&quot;4-7pcw&quot;, &quot;8-9pcw&quot;,
+                                                        &quot;10-12pcw&quot;, &quot;13-15pcw&quot;, &quot;16-18pcw&quot;,
+                                                        &quot;19-24pcw&quot;, &quot;25-38pcw&quot;, &quot;0-5mos&quot;,
+                                                        &quot;6-18mos&quot;, &quot;19mos-5yrs&quot;, &quot;6-11yrs&quot;,
+                                                        &quot;12-19yrs&quot;, &quot;20-29yrs&quot;, &quot;30-39yrs&quot;,
+                                                      &quot;40-49yrs&quot;, &quot;50-59yrs&quot;, &quot;60-69yrs&quot;,
+                                                      &quot;70-79yrs&quot;, &quot;80-89yrs&quot;, &quot;90-99yrs&quot;))) %&gt;%
+  ggplot(aes(x = AgeInterval,y = value, fill = Regions)) + geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 10, angle = 90),
+        axis.text.y = element_text(size = 12), 
+        legend.position = &quot;none&quot;) + facet_grid(~variable) </code></pre>
 <p><img src="figure/04-bulk-deconvolution.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
@@ -1937,9 +2543,25 @@ urwahnawaz
 <h2>Export</h2>
 <div id="datasets" class="section level3">
 <h3>Datasets</h3>
+<pre class="r"><code>#write.csv(as.data.frame(decon_results$BSpan_CIBERSORT), file = &quot;/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-decon.csv&quot; )
+#write.csv(as.data.frame(decon_results$BSeq_CIBERSORT), file = &quot;/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-decon.csv&quot; )
+#write.csv(as.data.frame(decon_results$GTEx_CIBERSORT), file = &quot;/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-decon.csv&quot;)
+#write.csv(as.data.frame(decon_results$HDBR_CIBERSORT), file = &quot;/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-decon.csv&quot;)
+#write.csv(as.data.frame(decon_results$PE_CIBERSORT), file = &quot;/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-decon.csv&quot;)</code></pre>
 </div>
 <div id="figures" class="section level3">
 <h3>Figures</h3>
+<pre class="r"><code># ggsave(plot = cbs_period, 
+#       filename = here::here(&quot;output/Thesis_plots/Deconvolution/GoF-period.svg&quot;), 
+#       units = &quot;in&quot;, 
+#       width = 6.48, 
+#       height = 12)
+# 
+# ggsave(plot = cbs_regions, 
+#       filename = here::here(&quot;output/Thesis_plots/Deconvolution/GoF-region.svg&quot;), 
+#       units = &quot;in&quot;, 
+#       width = 6.48, 
+#       height = 12)</code></pre>
 <!-- # ```{r} -->
 <!-- # ggsave(brainSpan_period, filename = "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/Brainspan-deconvolution-period.svg", height = 7, width = 8, units = "in") -->
 <!-- #  -->
@@ -1965,6 +2587,25 @@ urwahnawaz
 <!-- #  -->
 <!-- # ``` -->
 <!-- ## Goodness-of-fit -->
+<pre class="r"><code>## BrainSpan
+# gof_results$BSpan_DRS = write.gof(e$BSpan, decon_results$BSpan_DRS, sigsBrain$MB) %&gt;%
+#   as.data.frame() %&gt;%
+#   mutate(Dataset= &quot;BrainSpan&quot;,
+#          Deconvolution = &quot;DeconRNASeq&quot;) %&gt;%
+#   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+#   mutate(SampleID = gsub(&quot;X&quot;, &quot;&quot;, SampleID)) %&gt;%
+#   mutate(SampleID = gsub(&quot;\\.&quot;, &quot;-&quot;, SampleID)) %&gt;%
+#   left_join(md$BSpan %&gt;%
+#               dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)
+
+# gof_results$BSpan_DTG = write.gof(e$BSpan, decon_results$BSpan_DTG, sigsBrain$MB) %&gt;%
+#   as.data.frame() %&gt;% mutate(Dataset= &quot;BrainSpan&quot;,
+#                              Deconvolution = &quot;Dtangle&quot;)  %&gt;%
+#   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+#    mutate(SampleID = gsub(&quot;X&quot;, &quot;&quot;, SampleID)) %&gt;%
+#   mutate(SampleID = gsub(&quot;\\.&quot;, &quot;-&quot;, SampleID)) %&gt;%
+#   left_join(md$BSpan %&gt;%
+#               dplyr::select(SampleID, Regions, Period), by = &quot;SampleID&quot;)</code></pre>
 <!-- # ```{r} -->
 <!-- # ## BrainSeq -->
 <!-- # gof_results$BSeq_DRS = write.gof(e$BSeq, decon_results$BSeq_DRS, sigsBrain$MB) %>% -->
@@ -2657,6 +3298,7 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.3.3 (2024-02-29)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 22.04.4 LTS
