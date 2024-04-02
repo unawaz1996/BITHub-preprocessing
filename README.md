@@ -7,17 +7,13 @@ Table of Contents:
 
 - [Datasets](#datasets)
   * [Data collection](#data-collection)
+- [Preprocess](#preprocessing)
   * [Metadata annotation](#metadata-annotation)
   * [Determining drivers of variation](#determining-drivers-of-variation)
   * [Normalization](#normalization)
 
 
 # Datasets 
-
-All scripts for pre-processing data are loading in this Github repository. In order to use the code for preprocessing, please check the workflowR document: 
-The `analysis/` subfolder within this project contains detailed code for each step of the preprocessing and analysis for files for BITHub, including code for the analysis for the thesis chapter. 
-
-
 
 
 ## Data collection 
@@ -33,8 +29,61 @@ Both processed bulk and single-nucleus RNA-seq human brain transcriptomic datase
 | Human Cell Atlas  | Content Cell  | 32,749 | Content Cell  |
 | Velmeshev et al  | Velmeshev et al generated single-nuclei from 48 post-mortem tissue samples from the prefrontal cortex, anterior cingulate and insular cortical regions. Donors included 16 control subjects and 11 patients with ASD. All samples are postnatal  | 81,216 | [Cells UCSC](https://cells.ucsc.edu/?ds=autism)  <br> <br> Matrix: <br> [exprMatrix.tsv.gz](https://cells.ucsc.edu/autism/exprMatrix.tsv.gz) <br> Values in matrix are: 10x UMI counts from cellranger, log2-transformed <br><br> Raw count matrix: <br> [rawMatrix.zip](https://cells.ucsc.edu/autism/rawMatrix.zip) |
 
-# Code 
+# Preprocessing 
+
+All scripts for pre-processing data are loading in this Github repository. In order to use the code for preprocessing, please check the workflowR document: 
+The `analysis/` subfolder within this project contains detailed code for each step of the preprocessing and analysis for files for BITHub, including code for the analysis for the thesis chapter. Prior to rerunning the Rmarkdown files, please change the location of input and output directories in the 'code/directories.R' file. 
 
 
+The following Rmarkdown files are provided: 
+
+| File name  | Description | output file | 
+| ------------- | ------------- | ------------- | 
+`01-bulk-preprocess-data.Rmd` | This file contains the detailed analysis of preprocessing metadata and expression matrices of the bulk RNA-seq datasets listed in Table 1. The input of each file is the expression matrix as provided by each given dataset / database, and original metadata. The output is a harmonised metadata, whereby consistent naming conventions for metadata variables across datasets are adopted. In addition, consistent brain related nonemclature and developmental stages with respect to sample information are also provided. Full details are [Metadata annotation](#metadata-annotation) | |
+|`02-snRNA-seq-preprocess.Rmd` |||
+|`03-metadata-attributes.Rmd` |||
+||||
+||||
 
 
+## Metadata annotation
+
+As the metadata annotation was heterogeneous across the datasets, rigorous harmonization was performed. For each dataset, columns specifying `Age Intervals`, `Regions`, `Diagnosis` and `Period` were also added.
+
+<br> 
+
+*Developmental Ages*
+<br>
+Samples were binned into age intervals that were used to define developmental stages. For all samples < 20 years old, the binning was performed based on the BrainSpan Technical White Paper (Kang el al, 2011), whereas samples  20 years were binned in 10 year intervals. 
+
+To allow comparison on a consistent scale, all ages were converted to years (numeric age). 
+For prenatal ages (labeled -pcw): 
+
+```
+Numeric age =  -(40 - pcw) 52 
+```
+
+where pcw is the age in post-conception weeks, 40 is the total number of prenatal weeks, and 52 denotes the total number of weeks in a year. 
+
+For ages labelled in months (labelled mos): 
+
+```
+Numeric age = mos / 12
+```
+
+where 12 represents the total number of months in a year. 
+
+Prenatal or postnatal tags were assigned to samples depending on their numeric age where numeric age < 0 was labeled as prenatal and numeric age < 0 as postnatal.
+
+
+Ontology and nomenclature of brain regions <br>
+
+The brain structures were divided into 4 main categories (regions):` Cortex`, `Subcortex`, `Cerebellum` and `Spinal Cord`. 
+
+
+## Determining drivers of variation
+
+`variancePartition` was used for mixed linear analysis to estimate the proportion of variance explained by the selected covariates on each gene.  Highly correlated covariates cannot be included in the model, and so as a result covariates that were not strongly correlated for each dataset were selected to the the varianceParititon analysis on filtered genes. For filtering, the expression cut-off was selected at 1 RPKM/TPM/CPM  in at least 10% of the samples
+
+## Normalization 
+To allow direct comparison of datasets with different normalizations, datasets have `z-score transformed mean log2 expression values`. 
