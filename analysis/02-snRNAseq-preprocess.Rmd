@@ -1,13 +1,13 @@
 ---
-title: "snRNAseq-preprocess"
+title: "02-snRNAseq-preprocess"
 author: "urwahnawaz"
-date: "2023-10-06"
+date: "2024-04-02"
 output: workflowr::wflow_html
 editor_options:
   chunk_output_type: console
 ---
 
-## Introduction
+# Introduction
 
 ```{r}
 ## Functions and libraries
@@ -17,20 +17,15 @@ source(here::here("code/preprocess/functions.R"))
 library(foreach)
 ```
 
+
 ```{r}
 sn.dir = file.path("/home/neuro/Documents/BrainData/single-cell")
 ```
 
-# HCA 
 
-```{r}
-md = read.csv(file.path(sn.dir, "/hca/Raw/metadata.csv"))
-exp = read.csv(file.path(sn.dir, "/hca/Raw/matrix.csv"))
-```
+# Preprocessing of datasets 
 
-
-## Aldringer et al 
-
+## Aldinger et al (2022) 
 
 ```{r}
 mat <- fread("/home/neuro/Documents/BrainData/single-cell/aldinger/exprMatrix.tsv")
@@ -111,52 +106,13 @@ md_names = colnames(md.full) %>%
 
 write.csv(md_names , file="/home/neuro/Documents/Brain_integrative_transcriptome/brain_transcriptome/annotations/Aldringer-annotations.csv")
 
-head(md_names)
+#head(md_names)
 
 ```
 
+## Cameron et al (2023)
 
 
-```{r}
-vel.md = read.csv("/home/neuro/Documents/BrainData/single-cell/velmeshev/FormattedData/Velmeshev-metadata.csv", header=TRUE)
-```
+## HCA 
 
-
-```{r}
-colnames(vel.md) = c("CellID", "Cell-type", "SampleID", "DonorID", 
-                     "StructureAcronym", "AgeNumeric", "Sex", "Diagnosus", 
-                     "CaptureBatch","SequencingBatch", "PMI", "RIN", "nGenes", "nUMI",
-                     "mito_Rate", "rRNA_rate", "MajorCellType", "AgeNumeric", "Regions") 
-
-
-write.csv(vel.md,"/home/neuro/Documents/BrainData/single-cell/velmeshev/FormattedData/Velmeshev-metadata.csv")
-```
-
-
-```{r}
-hca.md = read.csv("/home/neuro/Documents/BrainData/single-cell/hca/Processed/HCA-metadata.csv", header=TRUE)
-```
-
-```{r}
-hca.md %<>% 
-  dplyr::select(-c("exp_component_name", "exp_component_name", "specimen_type",
-                   "cluster_color", "cluster_order", "class_color", "class_order",
-                   "class_label", "subclass_color", "subclass_order",
-                   "full_genotype_color", "full_genotype_order", "full_genotype_label",
-                   "donor_sex_color", "donor_sex_order", "region_color", "region_order",
-                   "cortical_layer_color", "cortical_layer_order",
-                   "cell_type_accession_color", "cell_type_accession_order", "cell_type_accession_label",
-                   "cell_type_alias_color", "cell_type_order", "cell_type_alt_alias_color", 
-                   "cell_type_alt_alias_order", "cell_type_alt_alias_label", "cell_type_designation_color",
-                   "cell_type_designation_order", "cell_type_designation_label", "external_donor_name_color",
-                   "external_donor_name_order", "outlier_call", "outlier_type"))
-```
-
-
-```{r}
-colnames(hca.md) = c("CellID", "Cell-Type", "Subclass", "Sex", "StructureAcronym", "CorticalLayer",
-                     "CellTypeAlias", "DonorID", "Age", "AgeNumeric", "AgeIntervals", "Regions")
-
-write.csv(hca.md,"/home/neuro/Documents/BrainData/single-cell/hca/Processed/HCA-metadata.csv")
-
-```
+## Velmeshev et al (2019)

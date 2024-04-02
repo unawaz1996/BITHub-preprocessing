@@ -5,10 +5,14 @@ navbar:
   left:
   - text: Home
     href: index.html
-  - text: About
-    href: about.html
-  - text: License
-    href: license.html
+  - text: Proprocessing datasets
+    menu:
+    - text: Bulk RNA-seq datasets
+      href: 01-bulk-preprocess-data.html
+  -   text: Dataset characteristics
+      href: 03-metadata-attributes.html
+  -   text: Deconvolution of bulk RNA-seq datasets
+      href: 04-bulk-deconvolution.html
   right:
   - icon: fab fa-github
     text: Source code

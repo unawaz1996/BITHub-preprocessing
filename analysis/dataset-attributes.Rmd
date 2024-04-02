@@ -400,9 +400,6 @@ ggsave(file = here::here("output/Thesis_plots/Attributes/Donor_and_sample/Aldrin
 
 ```
 
-
-## CerebroViz 
-
 ```{r}
 
 brain.dir = file.path("/home/neuro/Documents/BrainData/Bulk")
@@ -420,28 +417,28 @@ md$PE = read.csv(file.path(brain.dir, "PsychEncode/Formatted/PsychEncode-metadat
 ```
 
 
-```{r}
+<!-- ```{r} -->
 
-bseq =table(md$BrainSeq$StructureAcronym) %>% 
-  as.data.frame() %>% 
-  set_colnames(c("Structure", "Value")) %>% 
-  mutate(Structure = gsub("DLPFC", "DFC", Structure)) %>%
-  column_to_rownames("Structure") 
+<!-- bseq =table(md$BrainSeq$StructureAcronym) %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   set_colnames(c("Structure", "Value")) %>%  -->
+<!--   mutate(Structure = gsub("DLPFC", "DFC", Structure)) %>% -->
+<!--   column_to_rownames("Structure")  -->
 
-cerebro_Viz(as.matrix(bseq))
-```
+<!-- cerebro_Viz(as.matrix(bseq)) -->
+<!-- ``` -->
 
 
-```{r}
-bseq =table(md$BrainSpan$StructureAcronym) %>% 
-  as.data.frame() %>% 
-  set_colnames(c("Structure", "Value")) %>% 
-  mutate(Structure = gsub("DLPFC", "DFC", Structure)) %>%
-  column_to_rownames("Structure") 
+<!-- ```{r} -->
+<!-- bseq =table(md$BrainSpan$StructureAcronym) %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   set_colnames(c("Structure", "Value")) %>%  -->
+<!--   mutate(Structure = gsub("DLPFC", "DFC", Structure)) %>% -->
+<!--   column_to_rownames("Structure")  -->
 
-cerebro_Viz(as.matrix(bseq))
+<!-- cerebro_Viz(as.matrix(bseq)) -->
 
-```
+<!-- ``` -->
 
 
 ## Regions per age interval 
