@@ -347,12 +347,6 @@ div.tocify {
         <li>
   <a href="index.html">Home</a>
 </li>
-<li>
-  <a href="about.html">About</a>
-</li>
-<li>
-  <a href="license.html">License</a>
-</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Proprocessing datasets
@@ -366,7 +360,10 @@ div.tocify {
   </ul>
 </li>
 <li>
-  <a href="03-metadata-attributes.html">Metadata attributes</a>
+  <a href="03-metadata-attributes.html">Dataset characteristics</a>
+</li>
+<li>
+  <a href="04-bulk-deconvolution.html">Deconvolution of bulk RNA-seq datasets</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -556,15 +553,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree95607d00a209cfcf49c174cea4c8bd9e0be0184btargetblank95607d0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreeddc9f1d9a827bc1628a3fc12e0b3c36447b24434targetblankddc9f1da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/95607d00a209cfcf49c174cea4c8bd9e0be0184b" target="_blank">95607d0</a>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/ddc9f1d9a827bc1628a3fc12e0b3c36447b24434" target="_blank">ddc9f1d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree95607d00a209cfcf49c174cea4c8bd9e0be0184btargetblank95607d0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreeddc9f1d9a827bc1628a3fc12e0b3c36447b24434targetblankddc9f1da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -574,7 +571,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/95607d00a209cfcf49c174cea4c8bd9e0be0184b" target="_blank">95607d0</a>.
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/ddc9f1d9a827bc1628a3fc12e0b3c36447b24434" target="_blank">ddc9f1d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,7 +600,7 @@ Untracked files:
 Unstaged changes:
     Deleted:    analysis/Metadata-attributes.Rmd
     Modified:   analysis/_site.yml
-    Modified:   analysis/bulk-deconvolution.Rmd
+    Deleted:    analysis/bulk-deconvolution.Rmd
     Modified:   analysis/dataset-attributes.Rmd
     Modified:   analysis/snRNAseq-preprocess.Rmd
     Deleted:    analysis/variation-drives.Rmd
@@ -658,6 +655,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/unawaz1996/BITHub-preprocessing/8033da061f4701908ab78412c157616fcb7819fa/docs/03-metadata-attributes.html" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -725,6 +739,43 @@ Correlation plot showing highly correlating metadata variables in
 BrainSeq
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-2-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The final BrainSeq sequencing metrics contain the following
 columns:</p>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-7d3add13c6a483e279a1" style="width:100%;height:auto;"></div>
@@ -737,6 +788,43 @@ columns:</p>
 <p class="caption">
 Correlation plot showing highly correlating metadata variables in GTEx
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-5-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-4741f8913ab2a8a92f14" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-4741f8913ab2a8a92f14">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48"],["SAMPID","SMRIN","SMTSISCH","AGE","SEX","SMATSSCR","SMNABTCH","SMNABTCHT","SMNABTCHD","SMGEBTCH","SMGEBTCHD","SMGEBTCHT","SMCENTER","SMTS","SMTSD","SMTSPAX","SME2MPRT","SMCHMPRS","SMNTRART","SMMAPRT","SMEXNCRT","SMGNSDTC","SMESTLBS","SMMPPD","SMNTERRT","SMRRNANM","SMRDTTL","SMTRSCPT","SMMPPDPR","SMUNPDRD","SMNTRNRT","SMMPUNRT","SMEXPEFF","SMMPPDUN","SME2MMRT","SME2ANTI","SME2SNSE","SME1ANTI","SME1SNSE","SME1PCTS","SMRRNART","SME1MPRT","SMDPMPRT","SME2PCTS","SUBJID","DTHHRDY",null,null],["SampleID","RIN","PMI","AgeInterval","Sex","AutolysisScore","SequencingBatch","TypeofBatch","DateofBatch","Genotype_or_Expression_Batch_ID","DateofGenotypeorExpressionBatch","TypeofGenotypeorExpressionBatch","BSS_Collection_side_code","Regions","StructureAcronym","Time_spent_in_PAXgene_fixative","End_2_mapping_rate","ChimericPairs","IntragenicRate","MappingRate","ExonicRate","GenesDetected","LibrarySize","ReadsMapped","IntergenicRate","rRNA","TotalNReads","TranscriptsDetected","MappedPairs","UnpairedReads","IntronicRate","MappingRate_unique","ExpressionProfilingEfficiency","MappedUnique_no_dup_flags","End_2_Mismatch_Rate","End_2_Antisense","End_Sense_2","End_1_Antisense","End_1_Sense","End_1_Sense_percentage","rRNA_ratio","End_1_Mapping_rate","DuplicationRateMapped","Percentage_IntragenicEnd_2_Reads","DonorID","HardyScale","Period","Diagnosis"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Sample charactertics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Phenotype","Phenotype"],["GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OriginalMetadataColumnName<\/th>\n      <th>BITColumnName<\/th>\n      <th>Include..Yes.No....Interest<\/th>\n      <th>Type<\/th>\n      <th>Dataset<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OriginalMetadataColumnName","targets":1},{"name":"BITColumnName","targets":2},{"name":"Include..Yes.No....Interest","targets":3},{"name":"Type","targets":4},{"name":"Dataset","targets":5}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
@@ -767,6 +855,43 @@ Correlation plot showing highly correlating metadata variables in GTEx
 Correlation plot showing highly correlating metadata variables in HDBR
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-8-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-521e7420bfa881ce433c" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-521e7420bfa881ce433c">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39"],["Run","Sample.Characteristic.block.","Sample.Characteristic.Ontology.Term.block.","Sample.Characteristic.individual.","Sample.Characteristic.karyotype.","Sample.Characteristic.organism.part.","Sample.Characteristic.sampling.site.","external_id","recount_qc.aligned_reads..chrm","recount_qc.aligned_reads..chrx","recount_qc.aligned_reads..chry","recount_qc.bc_auc.all_.","recount_qc.bc_auc.unique_.","recount_qc.bc_frag.mode_length_count","recount_qc.exon_fc.all_.","recount_qc.exon_fc_count_all.assigned","recount_qc.exon_fc_count_unique.total","recount_qc.exon_fc_count_unique.assigned","recount_qc.gene_fc_count_all.assigned","recount_qc.intron_sum_.","recount_qc.star.._of_reads_mapped_to_multiple_loci","recount_qc.star.._of_reads_mapped_to_too_many_loci","recount_qc.star.._of_reads_unmapped._other","recount_qc.star.._of_reads_unmapped._too_many_mismatches","recount_qc.star.all_mapped_reads","recount_qc.star.number_of_input_reads","recount_qc.star.uniquely_mapped_reads_.","recount_qc.star.uniquely_mapped_reads_number","recount_qc.junction_count","recount_qc.star.all_mapped_reads_both","recount_qc.star.._mapped_reads_both","recount_qc.star.._reads_mapped_to_multiple_loci_both","recount_qc.star.._reads_mapped_to_too_many_loci_both",null,null,null,"time sample in transit (minutes)",null,null],["SampleID","SequencingBatch","Block","DonorID","Sex","StructureAcronym","Hemisphere","SampleID","ChimericPairs","Percent_aligned_ChrX","Percent_aligned_ChrY","AUC_all_percentage","AUC_unique_percentage","ModeFragmentLengthCount","ExonicRate","Total_fragments_assigned_exon_fc","Total_fragments_count_unique_exon_fc","Total_fragments_count_unique_assigned_exon_fc","totalAssignedGene","IntronicRate","Percentage_mapped_multi_loci_STAR","Percentage_mapped_too_many_loci_STAR","Percentage_unmapped_other_STAR","Percentage_unmapped_too_many_mismatches_STAR","ReadsMapped","TotalNReads","MappingRate","MappingRate_unique","Junction_count","MappedPairs","MappingRate_both","Percentage_mapped_multi_loci_both_STAR","Percentage_mapped_too_many_loci_both_STAR","AgeInterval","Diagnosis","Period","PMI","Regions","AgeNumeric"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Sample charactertics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Sample charactertics","Sample charactertics","Sample charactertics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Phenotype","Sequencing metrics","Sample charactertics","Phenotype"],["HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OriginalMetadataColumnName<\/th>\n      <th>BITColumnName<\/th>\n      <th>Include..Yes.No....Interest<\/th>\n      <th>Type<\/th>\n      <th>Dataset<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OriginalMetadataColumnName","targets":1},{"name":"BITColumnName","targets":2},{"name":"Include..Yes.No....Interest","targets":3},{"name":"Type","targets":4},{"name":"Dataset","targets":5}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 </div>
@@ -778,6 +903,43 @@ chapter.</p>
 <div id="aldinger-et-al-2022" class="section level3">
 <h3>Aldinger et al (2022)</h3>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-10-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -797,15 +959,163 @@ datasets.</p>
 <div id="sequencing-metrics" class="section level3">
 <h3>Sequencing metrics</h3>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-14-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="phenotype-attributes" class="section level3">
 <h3>Phenotype attributes</h3>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
+Past versions of unnamed-chunk-15-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-15-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-15-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-16-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="sample-characteristics" class="section level3">
 <h3>Sample characteristics</h3>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-17-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div
@@ -817,6 +1127,43 @@ analysis</h2>
 missing information across the available and retained metadata columns
 in all datasets.</p>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
+Past versions of unnamed-chunk-19-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8033da061f4701908ab78412c157616fcb7819fa/docs/figure/03-metadata-attributes.Rmd/unnamed-chunk-19-1.png" target="_blank">8033da0</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <!-- # ```{r} -->
 <!-- # md$GTEx %>% apply(., 2, count_na)  -->
 <!-- # md$HDBR %>% apply(.,2, count_na)  -->
