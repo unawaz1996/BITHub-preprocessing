@@ -553,15 +553,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreeddc9f1d9a827bc1628a3fc12e0b3c36447b24434targetblankddc9f1da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree7007796461ad04b7464369609f5b9977d7947023targetblank7007796a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/ddc9f1d9a827bc1628a3fc12e0b3c36447b24434" target="_blank">ddc9f1d</a>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/7007796461ad04b7464369609f5b9977d7947023" target="_blank">7007796</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtreeddc9f1d9a827bc1628a3fc12e0b3c36447b24434targetblankddc9f1da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree7007796461ad04b7464369609f5b9977d7947023targetblank7007796a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -571,7 +571,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/ddc9f1d9a827bc1628a3fc12e0b3c36447b24434" target="_blank">ddc9f1d</a>.
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/7007796461ad04b7464369609f5b9977d7947023" target="_blank">7007796</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -589,26 +589,10 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    output/Thesis_plots/Variance/PCA/BrainSpan/brainspan-varPart-cor/
 
-Untracked files:
-    Untracked:  analysis/02-snRNAseq-preprocess.Rmd
-    Untracked:  analysis/04-variation-drivers.Rmd
-    Untracked:  output/Thesis_plots/Variance/PCA/BrainSeq/BrainSeq-PCA-mitoR.png
-    Untracked:  output/Thesis_plots/Variance/PCA/BrainSpan/BrainSpan-PCA.png
-    Untracked:  output/Thesis_plots/Variance/PCA/GTEx/GTEx-PCA-rRNA.png
-    Untracked:  output/Thesis_plots/Variance/PCA/all-data.png
-
 Unstaged changes:
-    Deleted:    analysis/Metadata-attributes.Rmd
-    Modified:   analysis/_site.yml
-    Deleted:    analysis/bulk-deconvolution.Rmd
-    Modified:   analysis/dataset-attributes.Rmd
-    Modified:   analysis/snRNAseq-preprocess.Rmd
-    Deleted:    analysis/variation-drives.Rmd
-    Modified:   output/Thesis_plots/Attributes/Donor_and_sample/Aldringer_total.svg
-    Modified:   output/Thesis_plots/Attributes/Donor_and_sample/PsychEncode_regions_total.svg
-    Modified:   output/Thesis_plots/Metadata/BrainSeq-cor-seq-metadata.pdf
-    Modified:   output/Thesis_plots/Metadata/GTEx-cor-seq-metadata.pdf
-    Modified:   output/Thesis_plots/Metadata/HDBR-corplot.pdf
+    Deleted:    HDBR-PC-cor-filt.pdf
+    Deleted:    cerebroViz_output_outer_1.svg
+    Deleted:    cerebroViz_output_slice_1.svg
 
 </code></pre>
 <p>
@@ -657,6 +641,41 @@ Message
 <tbody>
 <tr>
 <td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/7007796461ad04b7464369609f5b9977d7947023/analysis/03-metadata-attributes.Rmd" target="_blank">7007796</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+wflow_publish(c("analysis/04-bulk-deconvolution.Rmd",
+"analysis/03-metadata-attributes.Rmd",
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/unawaz1996/BITHub-preprocessing/727f567b309dfb3439af0311b3def4d6b11a1d97/docs/03-metadata-attributes.html" target="_blank">727f567</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
 html
 </td>
 <td>
@@ -699,6 +718,35 @@ wflow_publish(c("analysis/03-metadata-attributes.Rmd",
 </div>
 <div id="set-up" class="section level1">
 <h1>Set-up</h1>
+<pre class="r"><code>library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(AnnotationHub)
+library(stargazer)
+library(ggfortify)
+library(glue)
+library(cowplot)
+library(broom)
+library(glmpca)
+library(DT)
+library(naniar)
+source(&quot;code/preprocess/functions.R&quot;)
+source(&quot;code/preprocess/def_stages.R&quot;)
+library(UpSetR)
+library(patchwork)
+library(pheatmap)
+library(ggpubr)</code></pre>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -730,8 +778,62 @@ al. To remove these, a correlation analysis of all sequencing metrics
 was performed. Correlation of metadata was prepared after processing the
 raw metadata and expression files. If you are interested in that part of
 the pipeline, please refer to the README.md in the Github repo.</p>
+<pre class="r"><code>dir = file.path(&quot;/home/neuro/Documents/BrainData/Bulk&quot;)
+sn_dir = file.path(&quot;/home/neuro/Documents/BrainData/single-cell&quot;)
+md = list()
+
+md$BrainSeq = read.csv(file.path(dir,&quot;Brainseq/Formatted/BrainSeq-metadata.csv&quot;), header=TRUE, check.names = FALSE, row.names = 1)
+md$BrainSpan = read.csv(file.path(dir,&quot;BrainSpan/Formatted/BrainSpan-metadata.csv&quot;), header=TRUE, check.names = FALSE, row.names = 1)
+md$GTEx =  read.csv(file.path(dir,&quot;GTEx/Formatted/GTEx-metadata.csv&quot;), header=TRUE, check.names = FALSE, row.names =1)
+md$HDBR = read.csv(file.path(dir, &quot;HDBR/Formatted/HDBR-metadata.csv&quot;), header=TRUE, check.names = FALSE, row.names =1)
+#md$FANTOM5 = read.csv(file.path(dir, &quot;Fantom5/Formatted/FANTOM5-metadata.csv&quot;), header=TRUE, check.names = FALSE)
+md$PsychEncode = read.csv(file.path(dir, &quot;PsychEncode/Formatted/PsychEncode-metadata.csv&quot;), header=TRUE, check.names = FALSE)
+md$Velmeshev = read.csv(file.path(dir, &quot;HDBR/Formatted/HDBR-metadata.csv&quot;), header=TRUE, check.names = FALSE)
+md$Aldringer = read.csv(file.path(sn_dir, &quot;aldinger/Aldringer-metadata.csv&quot;), header=TRUE, check.names = FALSE)</code></pre>
+<pre class="r"><code>annot = list()
+
+annot$BrainSpan = read.csv(here::here(&quot;data/annotations/BrainSpan-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;BrainSpan&quot;))
+annot$BrainSeq = read.csv(here::here(&quot;data/annotations/BrainSeq-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;BrainSeq&quot;))
+
+annot$GTEx = read.csv(here::here(&quot;data/annotations/GTEx-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;GTEx&quot;))
+
+annot$PsychEncode =  read.csv(here::here(&quot;data/annotations/PsychEncode-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;PsychEncode&quot;))
+
+annot$FANTOM5 = read.csv(here::here(&quot;data/annotations/Fantom5-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;FANTOM5&quot;))
+
+annot$HDBR = read.csv(here::here(&quot;data/annotations/HDBR-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;HDBR&quot;))
+
+annot$Velmeshev = read.csv(here::here(&quot;data/annotations/Velmeshev-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;Velmeshev&quot;))
+
+annot$Aldringer = read.csv(here::here(&quot;data/annotations/Aldringer-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;Aldringer&quot;))
+
+annot$HCA =  read.csv(here::here(&quot;data/annotations/HCA-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;HCA&quot;))
+
+annot$Cameron =  read.csv(here::here(&quot;data/annotations/Cameron-metadata-annot.csv&quot;), header=TRUE) %&gt;%
+  mutate(Dataset = c(&quot;Cameron&quot;))</code></pre>
 <div id="brainseq" class="section level2">
 <h2>BrainSeq</h2>
+<pre class="r"><code>annot_seq = annot$BrainSeq %&gt;%
+  dplyr::filter(Type == &quot;Sequencing metrics&quot;)
+md.clean = md$BrainSeq %&gt;% 
+  dplyr::select(contains(annot_seq$BITColumnName))
+md.clean = md.clean %&gt;% select_if(~ !any(is.na(.)))
+md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) &gt; 1, logical(1L))]</code></pre>
+<pre class="r"><code>M = cor(data.matrix(md.clean), use = &quot;complete.obs&quot;)
+#pdf(here::here(&quot;output/Thesis_plots/Metadata/BrainSeq-cor-seq-metadata.pdf&quot;), height = 10, width=10)
+corrplot(M, order=&#39;hclust&#39;,
+         method = &quot;circle&quot;, 
+         number.cex = .50, 
+         tl.cex=0.75)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-2-1.png" alt="Correlation plot showing highly correlating metadata variables in BrainSeq" width="672" />
 <p class="caption">
@@ -776,13 +878,29 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
 <p>The final BrainSeq sequencing metrics contain the following
 columns:</p>
+<pre class="r"><code>annot$BrainSeq %&gt;% 
+  dplyr::filter(Include..Yes.No....Interest == &quot;Yes&quot;) %&gt;% 
+  DT::datatable()</code></pre>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-7d3add13c6a483e279a1" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-7d3add13c6a483e279a1">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"],["X","trimmed","numReads","numUnmapped","overallMapRate","concordMapRate","mitoMapped","mitoRate","totalAssignedGene","rRNA_rate","BrNum","Region","RIN","Age","Sex","Race","Dx","Fetal_replicating","Fetal_quiescent","OPC","Neurons","Astrocytes","Oligodendrocytes","Microglia","Endothelial",null,null,null],["SampleID","trimmed","TotalNReads","numUnmapped","MappingRate","concordMapRate","mitoMapped","mito_ratio","totalAssignedGene","rRNA_ratio","DonorID","StructureAcronym","RIN","AgeNumeric","Sex","Ethnicity","Diagnosis","Dev.Replicating","Dev.Quiescent","Adult.OPC","Adult.Neurons","Adult.Astrocytes","Adult.Oligo","Adult.Microglia","Adult.Endothelial","AgeInterval","Period","Regions"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Sample charactertics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Phenotype","Sample charactertics","Sequencing metrics","Phenotype","Phenotype","Phenotype","Phenotype","Cell-Type","Cell-Type","Cell-Type","Cell-Type","Cell-Type","Cell-Type","Cell-Type","Cell-Type","Phenotype","Phenotype","Sample charactertics"],["BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq","BrainSeq"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OriginalMetadataColumnName<\/th>\n      <th>BITColumnName<\/th>\n      <th>Include..Yes.No....Interest<\/th>\n      <th>Type<\/th>\n      <th>Dataset<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OriginalMetadataColumnName","targets":1},{"name":"BITColumnName","targets":2},{"name":"Include..Yes.No....Interest","targets":3},{"name":"Type","targets":4},{"name":"Dataset","targets":5}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="gtex" class="section level2">
 <h2>GTEx</h2>
+<pre class="r"><code>annot_seq = annot$GTEx %&gt;%
+  dplyr::filter(Type == &quot;Sequencing metrics&quot;)
+md.clean = md$GTEx %&gt;%
+  dplyr::select(contains(annot_seq$BITColumnName))
+md.clean = md.clean %&gt;% select_if(~ !any(is.na(.)))
+md.clean = md.clean[vapply(md.clean, function(x) length(unique(x)) &gt; 1, logical(1L))]</code></pre>
+<pre class="r"><code>#pdf(here::here(&quot;output/Thesis_plots/Metadata/GTEx-cor-seq-metadata.pdf&quot;), height = 10, width=10)
+M = cor(data.matrix(md.clean), use = &quot;complete.obs&quot;)
+corrplot(M, order=&#39;hclust&#39;,
+         method = &quot;circle&quot;,
+         number.cex = .50,
+         tl.cex=0.75)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-5-1.png" alt="Correlation plot showing highly correlating metadata variables in GTEx" width="672" />
 <p class="caption">
@@ -826,6 +944,10 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
+<pre class="r"><code>annot$GTEx %&gt;% 
+  dplyr::filter(Include..Yes.No....Interest == &quot;Yes&quot;) %&gt;% 
+  DT::datatable()</code></pre>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-4741f8913ab2a8a92f14" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-4741f8913ab2a8a92f14">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48"],["SAMPID","SMRIN","SMTSISCH","AGE","SEX","SMATSSCR","SMNABTCH","SMNABTCHT","SMNABTCHD","SMGEBTCH","SMGEBTCHD","SMGEBTCHT","SMCENTER","SMTS","SMTSD","SMTSPAX","SME2MPRT","SMCHMPRS","SMNTRART","SMMAPRT","SMEXNCRT","SMGNSDTC","SMESTLBS","SMMPPD","SMNTERRT","SMRRNANM","SMRDTTL","SMTRSCPT","SMMPPDPR","SMUNPDRD","SMNTRNRT","SMMPUNRT","SMEXPEFF","SMMPPDUN","SME2MMRT","SME2ANTI","SME2SNSE","SME1ANTI","SME1SNSE","SME1PCTS","SMRRNART","SME1MPRT","SMDPMPRT","SME2PCTS","SUBJID","DTHHRDY",null,null],["SampleID","RIN","PMI","AgeInterval","Sex","AutolysisScore","SequencingBatch","TypeofBatch","DateofBatch","Genotype_or_Expression_Batch_ID","DateofGenotypeorExpressionBatch","TypeofGenotypeorExpressionBatch","BSS_Collection_side_code","Regions","StructureAcronym","Time_spent_in_PAXgene_fixative","End_2_mapping_rate","ChimericPairs","IntragenicRate","MappingRate","ExonicRate","GenesDetected","LibrarySize","ReadsMapped","IntergenicRate","rRNA","TotalNReads","TranscriptsDetected","MappedPairs","UnpairedReads","IntronicRate","MappingRate_unique","ExpressionProfilingEfficiency","MappedUnique_no_dup_flags","End_2_Mismatch_Rate","End_2_Antisense","End_Sense_2","End_1_Antisense","End_1_Sense","End_1_Sense_percentage","rRNA_ratio","End_1_Mapping_rate","DuplicationRateMapped","Percentage_IntragenicEnd_2_Reads","DonorID","HardyScale","Period","Diagnosis"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Sample charactertics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sample charactertics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Phenotype","Phenotype"],["GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx","GTEx"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OriginalMetadataColumnName<\/th>\n      <th>BITColumnName<\/th>\n      <th>Include..Yes.No....Interest<\/th>\n      <th>Type<\/th>\n      <th>Dataset<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OriginalMetadataColumnName","targets":1},{"name":"BITColumnName","targets":2},{"name":"Include..Yes.No....Interest","targets":3},{"name":"Type","targets":4},{"name":"Dataset","targets":5}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 <!-- <!-- - FANTOM5 -->
@@ -849,6 +971,38 @@ urwahnawaz
 </div>
 <div id="hdbr" class="section level2">
 <h2>HDBR</h2>
+<pre class="r"><code>hdbr_annot_seq = annot$HDBR %&gt;%
+  dplyr::filter(Type == &quot;Sequencing metrics&quot;)
+
+md.seq = md$HDBR %&gt;%
+  dplyr::select(contains(hdbr_annot_seq$BITColumnName)) %&gt;%
+  dplyr::select(-c(&quot;Percentage_fragment_mapped_unique_exon_fc&quot;,
+                   &quot;Total_fragments_assigned_exon_fc&quot;,
+                   &quot;Total_fragments_count_unique_exon_fc&quot;,
+                   &quot;Total_fragments_count_unique_assigned_exon_fc&quot;,
+                   &quot;AUC_all_annotated_exons&quot;, &quot;AUC_all_annotated_exons_unique&quot;,
+                   &quot;BigWigFile&quot;, &quot;CellLinePrediction&quot;,&quot;PredictionType&quot;,
+                   &quot;CuratedTypePrediction&quot;, &quot;PredictionType&quot;,
+                   &quot;Metadata_source&quot;, &quot;Metadata_source&quot;, &quot;LibraryName&quot;,
+                   &quot;LibraryStrategy&quot;, &quot;LibrarySource&quot;, &quot;LibraryLayout&quot;,
+                   &quot;LibrarySelection&quot;, &quot;CellTypePrediction&quot;, &quot;PatternPredictionType&quot;,
+                   &quot;SampleAccPrediction&quot;, &quot;CuratedTissuePrediction&quot;,
+                   &quot;Mapping_speed_per_hour_STAR&quot;, &quot;ReadInfo&quot;, &quot;RunAlias&quot;,
+                   &quot;Run_Center_Name&quot;, &quot;Run_Broker_name&quot;, &quot;Run_Center&quot;, &quot;Processed_Recount&quot;,
+                   &quot;FileSource_Recount&quot;, &quot;Organism_recount&quot;, &quot;PlatformModel&quot;,
+                   &quot;SampleAttributes&quot;, &quot;ExperimentAttributes&quot;, &quot;SampleName&quot;,
+                   &quot;SampleTitle&quot;, &quot;RunPublished&quot;, &quot;Size&quot;,
+                   &quot;MeanFragmentLength_BAM&quot;, &quot;Total_fragments_input_fc_exon_fc&quot;))
+
+md.seq.clean = md.seq  %&gt;% select_if(~ !any(is.na(.)))
+md.seq.clean = md.seq.clean[vapply(md.seq.clean, function(x) length(unique(x)) &gt; 1, logical(1L))]</code></pre>
+<pre class="r"><code>#M = cor(data.matrix(md.seq.clean), use = &quot;complete.obs&quot;)
+#pdf(here::here(&quot;output/Thesis_plots/Metadata/HDBR-corplot.pdf&quot;), height = 25, width=25)
+corrplot(M, order=&#39;hclust&#39;,
+         method = &quot;circle&quot;,
+         number.cex = .50,
+         cl.cex = 3,
+         tl.cex=1.2)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-8-1.png" alt="Correlation plot showing highly correlating metadata variables in HDBR" width="2400" />
 <p class="caption">
@@ -892,6 +1046,10 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
+<pre class="r"><code>annot$HDBR %&gt;% 
+  dplyr::filter(Include..Yes.No....Interest == &quot;Yes&quot;) %&gt;% 
+  DT::datatable()</code></pre>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-521e7420bfa881ce433c" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-521e7420bfa881ce433c">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39"],["Run","Sample.Characteristic.block.","Sample.Characteristic.Ontology.Term.block.","Sample.Characteristic.individual.","Sample.Characteristic.karyotype.","Sample.Characteristic.organism.part.","Sample.Characteristic.sampling.site.","external_id","recount_qc.aligned_reads..chrm","recount_qc.aligned_reads..chrx","recount_qc.aligned_reads..chry","recount_qc.bc_auc.all_.","recount_qc.bc_auc.unique_.","recount_qc.bc_frag.mode_length_count","recount_qc.exon_fc.all_.","recount_qc.exon_fc_count_all.assigned","recount_qc.exon_fc_count_unique.total","recount_qc.exon_fc_count_unique.assigned","recount_qc.gene_fc_count_all.assigned","recount_qc.intron_sum_.","recount_qc.star.._of_reads_mapped_to_multiple_loci","recount_qc.star.._of_reads_mapped_to_too_many_loci","recount_qc.star.._of_reads_unmapped._other","recount_qc.star.._of_reads_unmapped._too_many_mismatches","recount_qc.star.all_mapped_reads","recount_qc.star.number_of_input_reads","recount_qc.star.uniquely_mapped_reads_.","recount_qc.star.uniquely_mapped_reads_number","recount_qc.junction_count","recount_qc.star.all_mapped_reads_both","recount_qc.star.._mapped_reads_both","recount_qc.star.._reads_mapped_to_multiple_loci_both","recount_qc.star.._reads_mapped_to_too_many_loci_both",null,null,null,"time sample in transit (minutes)",null,null],["SampleID","SequencingBatch","Block","DonorID","Sex","StructureAcronym","Hemisphere","SampleID","ChimericPairs","Percent_aligned_ChrX","Percent_aligned_ChrY","AUC_all_percentage","AUC_unique_percentage","ModeFragmentLengthCount","ExonicRate","Total_fragments_assigned_exon_fc","Total_fragments_count_unique_exon_fc","Total_fragments_count_unique_assigned_exon_fc","totalAssignedGene","IntronicRate","Percentage_mapped_multi_loci_STAR","Percentage_mapped_too_many_loci_STAR","Percentage_unmapped_other_STAR","Percentage_unmapped_too_many_mismatches_STAR","ReadsMapped","TotalNReads","MappingRate","MappingRate_unique","Junction_count","MappedPairs","MappingRate_both","Percentage_mapped_multi_loci_both_STAR","Percentage_mapped_too_many_loci_both_STAR","AgeInterval","Diagnosis","Period","PMI","Regions","AgeNumeric"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Sample charactertics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Sample charactertics","Sample charactertics","Sample charactertics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Sequencing metrics","Phenotype","Phenotype","Phenotype","Sequencing metrics","Sample charactertics","Phenotype"],["HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR","HDBR"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OriginalMetadataColumnName<\/th>\n      <th>BITColumnName<\/th>\n      <th>Include..Yes.No....Interest<\/th>\n      <th>Type<\/th>\n      <th>Dataset<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OriginalMetadataColumnName","targets":1},{"name":"BITColumnName","targets":2},{"name":"Include..Yes.No....Interest","targets":3},{"name":"Type","targets":4},{"name":"Dataset","targets":5}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 </div>
@@ -902,6 +1060,20 @@ the metadata have not been fully explored in the BITHub thesis
 chapter.</p>
 <div id="aldinger-et-al-2022" class="section level3">
 <h3>Aldinger et al (2022)</h3>
+<pre class="r"><code>aldringer_annot_seq = annot$Aldringer %&gt;%
+  dplyr::filter(Type == &quot;Sequencing metrics&quot;)
+
+md.seq = md$Aldringer %&gt;%
+  dplyr::select(contains(aldringer_annot_seq$BITColumnName))
+
+md.seq.clean = md.seq  %&gt;% select_if(~ !any(is.na(.)))
+md.seq.clean = md.seq.clean[vapply(md.seq.clean, function(x) length(unique(x)) &gt; 1, logical(1L))]
+
+M = cor(data.matrix(md.seq.clean ), use = &quot;complete.obs&quot;)
+corrplot(M, order=&#39;hclust&#39;,
+         method = &quot;circle&quot;,
+         number.cex = .50,
+         tl.cex=0.75, type=&quot;upper&quot;)</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
@@ -956,8 +1128,70 @@ class="section level2">
 I overlapped metadata belonging to each of these categories were then
 overlapped to determine the set of common metadata attributes across all
 datasets.</p>
+<pre class="r"><code>annot = lapply(annot, function(x){
+  x %&lt;&gt;%
+    dplyr::filter(Include..Yes.No....Interest == &quot;Yes&quot;)
+  return(x)
+  })
+
+
+md$BrainSeq %&lt;&gt;% dplyr::select(contains(annot$BrainSeq$BITColumnName))
+md$BrainSpan %&lt;&gt;% dplyr::select(contains(annot$BrainSpan$BITColumnName))
+md$GTEx %&lt;&gt;% dplyr::select(contains(annot$GTEx$BITColumnName))
+md$HDBR %&lt;&gt;% dplyr::select(contains(annot$HDBR$BITColumnName))
+md$PsychEncode %&lt;&gt;% dplyr::select(contains(annot$PsychEncode$BITColumnName))</code></pre>
+<pre class="r"><code>seq.metrics = lapply(annot, function(x){
+  x = x %&gt;%
+     dplyr::filter(Type == &quot;Sequencing metrics&quot;)
+  return(x)
+})
+
+
+pheno.metrics = lapply(annot, function(x){
+  x = x %&gt;%
+     dplyr::filter(Type == &quot;Phenotype&quot;)
+  return(x)
+})
+
+
+annot = lapply(annot, function(x){
+  x = x %&gt;%
+    mutate(Type = gsub(&quot;Sample charactertics&quot;, &quot;Sample characteristics&quot;, Type))
+  return(x)
+})
+sample.metrics = lapply(annot, function(x){
+  x = x %&gt;%
+     dplyr::filter(Type == &quot;Sample characteristics&quot;)
+  return(x)
+})</code></pre>
 <div id="sequencing-metrics" class="section level3">
 <h3>Sequencing metrics</h3>
+<pre class="r"><code>library(VennDiagram)
+v= list( &quot;BrainSeq&quot; = seq.metrics$BrainSeq$BITColumnName,
+          &quot;BrainSpan&quot; = seq.metrics$BrainSpan$BITColumnName,
+          &quot;GTEx&quot; = seq.metrics$GTEx$BITColumnName,
+          &quot;HDBR&quot; = seq.metrics$HDBR$BITColumnName,
+          &quot;PsychEncode&quot; = seq.metrics$PsychEncode$BITColumnName
+       #  &quot;HCA&quot; = hca.tech$BITHubColumnName,
+        # &quot;Cameron et al&quot; = cam.tech$BITHubColumnName,
+         #&quot;Velmeshev et al&quot; = vel.tech$BITColumnName,
+         #&quot;Aldringer et al&quot; = adl.tech$BITHubColumnName
+         #,
+        #  &quot;Ramaker&quot; = ram.tech$BITColumnName
+         )
+
+
+a=calculate.overlap(v)
+
+plot =UpSetR::upset(fromList(v), sets.bar.color = c(&quot;#7DA1D4&quot;,&quot;#E11F28&quot;,&quot;#F1605F&quot;,&quot;#49215F&quot;),
+              main.bar.color = c(&quot;#7DA1D4&quot;,&quot;#E11F28&quot;,&quot;#F1605F&quot;,&quot;#49215F&quot;,
+                                 &quot;#808080&quot;,&quot;#808080&quot;,&quot;#808080&quot;,&quot;#808080&quot;,
+                                 &quot;#808080&quot;,&quot;#808080&quot;),
+              mainbar.y.label = &quot;Overlap of Sequencing Metrics&quot;,
+              sets.x.label = &quot;Total Sequencing Metrics&quot;,
+                text.scale = c(1.2, 2, 1.2),
+              point.size = 4)</code></pre>
+<pre class="r"><code>plot</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
@@ -996,9 +1230,34 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>combos &lt;- Reduce(c,lapply(2:length(v),
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect &lt;- lapply(combos, function(x) Reduce(intersect,v[x]) )</code></pre>
 </div>
 <div id="phenotype-attributes" class="section level3">
 <h3>Phenotype attributes</h3>
+<pre class="r"><code>v= list( &quot;BrainSeq&quot; = pheno.metrics$BrainSeq$BITColumnName,
+          &quot;BrainSpan&quot; = pheno.metrics$BrainSpan$BITColumnName,
+          &quot;GTEx&quot; = pheno.metrics$GTEx$BITColumnName,
+          &quot;HDBR&quot; = pheno.metrics$HDBR$BITColumnName,
+          &quot;PsychEncode&quot; = pheno.metrics$PsychEncode$BITColumnName
+       #  &quot;HCA&quot; = hca.tech$BITHubColumnName,
+        # &quot;Cameron et al&quot; = cam.tech$BITHubColumnName,
+         #&quot;Velmeshev et al&quot; = vel.tech$BITColumnName,
+         #&quot;Aldringer et al&quot; = adl.tech$BITHubColumnName
+         #,
+        #  &quot;Ramaker&quot; = ram.tech$BITColumnName
+         )
+
+
+
+UpSetR::upset(fromList(v), sets.bar.color = c(&quot;#FAAD79&quot;,&quot;#F1605F&quot;,&quot;#E11F28&quot;,&quot;#7DA1D4&quot;,&quot;#49215F&quot;),
+              main.bar.color = c(&quot;#FAAD79&quot;,&quot;#7DA1D4&quot;,
+                                &quot;#808080&quot;,&quot;#808080&quot;,&quot;#808080&quot;),
+              mainbar.y.label = &quot;Overlap of Phenotype Attributes&quot;,
+              sets.x.label = &quot;Total Phenotype Attributes&quot;,
+                text.scale = c(1.2, 2, 1.2),
+              point.size = 4)</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
@@ -1037,6 +1296,31 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>combos &lt;- Reduce(c,lapply(2:length(v),
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect &lt;- lapply(combos, function(x) Reduce(intersect,v[x]) )</code></pre>
+<pre class="r"><code>v= list( &quot;BrainSeq&quot; = pheno.metrics$BrainSeq$BITColumnName,
+          &quot;BrainSpan&quot; = pheno.metrics$BrainSpan$BITColumnName,
+          &quot;GTEx&quot; = pheno.metrics$GTEx$BITColumnName,
+          &quot;HDBR&quot; = pheno.metrics$HDBR$BITColumnName,
+          &quot;PsychEncode&quot; = pheno.metrics$PsychEncode$BITColumnName
+       #  &quot;HCA&quot; = hca.tech$BITHubColumnName,
+        # &quot;Cameron et al&quot; = cam.tech$BITHubColumnName,
+         #&quot;Velmeshev et al&quot; = vel.tech$BITColumnName,
+         #&quot;Aldringer et al&quot; = adl.tech$BITHubColumnName
+         #,
+        #  &quot;Ramaker&quot; = ram.tech$BITColumnName
+         )
+
+
+
+UpSetR::upset(fromList(v), sets.bar.color = c(&quot;#FAAD79&quot;,&quot;#F1605F&quot;,&quot;#E11F28&quot;,&quot;#7DA1D4&quot;,&quot;#49215F&quot;),
+              main.bar.color = c(&quot;#FAAD79&quot;,&quot;#7DA1D4&quot;,
+                                &quot;#808080&quot;,&quot;#808080&quot;,&quot;#808080&quot;),
+              mainbar.y.label = &quot;Overlap of Phenotype Attributes&quot;,
+              sets.x.label = &quot;Total Phenotype Attributes&quot;,
+                text.scale = c(1.2, 2, 1.2),
+              point.size = 4)</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
@@ -1075,9 +1359,33 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>combos &lt;- Reduce(c,lapply(2:length(v),
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect &lt;- lapply(combos, function(x) Reduce(intersect,v[x]) )</code></pre>
 </div>
 <div id="sample-characteristics" class="section level3">
 <h3>Sample characteristics</h3>
+<pre class="r"><code>v= list( &quot;BrainSeq&quot; = sample.metrics$BrainSeq$BITColumnName,
+          &quot;BrainSpan&quot; = sample.metrics$BrainSpan$BITColumnName,
+          &quot;GTEx&quot; = sample.metrics$GTEx$BITColumnName,
+          &quot;HDBR&quot; = sample.metrics$HDBR$BITColumnName,
+          &quot;PsychEncode&quot; = sample.metrics$PsychEncode$BITColumnName
+       #  &quot;HCA&quot; = hca.tech$BITHubColumnName,
+        # &quot;Cameron et al&quot; = cam.tech$BITHubColumnName,
+         #&quot;Velmeshev et al&quot; = vel.tech$BITColumnName,
+         #&quot;Aldringer et al&quot; = adl.tech$BITHubColumnName
+         #,
+        #  &quot;Ramaker&quot; = ram.tech$BITColumnName
+         )
+
+
+UpSetR::upset(fromList(v), sets.bar.color = c(&quot;#7DA1D4&quot;,&quot;#FAAD79&quot;,&quot;#E11F28&quot;,&quot;#F1605F&quot;,&quot;#49215F&quot;),
+              main.bar.color = c(&quot;#7DA1D4&quot;,&quot;#FAAD79&quot;,
+             &quot;#808080&quot;,&quot;#808080&quot;),
+              mainbar.y.label = &quot;Overlap of Sample Characteristics&quot;,
+              sets.x.label = &quot;Total Sample Characteristics&quot;,
+                text.scale = c(1.2, 2, 1.2),
+              point.size = 4)</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
@@ -1116,6 +1424,9 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>combos &lt;- Reduce(c,lapply(2:length(v),
+                          function(x) combn(1:length(v),x,simplify=FALSE) ))
+intersect &lt;- lapply(combos, function(x) Reduce(intersect,v[x]) )</code></pre>
 </div>
 </div>
 <div
@@ -1126,6 +1437,46 @@ analysis</h2>
 <p>I assessed the quality of the metadata by determining the extent of
 missing information across the available and retained metadata columns
 in all datasets.</p>
+<pre class="r"><code>count_na &lt;- function(x) sum(is.na(x))
+# md$ %&gt;%
+#   mutate(count_na = apply(., 1, count_na)) %&gt;%
+#   ggplot(aes(count_na)) + geom_density()
+
+na_calc = lapply(md[1:5], function(x){
+  x %&lt;&gt;%
+    mutate(count_na = apply(., 1, count_na)) %&gt;%
+    dplyr::select(count_na)
+  return(x)
+})
+
+
+total_nb = do.call(rbind, na_calc) %&gt;%
+  rownames_to_column(&quot;Dataset&quot;) %&gt;%
+  dplyr::filter(count_na != 0)</code></pre>
+<pre class="r"><code>#ggsave(filename = here::here(&quot;output/Thesis_plots/Metadata/missing_md.svg&quot;), height=6, width = 7, units = &quot;in&quot;)
+do.call(rbind, na_calc) %&gt;%
+  rownames_to_column(&quot;Dataset&quot;) %&gt;%
+  mutate(Dataset = gsub(&quot;\\..*&quot;, &quot;&quot;, Dataset)) %&gt;%
+   ggplot(aes(count_na, fill= Dataset)) +
+  geom_density(alpha = 0.75) +
+  theme_bw()  +
+     scale_fill_manual(values =c(&quot;BrainSeq&quot; =&quot;#F1605F&quot;,
+                               &quot;BrainSpan&quot; = &quot;#49215F&quot;,
+                               &quot;GTEx&quot; = &quot;#7DA1D4&quot;,
+                               &quot;HDBR&quot; = &quot;#E11F28&quot;,
+                               &quot;PsychEncode&quot; = &quot;#FAAD79&quot;))+
+  xlab(&quot;Number of missing metadata&quot;) +
+  ylab(&quot;Density of samples&quot;) +
+  theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.text.y = element_text(size = 15, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=15, family = &quot;serif&quot;),
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;),
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;)</code></pre>
 <p><img src="figure/03-metadata-attributes.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
@@ -1164,6 +1515,7 @@ urwahnawaz
 </table>
 </div>
 </div>
+<pre class="r"><code>#dev.off()</code></pre>
 <!-- # ```{r} -->
 <!-- # md$GTEx %>% apply(., 2, count_na)  -->
 <!-- # md$HDBR %>% apply(.,2, count_na)  -->
@@ -1294,6 +1646,11 @@ urwahnawaz
 </div>
 <div id="export-data" class="section level1">
 <h1>Export data</h1>
+<pre class="r"><code>#write.csv(file = file.path(dir,&quot;Brainseq/Formatted/BrainSeq-metadata-subset.csv&quot;), md$BrainSeq)
+#write.csv(file= file.path(dir,&quot;BrainSpan/Formatted/BrainSpan-metadata-subset.csv&quot;), md$BrainSpan)
+#write.csv(file = file.path(dir,&quot;GTEx/Formatted/GTEx-metadata-subset.csv&quot;), md$GTEx)
+#write.csv(file= file.path(dir, &quot;PsychEncode/Formatted/PsychEncode-metadata-subset.csv&quot;), md$PsychEncode)
+#write.csv(file = file.path(dir, &quot;HDBR/Formatted/HDBR-metadata-subset.csv&quot;), md$HDBR)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1302,6 +1659,7 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.3.3 (2024-02-29)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 22.04.4 LTS
