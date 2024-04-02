@@ -11,9 +11,14 @@ Table of Contents:
   * [Determining drivers of variation](#determining-drivers-of-variation)
   * [Normalization](#normalization)
 
+
 # Datasets 
 
-All scripts for pre-processing data are in the `R/preprocess` folder. Please read the [`R/preprocess/README.md`](https://github.com/VoineaguLabUNSW/BITHub/blob/master/R/preprocess/README.md) for more information on how to use the script to pre-process files. 
+All scripts for pre-processing data are loading in this Github repository. In order to use the code for preprocessing, please check the workflowR document: 
+The `analysis/` subfolder within this project contains detailed code for each step of the preprocessing and analysis for files for BITHub, including code for the analysis for the thesis chapter. 
+
+
+
 
 ## Data collection 
 
@@ -27,4 +32,9 @@ Both processed bulk and single-nucleus RNA-seq human brain transcriptomic datase
 | PsychEncode | The PsychEncode dataset contains data of the dorsolateral prefrontal cortex from human postmortem tissues from prenatal (age <0; range 4 to 40 pcw) and postnatal samples. Samples include controls and individuals with diagnosis of Bipolar Disorder, ASD, Schizophrenia and Affective disorder.   | 1866  | [PsychEncode Resource](http://resource.psychencode.org) <br><br> [Expression matrix](http://resource.psychencode.org/Datasets/Derived/DER-02_PEC_Gene_expression_matrix_TPM.txt)  <br><br> Metadata file  <br> *Access from Synapse* |
 | Human Cell Atlas  | Content Cell  | 32,749 | Content Cell  |
 | Velmeshev et al  | Velmeshev et al generated single-nuclei from 48 post-mortem tissue samples from the prefrontal cortex, anterior cingulate and insular cortical regions. Donors included 16 control subjects and 11 patients with ASD. All samples are postnatal  | 81,216 | [Cells UCSC](https://cells.ucsc.edu/?ds=autism)  <br> <br> Matrix: <br> [exprMatrix.tsv.gz](https://cells.ucsc.edu/autism/exprMatrix.tsv.gz) <br> Values in matrix are: 10x UMI counts from cellranger, log2-transformed <br><br> Raw count matrix: <br> [rawMatrix.zip](https://cells.ucsc.edu/autism/rawMatrix.zip) |
+
+# Code 
+
+
+
 
