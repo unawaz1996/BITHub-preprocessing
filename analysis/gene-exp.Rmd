@@ -452,6 +452,8 @@ pe = exp_data %>%
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
+ggsave(filename = here::here("output/Thesis_plots/Examples/ZIC2-all.png"),
+       height = 14, width = 16, units = "in", dpi=1200)
 #dev.off()
 ```
 
@@ -837,12 +839,12 @@ pe
 ```
 
 ```{r}
-pdf(file = here::here("output/Thesis_plots/Examples/MKI67-all.pdf"),
-       height = 14, width = 16)
+
 ggarrange(bseq, bspan,
           gtex, hdbr, pe, ncol=2, nrow=3 )
 
-dev.off()
+ggsave(filename = here::here("output/Thesis_plots/Examples/MKI67-all.png"),
+       height = 14, width = 16, dpi=1200)
 ```
 
 Zscore of MKI69
@@ -2048,7 +2050,7 @@ ggsave(filename = here::here("output/Thesis_plots/Variance/Examples/RNA-degradat
 ## Understanding spatiotemporal properties of Neurodevelopmental disorder genes
 
 ```{r}
-genes_of_interest = c("FMR1", "ZMYND8", "UPF1", "SPAST", "ATL1", "CTNNB1", "KCNQ2", "SPR")
+genes_of_interest = c("FMR1", "ZMYND8", "UPF1", "SPAST", "ATL1", "CTNNB1", "KCNQ2", "SPR", "UPF3B", "UPF3A")
 exp_data = list()
 datasets = c("BSpan", "GTEx", "BSeq", "PE", "HDBR")
 for (x in datasets) {
@@ -3649,6 +3651,15 @@ theme_bw() + scale_fill_manual(values = c("Cortex" = "#E85571",
   ylab(bquote(log["10"](TPM)))
 pe
 
+```
+
+```{r}
+
+ggarrange(bseq, bspan,
+          gtex, hdbr, pe, ncol=2, nrow=3 )
+
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/FMR1-all.png"),
+       height = 14, width = 16, units = "in", dpi=1200)
 ```
 
 ## UPF1
