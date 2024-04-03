@@ -4582,7 +4582,10 @@ snRNA$vel = read.csv(file.path(sn.dir, "velmeshev/FormattedData/Velmeshev-exp.cs
 
 snRNA$cer = read.csv(file.path(sn.dir, "aldinger/Aldringer-exp.csv"), header=TRUE, 
                      check.names = FALSE, row.names = 1)
+snRNA$cam = read.csv(file.path(sn.dir, "cameron/Cameron-exp.csv"), header=TRUE, 
+                     check.names = FALSE, row.names = 1)
 #snRNA$cameron 
+
 
 sn_md = list()
 
