@@ -589,12 +589,13 @@ period_scale$BSpan_Prenatal %>%
 ```
 
 ```{r}
-pdf(file = here::here("output/Thesis_plots/Examples/ZIC2-zscore.pdf"),
-       height = 6, width = 18)
+# png(file = here::here("output/Thesis_plots/Examples/ZIC2-zscore.png"),
+#        height = 6, width = 18)
 ggarrange(dataset_zscore_zic2 , regions_zscore_zic2,
           period_zscore_zic2, ncol=3, nrow=1 )
+ggsave(filename = here::here("output/Thesis_plots/Examples/ZIC2-zscore.png"),
+       height = 6, width = 18, dpi=1200)
 
-dev.off()
 ```
 
 
@@ -977,12 +978,12 @@ period_region_scale$BSpan_Prenatal_Cerebellum %>%
 ```
 
 ```{r}
-ggsave(file = here::here("output/Thesis_plots/Examples/MKI67-zscore.png"),
-       height = 6, width = 18)
+
 ggarrange(pe_zscore_mki67 , cortex_zscore_mki67,
           bspan_zscore_mki67, ncol=3, nrow=1 )
+ggsave(file = here::here("output/Thesis_plots/Examples/MKI67-zscore.png"),
+       height = 6, width = 18)
 
-dev.off()
 ```
 
 ## RNA degradation in the brain 
@@ -1072,7 +1073,7 @@ gtex_fig_RNASE2  = e$Raw$GTEx %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("RNASE2 - GTEx") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1130,7 +1131,7 @@ cor_RNASE2_gtex = e$Raw$GTEx %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("RNASE2 - GTEx") +
-  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1199,7 +1200,7 @@ bspan_fig_RNASE2 = e$Raw$BSpan %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("RNASE2 - BrainSpan") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1258,7 +1259,7 @@ cor_RNASE2_bspan = e$Raw$BSpan %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("RNASE2 - BrainSpan") +
-  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1306,7 +1307,7 @@ gtex_plot =e$Raw$GTEx %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("CXCL2 - GTEx") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1362,7 +1363,7 @@ cor_CXCL2_gtex = e$Raw$GTEx %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("CXCL2 - GTEx") +
-  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1425,7 +1426,7 @@ bspan_fig =e$Raw$BSpan %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("CXCL2 - BrainSpan") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1481,7 +1482,7 @@ cor_CXCL2_bspan = e$Raw$BSpan %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("CXCL2 - BrainSpan") +
-  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1501,7 +1502,7 @@ gtex_var_cxcl2 = var_part$GTEx %>%
   mutate(percentage = value * 100) %>%
   ggplot(aes(x= fct_reorder(variable,percentage  ), y = percentage )) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("CXCL2 - GTEx") +
-     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1518,7 +1519,7 @@ bspan_var_cxlc2 = var_part$BSpan %>%
   melt() %>%
     ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("")  + ggtitle("CXCL2 - BrainSpan") +  
-  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1565,7 +1566,7 @@ gtex_plot_egr3 = e$Raw$GTEx %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("EGR3 - GTEx") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1621,7 +1622,7 @@ cor_egr3_gtex =  e$Raw$GTEx %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("EGR3 - GTEx") +
-  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1665,7 +1666,7 @@ bspan_plot_EGR3 = e$Raw$BSpan %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("EGR3 - BrainSpan") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1720,7 +1721,7 @@ cor_EGR3_bspan = e$Raw$BSpan %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("EGR3 - BrainSpan") +
-  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1740,7 +1741,7 @@ gtex_var_egr3 =var_part$GTEx %>%
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + ggtitle("EGR3 - GTEx") + xlab("") +
-     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1758,7 +1759,7 @@ bspan_var_egr3 =var_part$BSpan %>%
   melt() %>% mutate(percent = value * 100)
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("EGR3 - BrainSpan") +
-     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1804,7 +1805,7 @@ gtex_plot_HBA1 =e$Raw$GTEx %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("HBA1 - GTEx") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1860,7 +1861,7 @@ cor_hba1_gtex= e$Raw$GTEx %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("HBA1 - GTEx") +
-  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("TPM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1905,7 +1906,7 @@ bspan_plot_HBA1 = e$Raw$BSpan %>%
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + 
   xlab ("PMI Intervals") + ggtitle("HBA1 - BrainSpan") +
-   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1960,7 +1961,7 @@ cor_hba1_bspan = e$Raw$BSpan %>%
                                  "Brain" = "#FFA6B7", 
                                  "Forebrain and midbrain" = "#9D696C"
                                 )) + theme_bw() + xlab("PMI (in hours)") + ggtitle("HBA1 - BrainSpan") +
-  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+  ylab("RPKM") +  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1980,7 +1981,7 @@ gtex_var_hba1 = var_part$GTEx %>%
   melt() %>%
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("HBA1 - GTEx") +
-     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -1999,7 +2000,7 @@ bspan_var_hba1 =var_part$BSpan %>%
   melt()  %>% 
   ggplot(aes(x= fct_reorder(variable, value), y = value)) + geom_bar(stat = "identity", fill = "#F04C51") +
   coord_flip() + theme_bw() + ylab("Variance Explained (%)") + xlab("") + ggtitle("HBA1 - BrainSpan") +
-     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
         axis.text.y = element_text(size = 15, family = "serif", color = "black"), 
         axis.title = element_text(size=15, family = "serif"), 
          legend.box.background = element_rect(color = "black"),
@@ -2032,13 +2033,13 @@ dev.off()
 
 ```{r}
 
-pdf(file = here::here("output/Thesis_plots/Variance/Examples/RNA-degradation_cor.pdf"), height=20, width=16)
+#pdf(file = here::here("output/Thesis_plots/Variance/Examples/RNA-degradation_cor.pdf"), height=20, width=16)
 ggarrange(cor_RNASE2_bspan, cor_RNASE2_gtex, 
           cor_CXCL2_bspan, cor_CXCL2_gtex,
           cor_hba1_bspan, cor_hba1_gtex, 
-          cor_EGR3_bspan, cor_EGR3_bspan, ncol =2, nrow=4)
+          cor_EGR3_bspan, cor_egr3_gtex, ncol =2, nrow=4)
 
-dev.off()
+ggsave(filename = here::here("output/Thesis_plots/Variance/Examples/RNA-degradation_cor.png"), height=20, width=16, dpi=1200)
 ```
 
 
