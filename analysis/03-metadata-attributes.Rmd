@@ -47,6 +47,7 @@ library(DT)
 library(naniar)
 source("code/preprocess/functions.R")
 source("code/preprocess/def_stages.R")
+source("code/preprocess/raw_file_locations.R")
 library(UpSetR)
 library(patchwork)
 library(pheatmap)
@@ -81,13 +82,13 @@ dir = file.path("/home/neuro/Documents/BrainData/Bulk")
 sn_dir = file.path("/home/neuro/Documents/BrainData/single-cell")
 md = list()
 
-md$BrainSeq = read.csv(file.path(dir,"Brainseq/Formatted/BrainSeq-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
-md$BrainSpan = read.csv(file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
-md$GTEx =  read.csv(file.path(dir,"GTEx/Formatted/GTEx-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
-md$HDBR = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
+md$BrainSeq = read.csv(file.path(bseq.out,"BrainSeq-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
+md$BrainSpan = read.csv(file.path(bspan.out,"BrainSpan-metadata.csv"), header=TRUE, check.names = FALSE, row.names = 1)
+md$GTEx =  read.csv(file.path(gtex.out,"GTEx-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
+md$HDBR = read.csv(file.path(hdbr.out, "HDBR-metadata.csv"), header=TRUE, check.names = FALSE, row.names =1)
 #md$FANTOM5 = read.csv(file.path(dir, "Fantom5/Formatted/FANTOM5-metadata.csv"), header=TRUE, check.names = FALSE)
-md$PsychEncode = read.csv(file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata.csv"), header=TRUE, check.names = FALSE)
-md$Velmeshev = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
+md$PsychEncode = read.csv(file.path(pe.out, "PsychEncode-metadata.csv"), header=TRUE, check.names = FALSE)
+#md$Velmeshev = read.csv(file.path(dir, "HDBR/Formatted/HDBR-metadata.csv"), header=TRUE, check.names = FALSE)
 md$Aldringer = read.csv(file.path(sn_dir, "aldinger/Aldringer-metadata.csv"), header=TRUE, check.names = FALSE)
 ```
 
@@ -492,7 +493,7 @@ total_nb = do.call(rbind, na_calc) %>%
 
 ```{r}
 #ggsave(filename = here::here("output/Thesis_plots/Metadata/missing_md.svg"), height=6, width = 7, units = "in")
-do.call(rbind, na_calc) %>%
+md_missing = do.call(rbind, na_calc) %>%
   rownames_to_column("Dataset") %>%
   mutate(Dataset = gsub("\\..*", "", Dataset)) %>%
    ggplot(aes(count_na, fill= Dataset)) +
@@ -515,6 +516,9 @@ do.call(rbind, na_calc) %>%
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line( size=.1 ),
               legend.position = "top")
+
+ggsave(filename = here::here("output/Thesis_plots/Metadata/missing_md.png"), 
+       height=5, width = 6, units = "in", plot=md_missing)
 #dev.off()
 
 ```
@@ -706,9 +710,9 @@ do.call(rbind, na_calc) %>%
 # Export data 
 
 ```{r}
-#write.csv(file = file.path(dir,"Brainseq/Formatted/BrainSeq-metadata-subset.csv"), md$BrainSeq)
-#write.csv(file= file.path(dir,"BrainSpan/Formatted/BrainSpan-metadata-subset.csv"), md$BrainSpan)
-#write.csv(file = file.path(dir,"GTEx/Formatted/GTEx-metadata-subset.csv"), md$GTEx)
-#write.csv(file= file.path(dir, "PsychEncode/Formatted/PsychEncode-metadata-subset.csv"), md$PsychEncode)
-#write.csv(file = file.path(dir, "HDBR/Formatted/HDBR-metadata-subset.csv"), md$HDBR)
+write.csv(file = file.path(bseq.out,"BrainSeq-metadata-subset.csv"), md$BrainSeq)
+write.csv(file= file.path(bspan.out,"BrainSpan/Formatted/BrainSpan-metadata-subset.csv"), md$BrainSpan)
+write.csv(file = file.path(gtex.out,"GTEx/Formatted/GTEx-metadata-subset.csv"), md$GTEx)
+write.csv(file= file.path(pe.out, "PsychEncode/Formatted/PsychEncode-metadata-subset.csv"), md$PsychEncode)
+write.csv(file = file.path(hdbr.out, "HDBR/Formatted/HDBR-metadata-subset.csv"), md$HDBR)
 ```

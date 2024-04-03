@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="unawaz1996" />
+
+<meta name="date" content="2023-09-19" />
+
+<title>Determining drivers of variation across datasets</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BITHub-preprocessing</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Proprocessing datasets
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01-bulk-preprocess-data.html">Bulk RNA-seq datasets</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Dataset characteristics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-metadata-attributes.html">Metadata attributes</a>
+    </li>
+    <li>
+      <a href="04-bulk-deconvolution.html">Deconvolution of bulk RNA-seq datasets</a>
+    </li>
+    <li class="dropdown-header">Drivers of variation</li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/unawaz1996/BITHub-preprocessing">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Determining drivers of variation across
+datasets</h1>
+<h4 class="author">unawaz1996</h4>
+<h4 class="date">2023-09-19</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-04-03
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>BITHub-preprocessing/</code>
+<span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20230919code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20230919)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20230919code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20230919)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-bs.svg
+</td>
+<td style="text-align:left;">
+output/Poster_plots/varPart-upf1-bs.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-gtex.svg
+</td>
+<td style="text-align:left;">
+output/Poster_plots/varPart-upf1-gtex.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-bs.svg
+</td>
+<td style="text-align:left;">
+output/Poster_plots/varPart-fmr1-bs.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-gtex.svg
+</td>
+<td style="text-align:left;">
+output/Poster_plots/varPart-fmr1-gtex.svg
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree2f511ca6f0c64decb0c2435c7da75a05b056a4d3targetblank2f511caa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/2f511ca6f0c64decb0c2435c7da75a05b056a4d3" target="_blank">2f511ca</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996BITHubpreprocessingtree2f511ca6f0c64decb0c2435c7da75a05b056a4d3targetblank2f511caa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/tree/2f511ca6f0c64decb0c2435c7da75a05b056a4d3" target="_blank">2f511ca</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
+    Ignored:    output/Thesis_plots/Variance/PCA/BrainSpan/brainspan-varPart-cor/
+
+Unstaged changes:
+    Deleted:    HDBR-PC-cor-filt.pdf
+    Modified:   analysis/04-variation-drivers.Rmd
+    Modified:   analysis/_site.yml
+    Deleted:    cerebroViz_output_outer_1.svg
+    Deleted:    cerebroViz_output_slice_1.svg
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/04-variation-drivers.Rmd</code>)
+and HTML (<code>docs/04-variation-drivers.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/unawaz1996/BITHub-preprocessing/blob/8dc75edadc8f9f67585a728df777782f7f598756/analysis/04-variation-drivers.Rmd" target="_blank">8dc75ed</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2024-04-02
+</td>
+<td>
+wflow_git_commit("./*")
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+</div>
+<div id="set-up" class="section level1">
+<h1>Set-up</h1>
+<p>This R markdown document contains the complete code for determing
+drivers of variation of bulk RNA-sequencing files for Brain Integrative
+Transcriptome Hub (BITHub). All datasets were preprocessed using the
+code in <code>01-bulk-preprocess-data.Rmd</code>, important metadata
+were retained in <code>03-bulk-preprocess-data.Rmd</code> and
+deconvolution analysis was performed in
+<code>04-bulk-deconvolution.Rmd</code>.</p>
+<p>In order to rerun the scripts - make sure to change the directories
+to the location of where the input files for preprocessing are stored.
+All directories are defined in each dataset section.</p>
+<p>All other files are stored within the data folder of this R workflow
+directory.</p>
+<pre class="r"><code>source(&quot;code/preprocess/functions.R&quot;)
+library(recount3)
+library(magrittr)
+library(tibble)
+library(reshape2)
+library(SummarizedExperiment)
+library(corrplot)
+library(dplyr)
+library(ggvenn)
+library(glue)
+library(pander)
+library(gridExtra)
+library(variancePartition)
+library(DT)
+library(EnsDb.Hsapiens.v86)
+library(singscore)
+library(ggplot2)
+library(UpSetR)
+library(patchwork)
+library(pheatmap)
+library(ggpubr)
+library(variancePartition)</code></pre>
+<pre class="r"><code>gene2symbol = genes(EnsDb.Hsapiens.v86, return.type=&quot;DataFrame&quot;) %&gt;%
+    as.data.frame()
+gene2symbol %&lt;&gt;% 
+    dplyr::select(&quot;EnsemblID&quot; = &quot;gene_id&quot;, gene_name)</code></pre>
+<pre class="r"><code>brain.dir =file.path(&quot;/home/neuro/Documents/BrainData/Bulk&quot;)
+e &lt;- list()
+  
+e$Raw$GTEx &lt;- read.csv(file.path(brain.dir, &quot;/GTEx/Formatted/GTEx-exp.csv&quot;), 
+                       check.names = FALSE, row.names = 1)
+e$Raw$PE &lt;- read.csv(file.path(brain.dir, &quot;/PsychEncode/Formatted/PsychEncode-exp.csv&quot;), 
+                     row.names =1, check.names = FALSE)
+e$Raw$BSpan &lt;- read.csv(file.path(brain.dir, &quot;/BrainSpan/Formatted/BrainSpan-exp.csv&quot;),
+                        check.names = FALSE, row.names = 1)
+e$Raw$BSeq &lt;- read.csv(file.path(brain.dir,&quot;/Brainseq/Formatted/BrainSeq-exp.csv&quot;), 
+                       check.names = FALSE, row.names = 1)
+
+e$Raw$HDBR &lt;- read.csv(file.path(brain.dir, &quot;/HDBR/Formatted/HDBR-exp.csv&quot;), 
+                       check.names = FALSE, row.names = 1)  %&gt;% 
+  column_to_rownames(&quot;EnsemblID&quot;)
+
+#e$Raw$Ram &lt;- read.csv(file.path(brain.dir, &quot;/Ramakar/Formatted/Ramaker-exp.csv&quot;), 
+ #                      check.names = FALSE, row.names = 1)
+
+
+#e$Raw &lt;- lapply(e$Raw, function(x) {
+ #   rownames(x) &lt;- x[,1]
+  #  x &lt;- x[,-1]
+   # return(x)
+#  })</code></pre>
+<pre class="r"><code>md = list()
+md$GTEx &lt;- read.csv(file.path(brain.dir, &quot;/GTEx/Formatted/GTEx-metadata.csv&quot;), 
+                       check.names = FALSE, row.names = 1) %&gt;% 
+  left_join( read.csv(file.path(brain.dir, 
+                                &quot;/GTEx/Formatted/GTEx-decon.csv&quot;), 
+                      header=TRUE, row.names = 1) %&gt;%
+               rownames_to_column(&quot;SampleID&quot;), by=&quot;SampleID&quot;)
+
+  
+md$PE &lt;- read.csv(file.path(brain.dir,&quot;/PsychEncode/Formatted/PsychEncode-metadata.csv&quot;),
+                  check.names = FALSE, row.names=1) %&gt;% 
+  left_join( read.csv(file.path(brain.dir, 
+                                &quot;/PsychEncode/Formatted/PsychEncode-decon.csv&quot;), 
+                      header=TRUE, row.names = 1) %&gt;%
+               rownames_to_column(&quot;SampleID&quot;), by=&quot;SampleID&quot;)
+
+md$BSeq &lt;- read.csv(file.path(brain.dir,&quot;/Brainseq/Formatted/BrainSeq-metadata.csv&quot;), 
+                       check.names = FALSE) %&gt;% 
+  left_join( read.csv(file.path(brain.dir, 
+                                &quot;/Brainseq/Formatted/BrainSeq-decon.csv&quot;), 
+                      header=TRUE, row.names = 1) %&gt;%
+               rownames_to_column(&quot;SampleID&quot;), by=&quot;SampleID&quot;)
+
+
+md$HDBR &lt;- read.csv(file.path(brain.dir, &quot;/HDBR/Formatted/HDBR-metadata.csv&quot;), 
+                       check.names = FALSE, row.names = 1)  %&gt;% 
+  left_join( read.csv(file.path(brain.dir, 
+                                &quot;/HDBR/Formatted/HDBR-decon.csv&quot;), 
+                      header=TRUE, row.names = 1) %&gt;%
+               rownames_to_column(&quot;SampleID&quot;), by=&quot;SampleID&quot;)
+#md$Ram &lt;- read.csv(file.path(brain.dir, &quot;/Ramakar/Formatted/Ramaker-metadata.csv&quot;),
+ #                      check.names = FALSE, row.names = 1)
+
+md$BSpan &lt;- read.csv(file.path(brain.dir,
+                               &quot;/BrainSpan/Formatted/BrainSpan-metadata.csv&quot;),
+                     check.names = FALSE, row.names =1) %&gt;% 
+  left_join( read.csv(file.path(brain.dir, 
+                                &quot;/BrainSpan/Formatted/BrainSpan-decon.csv&quot;), 
+                      header=TRUE, row.names = 1) %&gt;%
+               rownames_to_column(&quot;SampleID&quot;), by=&quot;SampleID&quot;)</code></pre>
+<p>To investigate the impact of biological and technical factors on gene
+expression, I performed an initial exploratory analysis on all bulk
+RNA-seq datasets grouped together via a PCA. The count matrices from all
+bulk RNA-seq datasets were filtered to remove lowly expressed genes. The
+expression cut-off was selected at 1 RPKM/TPM in at least 10% of the
+samples</p>
+<pre class="r"><code>thresh &lt;- function(x) {
+      y &lt;- x &gt; 1
+      keep &lt;- rowSums(y) &gt; (ncol(y) / 10)
+      return(x[keep,])
+    }</code></pre>
+<pre class="r"><code>gtex &lt;- thresh(e$Raw$GTEx)
+span &lt;- thresh(e$Raw$BSpan)
+seq &lt;- thresh(e$Raw$BSeq)
+pe &lt;- thresh(e$Raw$PE)
+hdbr &lt;- thresh(e$Raw$HDBR)</code></pre>
+<pre class="r"><code>common &lt;- intersect(rownames(gtex), rownames(span))
+common &lt;- intersect(common, rownames(seq))
+common &lt;- intersect(common, rownames(pe))
+common &lt;- intersect(common, rownames(hdbr))
+#common &lt;- intersect(common, rownames(ram))
+
+
+merge &lt;- cbind(gtex[common,], 
+               span[common,], 
+               seq[common,], 
+               pe[common,],
+               hdbr[common,])</code></pre>
+<p>An interquantile normalization was perfromed to group the samples
+together. This would allow me to merge the filtered count matrices into
+a single-data frame and make the distributions across datasets
+identical.</p>
+<div id="principal-component-analysis-of-all-data"
+class="section level2">
+<h2>Principal component analysis of all data</h2>
+<pre class="r"><code>library(preprocessCore)
+q.merge &lt;- normalize.quantiles(as.matrix(merge), copy = FALSE)
+  
+  # log transform
+q.merge &lt;- log2(q.merge + 0.5)</code></pre>
+<pre class="r"><code>pca &lt;- princomp(q.merge, cor = TRUE) # ~10 minutse</code></pre>
+<pre class="r"><code>m.merge = list()
+m.merge$BSeq= md$BSeq %&gt;% 
+  dplyr::select(&quot;SampleID&quot;, &quot;AgeInterval&quot;, &quot;Sex&quot;, &quot;Period&quot;,
+                &quot;Regions&quot;, &quot;StructureAcronym&quot;, &quot;DonorID&quot;)  %&gt;% 
+  mutate(Dataset = c(&quot;Brainseq&quot;))
+m.merge$BSpan = md$BSpan %&gt;% 
+  dplyr::select(&quot;SampleID&quot;, &quot;AgeInterval&quot;, &quot;Sex&quot;, &quot;Period&quot;,
+                &quot;Regions&quot;, &quot;StructureAcronym&quot;, &quot;DonorID&quot;)  %&gt;% 
+  mutate(Dataset = c(&quot;BrainSpan&quot;))
+
+m.merge$GTEx = md$GTEx %&gt;% 
+  dplyr::select(&quot;SampleID&quot;, &quot;AgeInterval&quot;, &quot;Sex&quot;, &quot;Period&quot;,
+                &quot;Regions&quot;, &quot;StructureAcronym&quot;, &quot;DonorID&quot;) %&gt;% 
+  mutate(Dataset = c(&quot;GTEx&quot;))
+m.merge$PE = md$PE %&gt;% 
+  dplyr::select(&quot;SampleID&quot;, &quot;AgeInterval&quot;, 
+                &quot;Sex&quot;, &quot;Period&quot;, &quot;Regions&quot;, &quot;StructureAcronym&quot;, &quot;DonorID&quot;)  %&gt;% 
+  mutate(Dataset = c(&quot;PsychEncode&quot;))
+
+m.merge$HDBR = md$HDBR %&gt;% 
+  dplyr::select(&quot;SampleID&quot;, &quot;AgeInterval&quot;, &quot;Sex&quot;, 
+                &quot;Regions&quot;, &quot;StructureAcronym&quot;, &quot;DonorID&quot;) %&gt;% 
+  mutate(Period = c(&quot;Prenatal&quot;), 
+         Dataset = c(&quot;HBDR&quot;))
+
+
+
+m.merge = do.call(rbind, m.merge)</code></pre>
+<pre class="r"><code>plot.data &lt;- as.data.frame(pca$loadings[,1:3])
+colnames(plot.data) &lt;- c(&quot;PC1&quot;, &quot;PC2&quot;, &quot;PC3&quot;)
+plot.data = plot.data[rownames(plot.data) %in% m.merge$SampleID,]</code></pre>
+<pre class="r"><code>library(glue)
+pca = plot.data %&gt;% 
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(m.merge, by = &quot;SampleID&quot;) %&gt;%
+ # dplyr::filter(Dataset != &quot;Ramaker&quot;) %&gt;%
+  ggplot(aes(x = PC1, y = PC2, color = Dataset, shape = Period, alpha = Dataset)) +
+    geom_point(size =5) + 
+  scale_color_manual(values =c(&quot;Brainseq&quot; =&quot;#F1605F&quot;,
+                               &quot;BrainSpan&quot; = &quot;#49215F&quot;, 
+                               &quot;GTEx&quot; = &quot;#7DA1D4&quot;, 
+                               &quot;HBDR&quot; = &quot;#E11F28&quot;, 
+                               &quot;PsychEncode&quot; = &quot;#FAAD79&quot;)) +
+  theme_bw() + 
+   labs(
+    x = glue(&quot;PC1 ({percent(pca$sdev[[1]]^2 / sum(pca$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pca$sdev[[2]]^2 / sum(pca$sdev^2), 0.1)})&quot;),
+    colour = &quot;Dataset&quot;,
+    shape = &quot;Period&quot;
+  ) + scale_alpha_manual(values = c(&quot;Brainseq&quot; = 0.45, 
+                                    &quot;BrainSpan&quot; = 0.65, 
+                                    &quot;GTEx&quot; = 0.65,
+                                    &quot;HBDR&quot; = 1, 
+                                    &quot;PsychEncode&quot; = 0.65)) +
+  theme(axis.text = element_text(size=12)) + scale_shape_manual(values = c(&quot;Postnatal&quot; =0, 
+                                                                           &quot;Prenatal&quot; = 19))
+
+pca </code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca, 
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/all-data.png&quot;), 
+#        height = 6, 
+#        width = 8, 
+#        units = &quot;in&quot;, 
+#        dpi = 1200)</code></pre>
+<pre class="r"><code>plot.data  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(m.merge) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3, 
+        Period, 
+        Regions, 
+        Dataset, 
+        Sex
+    ) %&gt;% 
+  drop_na(Regions) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)), 
+          Dataset = as.numeric(as.factor(Dataset)), 
+          Sex = as.numeric(as.factor(Sex))) %&gt;%
+    cor() %&gt;% 
+    corrplot(
+        type = &quot;lower&quot;, 
+        diag = FALSE, 
+        addCoef.col = 1)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="clustering-within-each-individual-dataset"
+class="section level2">
+<h2>Clustering within each individual dataset</h2>
+<p>To investigate if these clustering trends observed above are
+maintained within individual datasets, I determined the primary drivers
+of variation for each dataset seperately.</p>
+<div id="brainseq" class="section level3">
+<h3>BrainSeq</h3>
+<pre class="r"><code>pc = log(seq + 0.05) %&gt;% 
+  t() %&gt;% 
+   prcomp(scale = TRUE)</code></pre>
+<pre class="r"><code>pca_bseq =pc$x %&gt;% 
+  as.data.frame() %&gt;%
+  dplyr::select(PC1, PC2, PC3) %&gt;%
+   rownames_to_column(&quot;SampleID&quot;) %&gt;% 
+  left_join(md$BSeq, by = &quot;SampleID&quot;) %&gt;%
+ # pivot_wider(names_from = &quot;PC&quot;, names_prefix = &quot;PC&quot;, values_from = &quot;value&quot;) %&gt;% 
+  ggplot(aes(PC1, PC2)
+    
+  ) +
+  geom_point(aes(colour = mito_ratio, shape = Period),size=5) + 
+  theme_bw()+ theme(legend.position = &quot;top&quot;) + 
+  scale_color_gradient2(low = &quot;#ffaf7b&quot;, 
+                       mid = &quot;#d76d77&quot;, 
+                       high = &quot;#3a1c71&quot;)  + 
+   labs(
+    x = glue(&quot;PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    colour = &quot;Mitochondrial rate&quot;,
+    shape = &quot;Period&quot;,title = &quot;BrainSeq&quot;
+  ) + theme(axis.text = element_text(size=12, colour = &quot;black&quot;, family = &quot;serif&quot;), 
+            axis.title = element_text(size=15, family = &quot;serif&quot;), 
+            legend.box.background = element_rect(color = &quot;black&quot;),
+            legend.text = element_text(family = &quot;serif&quot;), 
+            legend.title = element_text( family = &quot;serif&quot;),
+            plot.title = element_text(family = &quot;serif&quot;, size =20)) 
+ 
+
+pca_bseq</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca_bseq,
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/BrainSeq/BrainSeq-PCA-mitoR.png&quot;), 
+#         height = 6, 
+#        width = 8, 
+#        units = &quot;in&quot;,
+#        dpi=1200)</code></pre>
+<pre class="r"><code> cor.bseq.test =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSeq) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        mito_ratio,
+        rRNA_ratio, 
+        RIN, 
+        TotalNReads, 
+        MappingRate, 
+        Period, 
+        AgeInterval,
+        Diagnosis,
+        Sex, 
+        DonorID,
+        Regions,
+        Neurons,
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia,
+        Endothelia
+        
+    ) %&gt;% 
+  drop_na(Regions) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          AgeInterval = as.numeric(as.factor(AgeInterval))) %&gt;%
+    cor.mtest()
+
+ cor.bseq =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSeq) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        mito_ratio,
+        rRNA_ratio, 
+        RIN, 
+        TotalNReads, 
+        MappingRate, 
+        Period, 
+        AgeInterval,
+        Diagnosis,
+        Sex, 
+        DonorID,
+        Regions,
+        Neurons,
+        Astrocytes, 
+        Oligodendrocytes, 
+        Microglia,
+        Endothelia
+        
+    ) %&gt;% 
+  drop_na(Regions) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)), 
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)), 
+          DonorID = as.numeric(as.factor(DonorID)), 
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          AgeInterval = as.numeric(as.factor(AgeInterval))) %&gt;%
+    cor()
+
+corrplot(cor.bseq, p.mat =cor.bseq.test$p, method = &#39;color&#39;, diag = FALSE, type = &#39;upper&#39;,
+         sig.level = c(0.05), pch.cex = 0.9,
+         insig = &#39;label_sig&#39;, pch.col = &#39;grey20&#39;, order = &#39;AOE&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cor.bseq = cor.bseq[-c(1:3),]
+cor.bseq = cor.bseq[,c(1:3)]
+cor.bseq.test$p = cor.bseq.test$p[-c(1:3),]
+cor.bseq.test$p = cor.bseq.test$p[,c(1:3)]
+cor.bseq %&gt;% corrplot(
+        method = &#39;color&#39;,
+        p.mat =cor.bseq.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = &#39;label_sig&#39;, pch.col = &#39;black&#39;, cl.pos = &#39;n&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="brainspan" class="section level3">
+<h3>BrainSpan</h3>
+<pre class="r"><code>pc = log(span + 0.05) %&gt;%
+  t() %&gt;%
+   prcomp(scale = TRUE)</code></pre>
+<pre class="r"><code>pca_bspan  = pc$x %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC1, PC2, PC3) %&gt;%
+   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSpan, by = &quot;SampleID&quot;) %&gt;%
+ # pivot_wider(names_from = &quot;PC&quot;, names_prefix = &quot;PC&quot;, values_from = &quot;value&quot;) %&gt;%
+  ggplot(aes(PC1, PC2)
+
+  ) +
+  geom_point(aes(colour = Regions, shape = Period),size=6) +
+  theme_bw()+ theme(legend.position = &quot;top&quot;) +
+  scale_color_manual(values= c(&quot;Cerebellum&quot; = &quot;#FFD256&quot;,
+                                           &quot;Subcortex&quot; = &quot;#838DE0&quot;,
+                                          &quot;Cortex&quot; = &quot;#E85571&quot;)) +
+   labs(
+    x = glue(&quot;PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    colour = &quot;Regions&quot;,
+    shape = &quot;Period&quot;, title = &quot;BrainSpan&quot;
+  ) + theme(axis.text = element_text(size=12, colour = &quot;black&quot;, family = &quot;serif&quot;),
+            axis.title = element_text(size=15, family = &quot;serif&quot;),
+            legend.box.background = element_rect(color = &quot;black&quot;),
+            legend.text = element_text(family = &quot;serif&quot;),
+            legend.title = element_text( family = &quot;serif&quot;),
+            plot.title = element_text(family = &quot;serif&quot;, size =20))
+
+pca_bspan</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca_bspan,
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/BrainSpan/BrainSpan-PCA.png&quot;),
+#         height = 6,
+#        width = 8,
+#        units = &quot;in&quot;,
+#        dpi=1200)</code></pre>
+<pre class="r"><code> pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSpan) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Period,
+        AgeInterval,
+        DonorID,
+        Regions,
+        Sex,
+        RIN,
+       PMI,
+        pH,
+      Dissectionscore
+    ) %&gt;%
+  drop_na(RIN, pH) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)),
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %&gt;%
+    cor() %&gt;%
+    corrplot(
+        type = &quot;lower&quot;,
+        diag = FALSE,
+        addCoef.col = 1,
+        number.cex = 0.75)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/04-variation-drivers.Rmd/unnamed-chunk-18-1.png" alt="Correlation" width="672" />
+<p class="caption">
+Correlation
+</p>
+</div>
+<pre class="r"><code>cor.bspan =   pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSpan) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Period,
+        PMI,
+        RIN,
+        pH,
+        Dissectionscore,
+        DonorID,
+        AgeInterval,
+        Sex,
+        Regions,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia) %&gt;%
+  drop_na(RIN, pH) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)),
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %&gt;%
+    cor()
+
+cor.bspan.test = pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$BSpan) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        Period,
+        PMI,
+        RIN,
+        pH,
+        Dissectionscore,
+        DonorID,
+        AgeInterval,
+        Sex,
+        Regions,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia) %&gt;%
+  drop_na(RIN, pH) %&gt;%
+   mutate(Period = as.numeric(as.factor(Period)),
+          Regions = as.numeric(as.factor(Regions)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          AgeInterval= as.numeric(as.factor(AgeInterval))) %&gt;%
+    cor.mtest()
+
+
+cor.bspan = cor.bspan[-c(1:3),]
+cor.bspan = cor.bspan[,c(1:3)]
+cor.bspan.test$p = cor.bspan.test$p[-c(1:3),]
+cor.bspan.test$p = cor.bspan.test$p[,c(1:3)]
+cor.bspan %&gt;% corrplot(
+        method = &#39;color&#39;,
+        p.mat =cor.bspan.test$p,
+         sig.level = c(0.05), pch.cex = 1.5, pch.col = &#39;black&#39;, cl.pos = &#39;n&#39;,
+         insig = &#39;label_sig&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gtex" class="section level3">
+<h3>GTEx</h3>
+<pre class="r"><code>pc = log(gtex + 0.05) %&gt;%
+  t() %&gt;%
+   prcomp(scale = TRUE)</code></pre>
+<pre class="r"><code>pca_gtex = pc$x %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC1, PC2, PC3) %&gt;%
+   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$GTEx, by = &quot;SampleID&quot;) %&gt;%
+ # pivot_wider(names_from = &quot;PC&quot;, names_prefix = &quot;PC&quot;, values_from = &quot;value&quot;) %&gt;%
+  ggplot(aes(PC1, PC2)
+
+  ) +
+  geom_point(aes(colour = as.numeric(rRNA_ratio), shape = Regions, alpha = Regions),size=5) +
+  theme_bw()+ theme(legend.position = &quot;top&quot;) +
+  scale_color_gradient(low = &quot;#EECDA3&quot;,
+
+                       high = &quot;#ef629f&quot;)  +
+  scale_shape_manual(values = c(&quot;Cerebellum&quot; =15,
+                                &quot;Spinal Cord&quot; = 0,
+                                &quot;Cortex&quot; = 17,
+                                &quot;Subcortex&quot; = 19)) +
+  scale_alpha_manual(values = c(&quot;Cerebellum&quot; =1,
+                                &quot;Spinal Cord&quot; = 1,
+                                &quot;Cortex&quot; = 0.5,
+                                &quot;Subcortex&quot; = 0.5)) +
+   labs(
+    x = glue(&quot;PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    color = &quot;rRNA rate&quot;,
+    shape = &quot;Regions&quot;, title = &quot;GTEx&quot;
+  ) +theme(axis.text = element_text(size=12, colour = &quot;black&quot;, family = &quot;serif&quot;),
+            axis.title = element_text(size=15, family = &quot;serif&quot;),
+            legend.box.background = element_rect(color = &quot;black&quot;),
+            legend.text = element_text(family = &quot;serif&quot;),
+            legend.title = element_text( family = &quot;serif&quot;),
+            plot.title = element_text(family = &quot;serif&quot;, size =20))
+
+pca_gtex</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca_gtex ,
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/GTEx/GTEx-PCA-rRNA.png&quot;),
+#         height = 6,
+#        width = 8,
+#        units = &quot;in&quot;,
+#        dpi=1200)</code></pre>
+<pre class="r"><code>cor.gtex = pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$GTEx) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        rRNA_ratio,
+        ExonicRate,
+        IntronicRate,
+        TotalNReads,
+        MappingRate,
+        SequencingBatch,
+        BSS_Collection_side_code,
+        RIN,
+        PMI,
+        Sex,
+        DonorID,
+        HardyScale,
+        AgeInterval,
+        Regions,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia
+
+    ) %&gt;%
+  drop_na(Regions) %&gt;%
+   mutate(RIN = as.numeric(as.factor(RIN)),
+          TotalNReads = as.numeric(as.factor(TotalNReads)),
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          rRNA_ratio = as.numeric(as.factor(rRNA_ratio)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch)),
+          BSS_Collection_side_code =  as.numeric(as.factor(SequencingBatch))) %&gt;%
+    cor()
+
+
+cor.gtex.test = pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$GTEx) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        rRNA_ratio,
+        ExonicRate,
+        IntronicRate,
+        TotalNReads,
+        MappingRate,
+        SequencingBatch,
+        BSS_Collection_side_code,
+        RIN,
+        PMI,
+        Sex,
+        DonorID,
+        HardyScale,
+        AgeInterval,
+        Regions,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia
+
+    ) %&gt;%
+  drop_na(Regions) %&gt;%
+   mutate(RIN = as.numeric(as.factor(RIN)),
+          TotalNReads = as.numeric(as.factor(TotalNReads)),
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          rRNA_ratio = as.numeric(as.factor(rRNA_ratio)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch)),
+          BSS_Collection_side_code =  as.numeric(as.factor(SequencingBatch))) %&gt;%
+    cor.mtest()
+
+cor.gtex = cor.gtex[-c(1:3),]
+cor.gtex = cor.gtex[,c(1:3)]
+cor.gtex.test$p = cor.gtex.test$p[-c(1:3),]
+cor.gtex.test$p = cor.gtex.test$p[,c(1:3)]
+cor.gtex %&gt;% corrplot(
+        method = &#39;color&#39;,
+        p.mat =cor.gtex.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+         insig = &#39;label_sig&#39;, pch.col = &#39;black&#39;, cl.pos = &#39;n&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hdbr" class="section level3">
+<h3>HDBR</h3>
+<pre class="r"><code>pc = log(hdbr + 0.05) %&gt;%
+  t() %&gt;%
+   prcomp(scale = TRUE)
+
+pca_hdbr = pc$x %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC1, PC2, PC3) %&gt;%
+   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$HDBR, by = &quot;SampleID&quot;) %&gt;%
+ # pivot_wider(names_from = &quot;PC&quot;, names_prefix = &quot;PC&quot;, values_from = &quot;value&quot;) %&gt;%
+  ggplot(aes(PC1, PC2)) +
+  geom_point(aes(colour = IntronicRate, shape = Regions),size=6, alpha = 0.85) +
+  #geom_point(aes(colour = ContributingStudy, shape = Period),size=5) +
+  theme_bw()+ theme(legend.position = &quot;top&quot;)  +
+  scale_color_gradient2(low = &quot;#ffaf7b&quot;,
+                       mid = &quot;#d76d77&quot;,
+                       high = &quot;#3a1c71&quot;) +
+  scale_shape_manual(values = c(&quot;Brain&quot; = 16,
+                                &quot;Forebrain&quot; = 17,
+                                &quot;Chroid plexus&quot; = 2,
+                                &quot;Hindbrain&quot; = 15,
+                                &quot;Midbrain&quot; = 0,
+                                &quot;Spinal Cord&quot; = 6)) +
+   labs(
+    x = glue(&quot;PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    color = &quot;Intronic Rate&quot;,
+    shape = &quot;Regions&quot;, title = &quot;HDBR&quot;
+  ) + theme(axis.text = element_text(size=12, colour = &quot;black&quot;, family = &quot;serif&quot;),
+            axis.title = element_text(size=15, family = &quot;serif&quot;),
+            legend.box.background = element_rect(color = &quot;black&quot;),
+            legend.text = element_text(family = &quot;serif&quot;),
+            legend.title = element_text( family = &quot;serif&quot;),
+            plot.title = element_text(family = &quot;serif&quot;, size =20))
+
+pca_hdbr</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca_hdbr,
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/HDBR/HDBR-PCA-intronicRate.png&quot;),
+#         height = 6,
+#        width = 8,
+#        units = &quot;in&quot;,
+#        dpi=1200)</code></pre>
+<pre class="r"><code>pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$HDBR) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        IntronicRate,
+        MappingRate,
+        AgeInterval,
+        Sex,
+        ExonicRate,
+        DonorID,
+        TotalNReads,
+        Regions,
+        Hemisphere,
+     #   PMI,
+        SequencingBatch) %&gt;%
+  #drop_na(PMI, Regions) %&gt;%
+   mutate(#RIN = as.numeric(as.factor(RIN)),
+          TotalNReads = as.numeric(as.factor(TotalNReads)),
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %&gt;%
+    cor() %&gt;%
+    corrplot(
+        type = &quot;lower&quot;,
+        diag = FALSE,
+        addCoef.col = 1,
+        number.cex = 0.75)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cor.hdbr =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$HDBR) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        IntronicRate,
+        MappingRate,
+        ExonicRate,
+        TotalNReads,
+        SequencingBatch,
+        PMI,
+        Sex,
+        DonorID,
+        AgeInterval,
+        Regions,
+        Hemisphere,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia) %&gt;%
+  drop_na(PMI, Regions) %&gt;%
+   mutate(#RIN = as.numeric(as.factor(RIN)),
+          TotalNReads = as.numeric(as.factor(TotalNReads)),
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %&gt;%
+    cor()
+
+cor.hdbr.test =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$HDBR) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        IntronicRate,
+        MappingRate,
+        ExonicRate,
+        TotalNReads,
+        SequencingBatch,
+        PMI,
+        Sex,
+        DonorID,
+        AgeInterval,
+        Regions,
+        Hemisphere,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia) %&gt;%
+  drop_na(PMI, Regions) %&gt;%
+   mutate(#RIN = as.numeric(as.factor(RIN)),
+          TotalNReads = as.numeric(as.factor(TotalNReads)),
+          MappingRate = as.numeric(as.factor(MappingRate)),
+          Regions = as.numeric(as.factor(Regions)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          DonorID = as.numeric(as.factor(DonorID)),
+          Hemisphere = as.numeric(as.factor(Hemisphere)),
+          SequencingBatch = as.numeric(as.factor(SequencingBatch))) %&gt;%
+    cor.mtest()
+cor.hdbr = cor.hdbr[-c(1:3),]
+cor.hdbr = cor.hdbr[,c(1:3)]
+cor.hdbr.test$p = cor.hdbr.test$p[-c(1:3),]
+cor.hdbr.test$p = cor.hdbr.test$p[,c(1:3)]
+cor.hdbr %&gt;% corrplot(
+        method = &#39;color&#39;,
+        p.mat =cor.hdbr.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,pch.col = &#39;black&#39;, cl.pos = &#39;n&#39;,insig = &#39;label_sig&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="psychencode" class="section level3">
+<h3>PsychENCODE</h3>
+<pre class="r"><code>pc = log(pe + 0.05) %&gt;%
+  t() %&gt;%
+   prcomp(scale = TRUE)
+
+
+
+pca_pe  = pc$x %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC1, PC2, PC3) %&gt;%
+   rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$PE, by = &quot;SampleID&quot;) %&gt;%
+ # pivot_wider(names_from = &quot;PC&quot;, names_prefix = &quot;PC&quot;, values_from = &quot;value&quot;) %&gt;%
+  ggplot(aes(PC1, PC2)
+
+  ) +
+  geom_point(aes(colour = ContributingStudy, shape = Period),size=6, alpha = 0.75) +
+  theme_bw()+ theme(legend.position = &quot;top&quot;) +
+   labs(
+    x = glue(&quot;PC1 ({percent(pc$sdev[[1]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    y = glue(&quot;PC2 ({percent(pc$sdev[[2]]^2 / sum(pc$sdev^2), 0.1)})&quot;),
+    color = &quot;Contributing study&quot;, title = &quot;PsychENCODE&quot;
+  ) + theme(axis.text = element_text(size=12, colour = &quot;black&quot;, family = &quot;serif&quot;),
+            axis.title = element_text(size=15, family = &quot;serif&quot;),
+            legend.box.background = element_rect(color = &quot;black&quot;),
+            legend.text = element_text(family = &quot;serif&quot;),
+            legend.title = element_text( family = &quot;serif&quot;),
+            plot.title = element_text(family = &quot;serif&quot;, size =20))
+
+pca_pe</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cor.pe =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$PE) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        individualIDSource,
+        Sex,
+        ContributingStudy,
+        Period,
+        #brainWeight,
+        AgeNumeric,
+        Diagnosis,
+        causeDeath,
+        AgeInterval,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia
+    ) %&gt;%
+  #drop_na(brainWeight) %&gt;%
+   mutate(#RIN = as.numeric(as.factor(RIN)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          individualIDSource = as.numeric(as.factor(individualIDSource)),
+          ContributingStudy = as.numeric(as.factor(ContributingStudy)),
+          Period = as.numeric(as.factor(Period)),
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          causeDeath = as.numeric(as.factor(causeDeath))) %&gt;%
+    cor()
+
+cor.pe.test =pc$x  %&gt;%
+    as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleID&quot;) %&gt;%
+  left_join(md$PE) %&gt;%
+    dplyr::select(
+        PC1, PC2, PC3,
+        individualIDSource,
+        Sex,
+        ContributingStudy,
+        Period,
+        #brainWeight,
+        AgeNumeric,
+        Diagnosis,
+        causeDeath,
+        AgeInterval,
+        Neurons,
+        Astrocytes,
+        Oligodendrocytes,
+        Microglia,
+        Endothelia
+    ) %&gt;%
+  #drop_na(brainWeight) %&gt;%
+   mutate(#RIN = as.numeric(as.factor(RIN)),
+          AgeInterval = as.numeric(as.factor(AgeInterval)),
+          Sex = as.numeric(as.factor(Sex)),
+          individualIDSource = as.numeric(as.factor(individualIDSource)),
+          ContributingStudy = as.numeric(as.factor(ContributingStudy)),
+          Period = as.numeric(as.factor(Period)),
+          Diagnosis = as.numeric(as.factor(Diagnosis)),
+          causeDeath = as.numeric(as.factor(causeDeath))) %&gt;%
+    cor.mtest()
+
+cor.pe = cor.pe[-c(1:3),]
+cor.pe = cor.pe[,c(1:3)]
+cor.pe.test$p = cor.pe.test$p[-c(1:3),]
+cor.pe.test$p = cor.pe.test$p[,c(1:3)]
+cor.pe %&gt;% corrplot(
+        method = &#39;color&#39;,
+        p.mat =cor.pe.test$p,
+         sig.level = c(0.05), pch.cex = 1.5,
+          pch.col = &#39;black&#39;, cl.pos = &#39;n&#39;, insig = &#39;label_sig&#39;)</code></pre>
+<p><img src="figure/04-variation-drivers.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ggsave(pca_pe,
+#        filename = here::here(&quot;output/Thesis_plots/Variance/PCA/PsychEncode/PE-PCA.png&quot;),
+#         height = 6,
+#        width = 8,
+#        units = &quot;in&quot;,
+#        dpi = 1200)</code></pre>
+</div>
+</div>
+<div id="variance-partitioning-analysis" class="section level2">
+<h2>Variance partitioning analysis</h2>
+<p>variancePartition is a statistical and visualization framework which
+fits a linear mixed model for each gene and partitions the total
+variance into the contribution of each variable in the experimental
+design, plus the residual variance. The fractions sum to 1 for each
+gene, the variance fractions are easily interpretable across genes and
+sources of variation.</p>
+<!-- # ```{r} -->
+<!-- # e$Scale <- lapply(e$Raw, scale) # basic z-score columnwise transformation -->
+<!-- # e$Log <- lapply(e$Raw, function(x) { log2(x+0.5) }) # log2 -->
+<!-- # e$Log_Scale <- lapply(e$Log, scale) # log2 followed by scale -->
+<!-- # ``` -->
+<!-- # ```{r} -->
+<!-- # e$Thresh <- lapply(e$Raw, apply.threshold) # this is > 1 unit (TPM in GTEx, RPKM in others) in > 10% of samples -->
+<!-- # e$Thresh_Scale <- lapply(e$Thresh, scale) -->
+<!-- # e$Thresh_Log <- lapply(e$Thresh, function(x) { log2(x+0.5) }) -->
+<!-- # e$Thresh_Log_Scale <- lapply(e$Log, scale) -->
+<!-- # ``` -->
+<!-- ```{r} -->
+<!-- ## Histogram of median expression -->
+<!--   # collect median expression values across samples for every dataset -->
+<!-- #p <- lapply(e, function(x) { -->
+<!-- #    # lapply(x, rowMeans) -->
+<!--  #   lapply(x, function(y) { -->
+<!--  #     apply(y, 1, median) -->
+<!-- #    }) -->
+<!-- #  }) -->
+<!-- p <- lapply(e, function(x) { -->
+<!--     # lapply(x, rowMeans) -->
+<!--     lapply(x, function(y) { -->
+<!--       apply(y, 1, mean) -->
+<!--     }) -->
+<!--   }) -->
+<!-- p <- melt(p) -->
+<!-- colnames(p) <- c("MeanExp", "Dataset", "Transform") -->
+<!-- p$Dataset <- factor(p$Dataset) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- # move thresholding category to a separate column -->
+<!-- p$Thresh <- FALSE; -->
+<!-- p$Thresh[grep("Thresh", p$Transform)] <- TRUE -->
+<!-- p$Transform <- gsub("Thresh_", "", p$Transform) -->
+<!-- p$Transform[which(p$Transform == "Thresh")] <- "Raw" -->
+<!-- p$Transform <- factor(p$Transform, levels = c("Raw", "Log", "Scale", "Log_Scale")) -->
+<!--   # ...and to separate dataframes -->
+<!-- t <- p[which(p$Thresh),] -->
+<!-- x <- table(t$Dataset) / 4 # this gets the number of genes in each dataset (divisor is 4 as each gene is represented by 4 transformations) -->
+<!-- levels(t$Dataset) <- paste0(names(x), " (n=", x, ")") -->
+<!-- p2 <- p[-which(p$Thresh),] -->
+<!-- x <- table(p$Dataset) / 4 # this gets the number of genes in each dataset (divisor is 4 as each gene is represented by 4 transformations) -->
+<!-- levels(p$Dataset) <- paste0(names(x), " (n=", x, ")") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- no_filt =p %>%  -->
+<!--   dplyr::filter(Transform == "Log" | Transform ==  -->
+<!--                   "Log_Scale") %>% -->
+<!--   ggplot(aes(x = MeanExp, colour = Dataset)) + -->
+<!--    scale_color_manual(values = c("#F75E5E",  -->
+<!--                                  "#49165E", -->
+<!--                                 "#78A2EB",  -->
+<!--                                "#E11F28",  -->
+<!--                                  "#F9AD79"),  -->
+<!--                       labels =c("BrainSeq",  -->
+<!--                                 "BrainSpan",  -->
+<!--                                 "PsychENCODE",  -->
+<!--                                 "GTEx",  -->
+<!--                                 "HDBR")) + -->
+<!--     geom_density() + -->
+<!--     # geom_histogram() + -->
+<!--     facet_wrap(~Transform, scales = "free") + -->
+<!--     theme_bw() + -->
+<!--     labs(y = "Density", x = "Mean Expression Across Samples")  +  -->
+<!--     theme(axis.text.x = element_text(size = 13, family = "serif", color = "black", angle = 90), -->
+<!--         axis.text.y = element_text(size = 13, family = "serif", color = "black"),  -->
+<!--         axis.title = element_text(size=15, family = "serif"),  -->
+<!--          legend.box.background = element_rect(color = "black"), -->
+<!--           legend.text = element_text(family = "serif"),  -->
+<!--           legend.title = element_text( family = "serif"), -->
+<!--            plot.title = element_text(family = "serif", size =20),          -->
+<!--         panel.grid.major.x = element_blank(), -->
+<!--         panel.grid.major.y = element_line( size=.1 ), -->
+<!--               legend.position = "top")   -->
+<!-- no_filt -->
+<!-- #ggsave(filename = here::here("output/Thesis_plots/Attributes/exp.svg"),  -->
+<!--  #      height = 6, width =12, units = "in", plot = no_filt) -->
+<!-- ``` -->
+<!-- # ```{r} -->
+<!-- # filt =ggplot(t, aes(x = MeanExp, colour = Dataset)) + -->
+<!-- #   scale_color_manual(values = c("#F75E5E",  -->
+<!-- #                                  "#49165E", -->
+<!-- #                                 "#78A2EB",  -->
+<!-- #                                "#E11F28",  -->
+<!-- #                                  "#F9AD79",  -->
+<!-- #                                  "#74C69D")) + -->
+<!-- #     geom_density() + -->
+<!-- #     # geom_histogram() + -->
+<!-- #     facet_wrap(~Transform, scales = "free") + -->
+<!-- #     theme_bw() + -->
+<!-- #     labs(y = "Density", x = "Median Expression Across Samples", title = ">1 RPKM in 10% of Samples") -->
+<!-- #  -->
+<!-- # filt -->
+<!-- # ``` -->
+<!-- # ```{r} -->
+<!-- # ## Correspondence -->
+<!-- #   p <- lapply(e[c(1,4,5,8)], function(x) { -->
+<!-- #     lapply(x, function(y) { -->
+<!-- #       apply(y, 1, median) -->
+<!-- #     }) -->
+<!-- #   }) -->
+<!-- #    -->
+<!-- # q <- list() -->
+<!-- # q$Thresh <- q$Raw <- list() -->
+<!-- # for (j in names(e$Raw)) { -->
+<!-- #     q$Raw[[j]] <- cbind(p$Raw[[j]], p$Log_Scale[[j]]) -->
+<!-- #     q$Thresh[[j]] <- cbind(p$Thresh[[j]], p$Thresh_Log_Scale[[j]]) -->
+<!-- #   } -->
+<!-- #    -->
+<!-- # scatterplot <- function(x, y, lim = 100) { # x is Raw/Thresh, y is dataset -->
+<!-- #     z <- q[[x]][[y]] -->
+<!-- #      -->
+<!-- #     # filter to set limit -->
+<!-- #     rem <- (which(z[,1] > lim)) -->
+<!-- #     z <- z[-rem,] -->
+<!-- #      -->
+<!-- #     # calculate correspondences -->
+<!-- #     at1 <- round(z[which.min(abs(z[,1] - 1)), 2],2) -->
+<!-- #     at10 <- round(z[which.min(abs(z[,1] - 10)), 2],2) -->
+<!-- #     at25 <- round(z[which.min(abs(z[,1] - 25)), 2],2) -->
+<!-- #     at100 <- round(z[which.min(abs(z[,1] - 100)), 2],2) -->
+<!-- #     at <- paste(at1, at10, at25, at100, sep = "/") -->
+<!-- #      -->
+<!-- #     qplot(z[,1], z[,2]) + -->
+<!-- #       theme_bw() + -->
+<!-- #       scale_x_continuous(limits = c(NA, lim)) + -->
+<!-- #       # theme(axis.title.x = element_blank(), axis.ti) -->
+<!-- #       labs(x = paste0("Untransformed RPKM/TPM", "\nx=1/10/25/100 | y=", at),  -->
+<!-- #            y = "Scaled log2+0.5",  -->
+<!-- #            title = paste(x, y, "(n=", nrow(z), ",", length(rem), "not shown)"))  -->
+<!-- #   } -->
+<!-- #    -->
+<!-- # p <- list() -->
+<!-- #  -->
+<!-- # ``` -->
+<!-- # ````{r} -->
+<!-- # p <- list() -->
+<!-- # p$AR <- scatterplot("Raw", "PE") -->
+<!-- # p$AT <- scatterplot("Thresh", "PE") -->
+<!-- # p$BR <- scatterplot("Raw", "BSpan") -->
+<!-- # p$BT <- scatterplot("Thresh", "BSpan") -->
+<!-- # p$CR <- scatterplot("Raw", "BSeq") -->
+<!-- # p$CT <- scatterplot("Thresh", "BSeq") -->
+<!-- # p$DR <- scatterplot("Raw", "GTEx") -->
+<!-- # p$DT <- scatterplot("Thresh", "GTEx") -->
+<!-- # #p$ER <- scatter_plot("Raw", "Ram") -->
+<!-- # #p$EL <- scatter_plot("Thresh", "Ram") -->
+<!-- # #p$FR <- scatter_plot("Raw", "HDBR") -->
+<!-- # #p$FL <- scatter_plot("Thresh", "HDBR") -->
+<!-- # ``` -->
+<p>–&gt;
+<!-- # form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) + Neurons + Astrocytes + Oligodendrocytes + Endothelia + Microglia -->
+<!-- # C.bseq = canCorPairs(form.bseq, md$BSeq) -->
+<!-- # plotCorrMatrix( C.bseq ) --> <!-- # ``` --></p>
+<!-- # ```{r} -->
+<!-- # form.bseq <- ~ AgeNumeric + (1|Regions) + (1|Sex) + RIN +  (1|Diagnosis) + mito_ratio + rRNA_ratio + TotalNReads + MappingRate +  (1|Period) + Neurons + Astrocytes + Oligodendrocytes + Endothelia -->
+<!-- #  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # rownames(md$BSeq) = md$BSeq$SampleID -->
+<!-- # varPar.bseq <- fitExtractVarPartModel(seq, form.bseq, md$BSeq) -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # varPar.bseq  = sortCols(varPar.bseq ) -->
+<!-- # plotVarPart(varPar.bseq ) -->
+<!-- # write.csv(varPar.bseq , file="/home/neuro/Documents/BrainData/Bulk/Brainseq/Formatted/BrainSeq-varPart-all.csv") -->
+<!-- # ``` -->
+<!-- The correlation plot reveals that many of the selected covariates do not correlate highly within their respective category, and therefore we will feed these into the mixed linear model.  -->
+<!-- <!-- Variance partition  -->
+<p>–&gt;</p>
+<!-- <!-- ```{r} -->
+<p>–&gt;
+<!-- <!-- form.bspan <- ~ AgeNumeric + (1|Sex) + (1|Period) + (1|Regions) + RIN +  pH + PMI + DonorID + Dissectionscore  + -->
+–&gt;
+<!-- <!--   Neurons + Astrocytes + Oligodendrocytes  + Endothelia -->
+–&gt; <!-- <!-- C.bspan = canCorPairs(form.bspan, md$BSpan) --> –&gt;
+<!-- <!-- plotCorrMatrix( C.bspan ) --> –&gt; <!-- <!-- ``` -->
+–&gt;</p>
+<!-- <!-- ```{r} -->
+<p>–&gt;
+<!-- <!-- varPar.bspan <- fitExtractVarPartModel(span,form.bspan ,md$BSpan) -->
+–&gt; <!-- <!-- varPar.bspan = sortCols(varPar.bspan) --> –&gt;
+<!-- <!-- plot_varPart = plotVarPart(varPar.bspan) --> –&gt;
+<!-- <!-- ``` --> –&gt;</p>
+<!-- <!-- # ```{r} -->
+<p>–&gt;
+<!-- <!-- # write.csv(varPar.bspan, file="/home/neuro/Documents/BrainData/Bulk/BrainSpan/Formatted/BrainSpan-varPart-all.csv") -->
+–&gt; <!-- <!-- # ``` --> –&gt;</p>
+<!-- ```{r} -->
+<!-- gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate + IntronicRate + Neurons + Astrocytes + Oligodendrocytes + Microglia + Endothelia -->
+<!-- C.gtex = canCorPairs(gtex.form, md$GTEx) -->
+<!-- plotCorrMatrix(C.gtex) -->
+<!-- ``` -->
+<!-- <!-- # ```{r} -->
+<p>–&gt;
+<!-- <!-- # gtex.form <- ~ TotalNReads + rRNA_ratio + (1|TypeofBatch)  + (1|AgeInterval) + (1|Sex) + (1|Regions) + RIN + HardyScale + PMI + MappingRate + PMI + ExonicRate +  Neurons + Astrocytes + Oligodendrocytes +  Endothelia -->
+–&gt; <!-- <!-- #  --> –&gt;
+<!-- <!-- # varPar.gtex <- fitExtractVarPartModel(gtex,gtex.form ,md$GTEx) -->
+–&gt; <!-- <!-- # ``` --> –&gt; <!-- <!-- #  --> –&gt;
+<!-- <!-- # ```{r} --> –&gt;
+<!-- <!-- # varPar.gtex = sortCols(varPar.gtex) --> –&gt;
+<!-- <!-- # plot_varPart = plotVarPart(varPar.gtex) --> –&gt;
+<!-- <!-- # ``` --> –&gt; <!-- <!-- #  --> –&gt; <!-- <!-- # ```{r} -->
+–&gt;
+<!-- <!-- # write.csv(varPar.gtex,"/home/neuro/Documents/BrainData/Bulk/GTEx/Formatted/GTEx-varPart-all.csv") -->
+–&gt; <!-- <!-- # ``` --> –&gt;</p>
+<!-- - PyschEncode -->
+<!-- ```{r fig.height =5, fig.width=5, fig.cap="*Assessing correlation between covariates of interest from the PsychEncode data*"} -->
+<!-- pe.form <- ~ (1|Sex) + (1|Diagnosis) + AgeNumeric + (1|Ethnicity) +  -->
+<!--   (1|Period) + (1|individualIDSource) + (1|Death) +  Neurons + Astrocytes + Oligodendrocytes + Endothelia -->
+<!-- C.pe = canCorPairs(pe.form, md$PE) -->
+<!-- plotCorrMatrix(C.pe) -->
+<!-- ``` -->
+<!-- <!-- ```{r} -->
+<p>–&gt; <!-- <!-- md$PE= md$PE[!duplicated(md$PE[,c('SampleID')]),] -->
+–&gt;
+<!-- <!-- varPar.pe <- fitExtractVarPartModel(pe, pe.form, md$PE) -->
+–&gt;</p>
+<!-- <!-- ``` -->
+<p>–&gt;</p>
+<!-- <!-- ```{r} -->
+<p>–&gt; <!-- <!-- varPar.pe = sortCols(varPar.pe) --> –&gt;
+<!-- <!-- plot_varPart = plotVarPart(varPar.pe) --> –&gt;
+<!-- <!-- ``` --> –&gt;</p>
+<!-- <!-- ```{r} -->
+<p>–&gt;
+<!-- <!-- write.csv(varPar.pe,"/home/neuro/Documents/BrainData/Bulk/PsychEncode/Formatted/PsychEncode-varPart-all.csv") -->
+–&gt; <!-- <!-- ``` --> –&gt;</p>
+<!-- - HDBR -->
+<!-- ```{r} -->
+<!-- form.hdbr <- ~(1|Sex) + (1|Hemisphere) + (1|SequencingBatch)+  TotalNReads + MappingRate + (1|Regions) + PMI + DonorID + ExonicRate + IntronicRate + (1|AgeInterval) +  Neurons + Astrocytes + Oligodendrocytes + Endothelia -->
+<!-- C.hdbr = canCorPairs(form.hdbr, md$HDBR) -->
+<!-- plotCorrMatrix(C.hdbr) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- varPar.hdbr <- fitExtractVarPartModel(hdbr,form.hdbr ,md$HDBR) -->
+<!-- varPar.hdbr = sortCols(varPar.hdbr) -->
+<!-- hdbr.varpart =plot_varPart = plotVarPart(varPar.hdbr) -->
+<!-- write.csv(varPar.hdbr , file = "/home/neuro/Documents/BrainData/Bulk/HDBR/Formatted/HDBR-varPart-all.csv") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- pdf(file = here::here("output/Thesis_plots/Variance/PCA/alll-pca-plots.pdf"), -->
+<!--     height =20, width = 15) -->
+<!-- grid.arrange(pca_bseq, pca_bspan, -->
+<!--              pca_gtex, pca_hdbr, -->
+<!--             pca_pe, ncol=2, nrow=3) -->
+<!-- dev.off() -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- ggarrange(plotCorrMatrix(C.hdbr), plotCorrMatrix(C.gtex)) -->
+<!-- ``` -->
+<!-- ## Determining the utlity of factors of unwanted variation -->
+<!-- ```{r} -->
+<!-- var_part = list() -->
+<!-- var_part$BSpan = read.csv(file.path(brain.dir,"/BrainSpan/Formatted/BrainSpan-varPart-all.csv"), header=TRUE, -->
+<!--                                     row.names =1)  %>% -->
+<!--     as.data.frame() %>% -->
+<!--     rownames_to_column("EnsemblID") %>% -->
+<!--     left_join(gene2symbol, by = "EnsemblID") -->
+<!-- var_part$BSeq = read.csv(file.path(brain.dir,"/Brainseq/Formatted/BrainSeq-varPart-all.csv"), -->
+<!--                                    header=TRUE, row.names=1) %>% -->
+<!--     as.data.frame() %>% -->
+<!--     rownames_to_column("EnsemblID") %>% -->
+<!--     left_join(gene2symbol, by = "EnsemblID") -->
+<!-- var_part$GTEx = read.csv(file.path(brain.dir,"/GTEx/Formatted/GTEx-varPart-all.csv"), header=TRUE, -->
+<!--                                    row.names=1) %>% -->
+<!--     as.data.frame() %>% -->
+<!--     rownames_to_column("EnsemblID") %>% -->
+<!--     left_join(gene2symbol, by = "EnsemblID") -->
+<!-- var_part$HDBR = read.csv(file.path(brain.dir,"/HDBR/Formatted/HDBR-varPart-all.csv"), header=TRUE, -->
+<!--                                    row.names=1) %>% -->
+<!--     as.data.frame() %>% -->
+<!--     rownames_to_column("EnsemblID") %>% -->
+<!--     left_join(gene2symbol, by = "EnsemblID") -->
+<!-- var_part$PE = read.csv(file.path(brain.dir,"/PsychEncode/Formatted/PsychEncode-varPart-all.csv"), header=TRUE, -->
+<!--                                    row.names=1) %>% -->
+<!--     as.data.frame() %>% -->
+<!--     rownames_to_column("EnsemblID") %>% -->
+<!--     left_join(gene2symbol, by = "EnsemblID") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- bspan =var_part$BSpan %>% dplyr::select(-gene_name) %>% -->
+<!--   column_to_rownames("EnsemblID") %>% -->
+<!-- plotVarPart() + ggtitle("BrainSpan") + ylab("Variance Explained (%)") + -->
+<!--   theme(axis.text = element_text(size=12, family = "serif"), -->
+<!--         axis.title = element_text(size=12,family = "serif"), -->
+<!--         plot.title = element_text(hjust = 0, size = 15, family = "serif")) -->
+<!-- bseq =var_part$BSeq %>% dplyr::select(-gene_name) %>% -->
+<!--   column_to_rownames("EnsemblID") %>% -->
+<!-- plotVarPart() + ggtitle("BrainSeq") + ylab("Variance Explained (%)") + -->
+<!--   theme(axis.text = element_text(size=12, family = "serif"), -->
+<!--         axis.title = element_text(size=12,family = "serif"), -->
+<!--         plot.title = element_text(hjust = 0, size = 15, family = "serif")) -->
+<!-- gtex  =var_part$GTEx %>% dplyr::select(-gene_name) %>% -->
+<!--   column_to_rownames("EnsemblID") %>% -->
+<!-- plotVarPart() + ggtitle("GTEx") + ylab("Variance Explained (%)") + -->
+<!--   theme(axis.text = element_text(size=12, family = "serif"), -->
+<!--         axis.title = element_text(size=12,family = "serif"), -->
+<!--         plot.title = element_text(hjust = 0, size = 15, family = "serif")) -->
+<!-- hdbr  =var_part$HDBR %>% dplyr::select(-gene_name) %>% -->
+<!--   column_to_rownames("EnsemblID") %>% -->
+<!-- plotVarPart() + ggtitle("HDBR") + ylab("Variance Explained (%)") + -->
+<!--   theme(axis.text = element_text(size=12, family = "serif"), -->
+<!--         axis.title = element_text(size=12,family = "serif"), -->
+<!--         plot.title = element_text(hjust = 0, size = 15, family = "serif")) -->
+<!-- pe  =var_part$PE %>% dplyr::select(-gene_name) %>% -->
+<!--   column_to_rownames("EnsemblID") %>% -->
+<!-- plotVarPart() + ggtitle("PsychENCODE") + ylab("Variance Explained (%)") + -->
+<!--   theme(axis.text = element_text(size=12, family = "serif"), -->
+<!--         axis.title = element_text(size=12,family = "serif"), -->
+<!--         plot.title = element_text(hjust = 0, size = 15, family = "serif")) -->
+<!-- pdf(file = here::here("output/Thesis_plots/Variance/PCA/varpart-all-update2.pdf"), height =20, width = 15) -->
+<!-- grid.arrange(bseq, bspan, -->
+<!--              gtex, hdbr, -->
+<!--              pe, ncol=2, nrow=3) -->
+<!-- dev.off() -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- median(var_part$BSeq$Sex) * 100 -->
+<!-- ``` -->
+<!-- # ```{r} -->
+<!-- # upf1_1 = var_part$BSpan %>%  -->
+<!-- #   dplyr::filter(gene_name == "UPF1") %>% -->
+<!-- #   dplyr::select(-gene_name) %>%  -->
+<!-- #   column_to_rownames("EnsemblID") %>%  -->
+<!-- #   melt()  %>%  -->
+<!-- #   ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") + -->
+<!-- #   coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("UPF1 - BrainSpan") + -->
+<!-- #      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90), -->
+<!-- #         axis.text.y = element_text(size = 15, family = "serif", color = "black"),  -->
+<!-- #         axis.title = element_text(size=15, family = "serif"),  -->
+<!-- #          legend.box.background = element_rect(color = "black"), -->
+<!-- #           legend.text = element_text(family = "serif"),  -->
+<!-- #           legend.title = element_text( family = "serif"), -->
+<!-- #            plot.title = element_text(family = "serif", size =20),          -->
+<!-- #         panel.grid.major.x = element_blank(), -->
+<!-- #         panel.grid.major.y = element_line( size=.1 ))  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # fmr1_1 = var_part$BSpan %>%  -->
+<!-- #   dplyr::filter(gene_name == "FMR1") %>% -->
+<!-- #   dplyr::select(-gene_name) %>%  -->
+<!-- #   column_to_rownames("EnsemblID") %>%  -->
+<!-- #   melt()  %>%  -->
+<!-- #   ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") + -->
+<!-- #   coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("FMR1 - BrainSpan") + -->
+<!-- #      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90), -->
+<!-- #         axis.text.y = element_text(size = 15, family = "serif", color = "black"),  -->
+<!-- #         axis.title = element_text(size=15, family = "serif"),  -->
+<!-- #          legend.box.background = element_rect(color = "black"), -->
+<!-- #           legend.text = element_text(family = "serif"),  -->
+<!-- #           legend.title = element_text( family = "serif"), -->
+<!-- #            plot.title = element_text(family = "serif", size =20),          -->
+<!-- #         panel.grid.major.x = element_blank(), -->
+<!-- #         panel.grid.major.y = element_line( size=.1 ))  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # upf1_2 =var_part$GTEx %>%  -->
+<!-- #   dplyr::filter(gene_name == "UPF1") %>% -->
+<!-- #   dplyr::select(-gene_name) %>%  -->
+<!-- #   column_to_rownames("EnsemblID") %>%  -->
+<!-- #   melt()  %>%  -->
+<!-- #   ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") + -->
+<!-- #   coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("UPF1 - GTEx") + -->
+<!-- #      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90), -->
+<!-- #         axis.text.y = element_text(size = 15, family = "serif", color = "black"),  -->
+<!-- #         axis.title = element_text(size=15, family = "serif"),  -->
+<!-- #          legend.box.background = element_rect(color = "black"), -->
+<!-- #           legend.text = element_text(family = "serif"),  -->
+<!-- #           legend.title = element_text( family = "serif"), -->
+<!-- #            plot.title = element_text(family = "serif", size =20),          -->
+<!-- #         panel.grid.major.x = element_blank(), -->
+<!-- #         panel.grid.major.y = element_line( size=.1 ))  -->
+<!-- # ``` -->
+<!-- # ```{r} -->
+<!-- # fmr1_2 = var_part$GTEx %>%  -->
+<!-- #   dplyr::filter(gene_name == "FMR1") %>% -->
+<!-- #   dplyr::select(-gene_name) %>%  -->
+<!-- #   column_to_rownames("EnsemblID") %>%  -->
+<!-- #   melt()  %>%  -->
+<!-- #   ggplot(aes(x=variable, y = value)) + geom_bar(stat = "identity", fill = "#F16160") + -->
+<!-- #   coord_flip() + theme_bw() + ylab("Fraction Variance Explained") + xlab("") + ggtitle("FMR1 - GTEx") + -->
+<!-- #      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90), -->
+<!-- #         axis.text.y = element_text(size = 15, family = "serif", color = "black"),  -->
+<!-- #         axis.title = element_text(size=15, family = "serif"),  -->
+<!-- #          legend.box.background = element_rect(color = "black"), -->
+<!-- #           legend.text = element_text(family = "serif"),  -->
+<!-- #           legend.title = element_text( family = "serif"), -->
+<!-- #            plot.title = element_text(family = "serif", size =20),          -->
+<!-- #         panel.grid.major.x = element_blank(), -->
+<!-- #         panel.grid.major.y = element_line( size=.1 ))  -->
+<!-- # ``` -->
+<!-- # ```{r} -->
+<!-- # ggsave(upf1_1, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-bs.svg", height = 10, width =8, units =  -->
+<!-- #          "in") -->
+<!-- # ggsave(upf1_2, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-upf1-gtex.svg", height = 10, width =8, units =  -->
+<!-- #          "in") -->
+<!-- # ggsave(fmr1_1, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-bs.svg", height = 10, width =8, units =  -->
+<!-- #          "in") -->
+<!-- #  -->
+<!-- # ggsave(fmr1_2, file= "/home/neuro/Documents/Brain_integrative_transcriptome/BITHub-preprocessing/output/Poster_plots/varPart-fmr1-gtex.svg", height = 10, width =8, units =  -->
+<!-- #          "in") -->
+<!-- # ``` -->
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.3 (2024-02-29)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0
+
+locale:
+ [1] LC_CTYPE=en_AU.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_AU.UTF-8        LC_COLLATE=en_AU.UTF-8    
+ [5] LC_MONETARY=en_AU.UTF-8    LC_MESSAGES=en_AU.UTF-8   
+ [7] LC_PAPER=en_AU.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_AU.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Australia/Adelaide
+tzcode source: system (glibc)
+
+attached base packages:
+ [1] grid      stats4    tools     stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] preprocessCore_1.64.0       ggpubr_0.6.0               
+ [3] pheatmap_1.0.12             patchwork_1.2.0            
+ [5] UpSetR_1.4.0                singscore_1.22.0           
+ [7] EnsDb.Hsapiens.v86_2.99.0   ensembldb_2.26.0           
+ [9] AnnotationFilter_1.26.0     GenomicFeatures_1.54.1     
+[11] AnnotationDbi_1.64.1        DT_0.31                    
+[13] variancePartition_1.32.2    BiocParallel_1.36.0        
+[15] limma_3.58.1                gridExtra_2.3              
+[17] pander_0.6.5                glue_1.7.0                 
+[19] ggvenn_0.1.10               recount3_1.12.0            
+[21] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+[23] GenomicRanges_1.54.1        GenomeInfoDb_1.38.5        
+[25] IRanges_2.36.0              S4Vectors_0.40.2           
+[27] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+[29] matrixStats_1.2.0           corrplot_0.92              
+[31] lubridate_1.9.3             forcats_1.0.0              
+[33] purrr_1.0.2                 readr_2.1.5                
+[35] tidyverse_2.0.0             stringr_1.5.1              
+[37] tidyr_1.3.0                 scales_1.3.0               
+[39] data.table_1.14.10          readxl_1.4.3               
+[41] tibble_3.2.1                magrittr_2.0.3             
+[43] reshape2_1.4.4              ggplot2_3.4.4              
+[45] dplyr_1.1.4                 workflowr_1.7.1            
+
+loaded via a namespace (and not attached):
+  [1] splines_4.3.3            later_1.3.2              BiocIO_1.12.0           
+  [4] bitops_1.0-7             filelock_1.0.3           R.oo_1.25.0             
+  [7] cellranger_1.1.0         graph_1.80.0             XML_3.99-0.16           
+ [10] lifecycle_1.0.4          rstatix_0.7.2            Rdpack_2.6              
+ [13] edgeR_4.0.11             rprojroot_2.0.4          processx_3.8.3          
+ [16] lattice_0.22-5           MASS_7.3-60.0.1          backports_1.4.1         
+ [19] sass_0.4.8               rmarkdown_2.25           jquerylib_0.1.4         
+ [22] yaml_2.3.8               httpuv_1.6.13            sessioninfo_1.2.2       
+ [25] RColorBrewer_1.1-3       DBI_1.2.1                minqa_1.2.6             
+ [28] abind_1.4-5              zlibbioc_1.48.0          EnvStats_2.8.1          
+ [31] R.utils_2.12.3           RCurl_1.98-1.14          rappdirs_0.3.3          
+ [34] git2r_0.33.0             GenomeInfoDbData_1.2.11  pbkrtest_0.5.2          
+ [37] annotate_1.80.0          codetools_0.2-19         DelayedArray_0.28.0     
+ [40] xml2_1.3.6               tidyselect_1.2.0         farver_2.1.1            
+ [43] lme4_1.1-35.1            BiocFileCache_2.10.1     GenomicAlignments_1.38.2
+ [46] jsonlite_1.8.8           iterators_1.0.14         progress_1.2.3          
+ [49] Rcpp_1.0.12              SparseArray_1.2.3        xfun_0.41               
+ [52] withr_3.0.0              numDeriv_2016.8-1.1      fastmap_1.1.1           
+ [55] boot_1.3-28.1            fansi_1.0.6              callr_3.7.3             
+ [58] caTools_1.18.2           digest_0.6.34            timechange_0.3.0        
+ [61] R6_2.5.1                 colorspace_2.1-0         gtools_3.9.5            
+ [64] biomaRt_2.58.0           RSQLite_2.3.5            R.methodsS3_1.8.2       
+ [67] RhpcBLASctl_0.23-42      utf8_1.2.4               generics_0.1.3          
+ [70] corpcor_1.6.10           rtracklayer_1.62.0       prettyunits_1.2.0       
+ [73] httr_1.4.7               htmlwidgets_1.6.4        S4Arrays_1.2.0          
+ [76] whisker_0.4.1            pkgconfig_2.0.3          gtable_0.3.4            
+ [79] blob_1.2.4               XVector_0.42.0           remaCor_0.0.16          
+ [82] htmltools_0.5.7          carData_3.0-5            GSEABase_1.64.0         
+ [85] ProtGenerics_1.34.0      png_0.1-8                fANCOVA_0.6-1           
+ [88] knitr_1.45               rstudioapi_0.15.0        tzdb_0.4.0              
+ [91] rjson_0.2.21             nlme_3.1-164             curl_5.2.0              
+ [94] nloptr_2.0.3             cachem_1.0.8             KernSmooth_2.23-22      
+ [97] parallel_4.3.3           restfulr_0.0.15          pillar_1.9.0            
+[100] vctrs_0.6.5              gplots_3.1.3             promises_1.2.1          
+[103] car_3.1-2                dbplyr_2.4.0             xtable_1.8-4            
+[106] evaluate_0.23            locfit_1.5-9.8           mvtnorm_1.2-4           
+[109] cli_3.6.2                compiler_4.3.3           Rsamtools_2.18.0        
+[112] rlang_1.1.3              crayon_1.5.2             ggsignif_0.6.4          
+[115] labeling_0.4.3           ps_1.7.6                 getPass_0.2-4           
+[118] plyr_1.8.9               fs_1.6.3                 stringi_1.8.3           
+[121] lmerTest_3.1-3           munsell_0.5.0            Biostrings_2.70.1       
+[124] lazyeval_0.2.2           aod_1.3.3                Matrix_1.6-5            
+[127] hms_1.1.3                bit64_4.0.5              KEGGREST_1.42.0         
+[130] statmod_1.5.0            highr_0.10               rbibutils_2.2.16        
+[133] broom_1.0.5              memoise_2.0.1            bslib_0.6.1             
+[136] bit_4.0.5               </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

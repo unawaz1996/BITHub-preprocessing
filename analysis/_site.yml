@@ -9,10 +9,13 @@ navbar:
     menu:
     - text: Bulk RNA-seq datasets
       href: 01-bulk-preprocess-data.html
-  -   text: Dataset characteristics
+  - text: Dataset characteristics
+    menu:
+    - text: Metadata attributes
       href: 03-metadata-attributes.html
-  -   text: Deconvolution of bulk RNA-seq datasets
+    - text: Deconvolution of bulk RNA-seq datasets
       href: 04-bulk-deconvolution.html
+    - text: Drivers of variation
   right:
   - icon: fab fa-github
     text: Source code
