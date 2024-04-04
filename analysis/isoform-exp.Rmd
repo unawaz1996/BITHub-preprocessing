@@ -158,12 +158,12 @@ zmynd8_heatmap_gtex = gtex_trans %>%
   dplyr::select(-gene_id) %>% 
   dplyr::select(contains(md$SampleID))
 
-dim(zmynd8_heatmap)
+dim(zmynd8_heatmap_gtex)
 
 #StructureAcronym
 
 
-average = with(md, setNames(StructureAcronym, SampleID))[names(zmynd8_heatmap_gtex)[col(zmynd8_heatmap_GTEx)]]
+average = with(md, setNames(StructureAcronym, SampleID))[names(zmynd8_heatmap_gtex)[col(zmynd8_heatmap_gtex)]]
 
 average_exp = tapply(unlist(zmynd8_heatmap_gtex), list(row(zmynd8_heatmap_gtex), average ), mean)
 
@@ -174,13 +174,16 @@ tx_order = c("ENST00000345865",  "ENST00000636792", "ENST00000276201", "ENST0000
 average_exp = average_exp[match(tx_order , rownames(average_exp)), ]
 
 
-pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = TRUE, 
+pheatmap(log(average_exp + 0.05), scale = "none", cluster_rows = FALSE, 
          cluster_cols= FALSE,cellwidth = 10, cellheight = 10, border_color = "grey", 
          color= palette)
 
 
 a <- with(df_category, setNames(Category, Col_name))[names(df)[col(df)]]
 tapply(unlist(df), list(row(df), a), mean)
+
+
+ggsave(filename = here::here("output/Thesis_plots/Examples/NDDs/UPF3B-GTEx.svg"), height = 8, width =18)
 ```
 
 
