@@ -42,8 +42,8 @@ The following Rmarkdown files are provided:
 `01-bulk-preprocess-data.Rmd` | This file contains the detailed analysis of preprocessing metadata and expression matrices of the bulk RNA-seq datasets listed in Table 1. The input of each file is the expression matrix as provided by each given dataset / database, and original metadata. The output is a harmonised metadata, whereby consistent naming conventions for metadata variables across datasets are adopted. In addition, consistent brain related nonemclature and developmental stages with respect to sample information are also provided. Full details are [Metadata annotation](#metadata-annotation) | [bulk preprocess code](https://urwahnawaz.github.io/BITHub-preprocessing/01-bulk-preprocess-data.html) |
 |`02-snRNA-seq-preprocess.Rmd` |||
 |`03-metadata-attributes.Rmd` || [Metadata attributes notebook](https://urwahnawaz.github.io/BITHub-preprocessing/03-metadata-attributes.html)|
-||||
-||||
+|`04-bulk-deconvolution.Rmd`|||
+|`05-variation-drivers.Rmd`|||
 
 
 ## Metadata annotation
