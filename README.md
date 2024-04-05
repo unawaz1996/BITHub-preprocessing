@@ -87,3 +87,4 @@ The brain structures were divided into 4 main categories (regions):` Cortex`, `S
 
 ## Normalization 
 To allow direct comparison of datasets with different normalizations, datasets have `z-score transformed mean log2 expression values`. 
+Log2 --> Mean --> Zscore
